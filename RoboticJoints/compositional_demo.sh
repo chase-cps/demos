@@ -1,10 +1,9 @@
 #!/bin/sh
 
-SLUGSCOMPILER=$1
-WD=$2
+WD=$1
 
-if test "$#" -ne 2; then
-    echo "Two parameters required: 1. slugs compiler path, and 2. working directory"
+if test "$#" -ne 1; then
+    echo "One parameters required: working directory"
     exit
 fi
 

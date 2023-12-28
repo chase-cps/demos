@@ -20,10 +20,10 @@ blackn () {
 
 less specs.ltl
 clear && red "Verification of the refinement relation"
-blackn "COMPOSITIONAL MODEL DEMO >> logics_frontend -i specs.ltl -o workdir -c verification.chase"
+blackn "COMPOSITIONAL MODEL DEMO >> logics_tool -i specs.ltl -o workdir -c verification.chase"
 read ans
 
-logics_frontend -i specs.ltl -o workdir -c verification.chase -V
+logics_tool -i specs.ltl -o workdir -c verification.chase -V
 
 red "Run NuSMV to verify refinement"
 ref=`nuxmv workdir/refinement.smv | egrep "is true" | wc -l `
@@ -33,9 +33,9 @@ then
     black "Refinement Check: OK"
     red "Synthesis of the control strategies"
 
-    blackn "COMPOSITIONAL MODEL DEMO >> logics_frontend -i specs.ltl -o workdir -c synthesis.chase"
+    blackn "COMPOSITIONAL MODEL DEMO >> logics_tool -i specs.ltl -o workdir -c synthesis.chase"
     read ans
-    logics_frontend -i specs.ltl -o workdir -c synthesis.chase
+    logics_tool -i specs.ltl -o workdir -c synthesis.chase
 
     python3 /home/lora/third_party/slugs/tools/StructuredSlugsParser/compiler.py \
         workdir/joint1.structuredSlugs > workdir/joint1.slugsin

@@ -41,7 +41,7 @@ read ans
 echo
 echo
 
-echo -n "$> dsl_tool -i template_0_unrealizable.txt -o $WD/unrealizable.structuredSlugs"
+echo -n "$> dsl_tool -i template_0_realizable.txt -o $WD/realizable.structuredSlugs"
 read ans
 dsl_tool -i template_0_realizable.txt -o $WD/realizable.spc -b gr1c
 gr1c -r $WD/realizable.spc
