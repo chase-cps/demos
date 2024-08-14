@@ -1,0 +1,86 @@
+TYPES
+warehouse: Source(Iron);
+conveyor: Bus(Iron);
+pipe: Bus(Coin);
+machine: Converter(Iron, Coin);
+bay: Sink(Coin);
+gate: Switch;
+
+
+COMPONENTS
+
+central warehouse:  1;
+main conveyor:      2;
+secondary conveyor: 2;
+main machine:       2;
+main pipe:          2;
+secondary pipe:     1;
+output bay:         2;
+
+gate: *;
+
+
+ABBREVIATIONS
+central warehouse 1:    CW;
+main conveyor 1:        MC1;
+main conveyor 2:        MC2;
+secondary conveyor 1:   SC1;
+secondary conveyor 2:   SC2;
+main machine 1:         M1;
+main machine 2:         M2;
+main pipe 1:            MP1;
+main pipe 2:            MP2;
+output bay 1:           B1;
+output bay 2:           B2;
+
+
+CONNECTIONS
+
+CW -(gate 1)> MC1;
+CW -(gate 2)> MC2;
+CW -(gate 3)> SC1;
+CW -(gate 4)> SC2;
+
+MC1 -(gate 5)> M1;
+MC2 -(gate 6)> M2;
+SC1 -(gate 7)> M1;
+SC2 -(gate 8)> M2;
+
+M1 -(gate 9)> MP1;
+M2 -(gate 10)> MP2;
+
+UNSWITCHED
+MP1 -> B1;
+MP2 -> B2;
+
+REQUIREMENTS
+never-connect(conveyor, conveyor, central warehouse);
+never-connect(conveyor, conveyor, main machine);
+never-connect(machine, machine, pipe);
+
+must-disconnect-failed(main conveyor, 20, MS);
+
+never-disconnect(output bay 1, warehouse, 30, MS);
+never-disconnect(output bay 2, warehouse, 30, MS);
+
+ASSUMPTIONS
+no-failures(central warehouse);
+no-failures(secondary conveyor);
+no-failures(main machine);
+no-failures(main pipe);
+no-failures(secondary pipe);
+no-failures(output bay);
+no-control(central warehouse);
+no-control(main conveyor);
+no-control(secondary conveyor);
+no-control(main machine);
+no-control(main pipe);
+no-control(secondary pipe);
+no-control(output bay);
+
+switch-on-time(gate, 10, MS);
+switch-off-time(gate, 10, MS);
+
+max-failures(main conveyor, 2);
+
+
