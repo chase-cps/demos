@@ -35,7 +35,10 @@ read ans
 logics_tool -i specs.ltl -o $WD -c verification.chase -V
 
 red "Run nuXmv to verify refinement"
-ref=`nuXmv $WD/refinement.smv | egrep "is true" | wc -l `
+# IC3 proves the two properties in seconds (the default BDD engine takes much longer).
+printf 'read_model -i %s\nflatten_hierarchy\nencode_variables\nbuild_boolean_model\ncheck_ltlspec_ic3\nquit\n' \
+    $WD/refinement.smv > $WD/refinement.cmd
+ref=`nuXmv -source $WD/refinement.cmd | egrep "is true" | wc -l `
 
 if test $ref -eq 2
 then
