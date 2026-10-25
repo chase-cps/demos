@@ -91,10 +91,11 @@ def arm(n: int) -> Contract:
                                  guarantees=guarantees, name="Joints")
 
 
-def compose_joints(n: int, broken: bool = False) -> Contract:
+def compose_joints(n: int, broken: bool = False, discharge: bool = False,
+                   backend: str = "auto") -> Contract:
     system = joint(1, broken)
     for i in range(2, n + 1):
-        system = system.compose(joint(i))
+        system = system.compose(joint(i), discharge=discharge, backend=backend)
     return system
 
 
@@ -110,9 +111,9 @@ def backend_version(backend: str) -> str:
     return m.group(1) if m else ""
 
 
-def check(n: int, broken: bool, backend: str, timeout: float):
+def check(n: int, broken: bool, backend: str, timeout: float, discharge: bool = False):
     start = time.monotonic()
-    system = compose_joints(n, broken)
+    system = compose_joints(n, broken, discharge, backend)
     composed = time.monotonic() - start
     r = refines(system, arm(n), backend, timeout=timeout)
     seconds = r.assumptions.seconds + r.guarantees.seconds
@@ -122,15 +123,16 @@ def check(n: int, broken: bool, backend: str, timeout: float):
     return r, composed, seconds, verdict
 
 
-def run(n: int, broken: bool, backend: str, timeout: float) -> dict:
+def run(n: int, broken: bool, backend: str, timeout: float, discharge: bool = False) -> dict:
     """One row: the correct version, then the broken one with --broken."""
-    r, composed, seconds, verdict = check(n, False, backend, timeout)
+    r, composed, seconds, verdict = check(n, False, backend, timeout, discharge)
     used = r.guarantees.backend or r.assumptions.backend or ""
-    row = {"N": n, "compose_s": round(composed, 3), "refine_s": round(seconds, 3),
+    row = {"N": n, "composition": "discharge" if discharge else "closed",
+           "compose_s": round(composed, 3), "refine_s": round(seconds, 3),
            "verdict": verdict, "cex_s": "", "cex_length": "", "cex_verdict": "",
            "backend": used, "backend_version": backend_version(used)}
     if broken:
-        r, _, seconds, verdict = check(n, True, backend, timeout)
+        r, _, seconds, verdict = check(n, True, backend, timeout, discharge)
         part = r.assumptions if r.failed == "assumptions" else r.guarantees
         row["cex_s"] = round(seconds, 3)
         row["cex_verdict"] = verdict
@@ -147,6 +149,9 @@ def main(argv=None) -> int:
                    help="seconds for each implication check (default 600)")
     p.add_argument("--broken", action="store_true",
                    help="also check the version where Joint1 lacks G F j1_done")
+    p.add_argument("--discharge", action="store_true",
+                   help="compose with discharge=True (keep the terms) instead of the "
+                        "closed form")
     p.add_argument("--csv", help="write the results to this file")
     p.add_argument("--expect", action="store_true",
                    help="exit with 1 unless every correct version is valid and every "
@@ -157,7 +162,7 @@ def main(argv=None) -> int:
     print(f"{'N':>3} {'compose_s':>9} {'refine_s':>9} {'verdict':>8} {'cex_s':>8} "
           f"{'cex_length':>10} {'backend':>10}")
     for n in args.joints:
-        row = run(n, args.broken, args.backend, args.timeout)
+        row = run(n, args.broken, args.backend, args.timeout, args.discharge)
         rows.append(row)
         print(f"{row['N']:>3} {row['compose_s']:>9} {row['refine_s']:>9} {row['verdict']:>8} "
               f"{row['cex_s']:>8} {row['cex_length']:>10} {row['backend']:>10}", flush=True)

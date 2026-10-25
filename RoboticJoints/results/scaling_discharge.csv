@@ -1,0 +1,9 @@
+N,composition,compose_s,refine_s,verdict,cex_s,cex_length,cex_verdict,backend,backend_version
+1,discharge,0.0,0.169,valid,0.168,3,invalid,nuxmv/ic3,nuXmv 2.2.0
+2,discharge,2.358,0.392,valid,0.401,3,invalid,nuxmv/ic3,nuXmv 2.2.0
+3,discharge,7.21,0.726,valid,0.68,3,invalid,nuxmv/ic3,nuXmv 2.2.0
+4,discharge,16.372,1.173,valid,1.011,3,invalid,nuxmv/ic3,nuXmv 2.2.0
+5,discharge,32.318,1.618,valid,1.523,3,invalid,nuxmv/ic3,nuXmv 2.2.0
+6,discharge,55.478,2.22,valid,1.968,3,invalid,nuxmv/ic3,nuXmv 2.2.0
+7,discharge,91.095,2.744,valid,2.546,3,invalid,nuxmv/ic3,nuXmv 2.2.0
+8,discharge,139.526,3.313,valid,3.315,3,invalid,nuxmv/ic3,nuXmv 2.2.0
