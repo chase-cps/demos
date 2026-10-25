@@ -99,13 +99,13 @@ or viceversa. To do this:
 
 Once back to the system console:
 
-`$> NuSMV /tmp/TM.smv`
+`$> nuXmv /tmp/TM.smv`
 
 The second formula is false, then _Target_ do not refine _Mission_.
 
 Then:
 
-`$> NuSMV /tmp/MT.smv`
+`$> nuXmv /tmp/MT.smv`
 
 Both formulas are true. _Mission_ refines _Target_.
 
@@ -129,11 +129,13 @@ _System_ contract.
 
 `$> verify System system`
 
-The last command generates the `system.smv` to be used in NuSMV to verify
-the consistency and the compatibility of the contract:
+The last command generates the `system.smv` to be used in nuXmv to verify
+the consistency and the compatibility of the contract. The properties are
+expected to be false, and bounded model checking (`-bmc`) finds the
+counterexamples at once:
 
 `$> exit`\
-`$> NuSMV /tmp/system.smv`
+`$> nuXmv -bmc /tmp/system.smv`
 
 For both assertions, the model checker returns a counter strategy: the
 contract is consistent and compatible.

@@ -25,8 +25,8 @@ read ans
 
 logics_tool -i specs.ltl -o workdir -c verification.chase -V
 
-red "Run NuSMV to verify refinement"
-ref=`nuxmv workdir/refinement.smv | egrep "is true" | wc -l `
+red "Run nuXmv to verify refinement"
+ref=`nuXmv workdir/refinement.smv | egrep "is true" | wc -l `
 
 if test $ref -eq 2
 then

@@ -34,8 +34,8 @@ read ans
 
 logics_tool -i specs.ltl -o $WD -c verification.chase -V
 
-red "Run NuSMV to verify refinement"
-ref=`nuxmv $WD/refinement.smv | egrep "is true" | wc -l `
+red "Run nuXmv to verify refinement"
+ref=`nuXmv $WD/refinement.smv | egrep "is true" | wc -l `
 
 if test $ref -eq 2
 then

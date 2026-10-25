@@ -14,7 +14,7 @@ This repository contains the demonstrations of [CHASE][WEB]:
     package and measures the time of the refinement check.
 - **FDL2024**: DSL specification of a small factory.
 
-The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `NuSMV` to
+The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository.
 
