@@ -22,7 +22,7 @@ import csv
 import sys
 import time
 
-from chase_cps import Contract, refinement
+from chase_cps import Contract, refines
 
 ANGLE = (0, 4)
 CMD = (0, 2)
@@ -97,7 +97,7 @@ def run(n: int, broken: bool, backend: str, timeout: float) -> dict:
     start = time.monotonic()
     system = compose_joints(n, broken)
     composed = time.monotonic() - start
-    r = refinement(system, arm(n), backend, timeout=timeout)
+    r = refines(system, arm(n), backend, timeout=timeout)
     return {"joints": n, "version": "broken" if broken else "correct",
             "status": r.status, "failed": r.failed or "",
             "backend": r.guarantees.backend or r.assumptions.backend,
