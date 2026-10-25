@@ -7,9 +7,9 @@ Specific Language (DSL) provided with the framework, or using the Logic-based
 language available in CHASE.
 
 ### Content of the directory
-The directory of the demo is organized into two subdirectories:
-- `bin/`: contains some utility scripts to use synthesis toolchains.
-- `specs/`: contains the specification files to be used during the demo.
+The directory of the demo contains:
+- `specs/`: the specification files to be used during the demo;
+- `solution.script`: the commands of the logics-based flow.
 
 ### DSL-based Flow
 
@@ -51,15 +51,16 @@ fourth requirements with the following:
 - Failed generators must be disconnected within 20 ms
 - A DC bus shall never be unpowered for more than 30 ms
 
-The file `specs/template_0_realizable.txt` specifies these requirements.
-Thus, first let's verify its realizability and try to synthesize it. For 
-this step, let's use the utilities scripts:
+The file `specs/template_0_synthesizable.txt` specifies these requirements.
+Thus, first let's verify its realizability and try to synthesize it:
 
-`$> dsl_tool -i specs/template_0_synthesizable.txt -o /tmp/template_0 -b gr1c`
-`$> bash bin/synthesize_gr1c /tmp/template_0`
+`$> dsl_tool -i specs/template_0_synthesizable.txt -o /tmp/template_0 -b gr1c`\
+`$> gr1c -r /tmp/template_0.spc`\
+`Realizable.`\
+`$> gr1c -t dot /tmp/template_0.spc > /tmp/template_0.dot`
 
-The last command, will generate a graphical representation of the
-Mealy Machine implementing the control strategy for the system.
+The last command will generate a graphical representation (in the _dot_
+format) of the Mealy Machine implementing the control strategy for the system.
 
 ### Logic-based Flow
 
@@ -69,9 +70,9 @@ The system being modeled is a robotic arm, which has to pick, turn and place
 a piece of material.
 
 The formalization is provided in `specs/robotic_arm.ltl`.
-The specification is manipulated using the `logics_frontend`:
+The specification is manipulated using the `logics_tool`:
 
-`logics_frontend -i specs/robotic_arm.ltl -o /tmp/`
+`logics_tool -i specs/robotic_arm.ltl -o /tmp/`
 
 The command will open the front-end console, which provides a set of commands
 that can be seen by using the `help` command.
@@ -104,16 +105,16 @@ The second formula is false, then _Target_ do not refine _Mission_.
 
 Then:
 
-`$> NuSMV /tmp/MT.SMV`
+`$> NuSMV /tmp/MT.smv`
 
 Both formulas are true. _Mission_ refines _Target_.
 
 Then, it is possible to compose the system to create the complete specification.
-To do this, it is necessary to re-open the logics frontend:
+To do this, it is necessary to re-open the logics tool:
 
-`$> logics_frontend -i specs/robotic_arm.ltl -o /tmp/`
+`$> logics_tool -i specs/robotic_arm.ltl -o /tmp/`
 
-The objective is to compose the system by using the logics frontend.
+The objective is to compose the system by using the logics tool.
   
 `$> compose Mission Coordinator Top`\
 `$> verify Top top`\
@@ -145,7 +146,7 @@ This command will generate a _dot_ representation of the Finite State Machine
 implementing the controller implementing the coordinator specification.
 
 The file `solution.script` is a script specifying all the commands for the
-logics frontend. The script will produce the files: `MT.smv`, `TM.smv`,
+logics tool. The script will produce the files: `MT.smv`, `TM.smv`,
 `system.smv`, and `coordinator.spc` in the chosen output directory.
 
 ### References
