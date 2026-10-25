@@ -10,6 +10,8 @@ This repository contains the demonstrations of [CHASE][WEB]:
     verification and synthesis of the controller of a robotic arm, using both
     a single model and a compositional model.
 - **RoboticJoints**: extended version of the robotic arm demonstration.
+    `scaling.py` builds the same contracts for N joints with the CHASE Python
+    package and measures the time of the refinement check.
 - **FDL2024**: DSL specification of a small factory.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `NuSMV` to
