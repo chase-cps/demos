@@ -1,0 +1,96 @@
+NAME: Charger;
+
+# Two robots share a charging station. Robot i asks for the station
+# (req_i) when its battery is low (low_i); an arbiter grants it (grant_i).
+
+CONTRACT Robot1:
+    input boolean variable low1;
+    input boolean variable grant1;
+    output boolean variable req1;
+    Assumptions:
+        G(F(grant1 | !req1));
+    Guarantees:
+        !req1;
+        G(low1 -> X(req1));
+        G(!low1 -> X(!req1));
+
+CONTRACT Robot2:
+    input boolean variable low2;
+    input boolean variable grant2;
+    output boolean variable req2;
+    Assumptions:
+        G(F(grant2 | !req2));
+    Guarantees:
+        !req2;
+        G(low2 -> X(req2));
+        G(!low2 -> X(!req2));
+
+# First arbiter: each request is granted at the next step.
+CONTRACT Greedy:
+    input boolean variable req1;
+    input boolean variable req2;
+    output boolean variable grant1;
+    output boolean variable grant2;
+    Assumptions:
+        true;
+    Guarantees:
+        !grant1;
+        !grant2;
+        G(req1 -> X(grant1));
+        G(req2 -> X(grant2));
+        G(!(grant1 & grant2));
+
+# Second arbiter: each request is granted eventually.
+CONTRACT Fair:
+    input boolean variable req1;
+    input boolean variable req2;
+    output boolean variable grant1;
+    output boolean variable grant2;
+    Assumptions:
+        true;
+    Guarantees:
+        !grant1;
+        !grant2;
+        G(!(grant1 & grant2));
+        G(F(grant1 | !req1));
+        G(F(grant2 | !req2));
+        G(F(grant1 | !req1 | grant2));
+
+# An arbiter that assumes that robot 1 drops its request after any grant.
+CONTRACT Pushy:
+    input boolean variable req1;
+    input boolean variable req2;
+    output boolean variable grant1;
+    output boolean variable grant2;
+    Assumptions:
+        G(F(req1));
+        G(grant1 -> X(!req1));
+    Guarantees:
+        G(!(grant1 & grant2));
+
+# The same, but robot 1 drops its request only after a grant of it.
+CONTRACT Polite:
+    input boolean variable req1;
+    input boolean variable req2;
+    output boolean variable grant1;
+    output boolean variable grant2;
+    Assumptions:
+        G(F(req1));
+        G((req1 & grant1) -> X(!req1));
+    Guarantees:
+        G(!(grant1 & grant2));
+
+# What the whole system must do.
+CONTRACT System:
+    input boolean variable low1;
+    input boolean variable low2;
+    output boolean variable req1;
+    output boolean variable req2;
+    output boolean variable grant1;
+    output boolean variable grant2;
+    Assumptions:
+        true;
+    Guarantees:
+        G(F(grant1 | !req1));
+        G(F(grant2 | !req2));
+        G(!(grant1 & grant2));
