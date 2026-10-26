@@ -1,0 +1,65 @@
+Requirements of the LPC_mini project of the FRET case study Lift-Plus-Cruise
+(https://github.com/NASA-SW-VnV/fret, caseStudies/LiftPlusCruise), in
+FRETish. All the variables are outputs of the vehicle.
+
+Variables
+    kias                 airspeed (real)
+    kgs                  ground speed (real)
+    hover_control_mode   Boolean
+    lift_mode            thrust_borne, semi_thrust_borne, semi_wing_borne,
+                         or wing_borne
+
+Requirements
+    LPC_TB_STAY_ON_NEXT
+        Whenever lift_mode = thrust_borne & kgs <= 20.0 & hover_control_mode the
+        vehicle shall at the next timepoint satisfy lift_mode = thrust_borne
+    LPC_STB_STAY_ON_NEXT
+        Whenever lift_mode = semi_thrust_borne & kias <= 40.0 & (kgs > 20.0 |
+        !hover_control_mode) the vehicle shall at the next timepoint satisfy
+        lift_mode = semi_thrust_borne
+    LPC_SWB_TO_STB
+        Upon lift_mode = semi_wing_borne & kias <= 30.0 the vehicle shall at the
+        next timepoint satisfy lift_mode = semi_thrust_borne
+    LPC_STB_TO_SWB
+        Upon lift_mode = semi_thrust_borne & kias > 40.0 the vehicle shall at
+        the next timepoint satisfy lift_mode = semi_wing_borne
+    LPC_STB_TO_TB
+        Upon lift_mode = semi_thrust_borne & hover_control_mode & kgs <= 20.0
+        the vehicle shall at the next timepoint satisfy lift_mode = thrust_borne
+    LPC_SWB_TO_WB
+        Upon lift_mode = semi_wing_borne & kias > 100.0 the vehicle shall at the
+        next timepoint satisfy lift_mode = wing_borne
+    LPC_TB_TO_STB
+        Upon lift_mode = thrust_borne & (!hover_control_mode | kgs > 20.0) the
+        vehicle shall at the next timepoint satisfy lift_mode =
+        semi_thrust_borne
+    LPC_INIT_LIFT_MODE
+        The vehicle shall immediately satisfy lift_mode = wing_borne <=> kias >=
+        90.0
+    LPC_LIFT_MODE
+        The vehicle shall always satisfy lift_mode = thrust_borne | lift_mode =
+        semi_thrust_borne | lift_mode = semi_wing_borne | lift_mode = wing_borne
+    LPC_INIT_KIAS
+        The vehicle shall immediately satisfy kias = 120.0
+    LPC_KIAS_KGS
+        The vehicle shall always satisfy kias = kgs
+    LPC_KIAS_DERIVATIVE
+        The vehicle shall always satisfy FTP | absReal(preReal(0.0, kias) -
+        kias) <= 10.0
+    LPC_WB_TO_SWB
+        Upon lift_mode = wing_borne & kias <= 90.0 the vehicle shall at the next
+        timepoint satisfy lift_mode = semi_wing_borne
+    LPC_INIT_HOVER_MODE
+        The vehicle shall immediately satisfy hover_control_mode <=> kgs < 20.0
+    LPC_KIAS_0
+        The vehicle shall always satisfy kias >= 0.0
+    LPC_SWB_STAY_ON_NEXT
+        Whenever lift_mode = semi_wing_borne & kias <= 100.0 & kias > 30.0 the
+        vehicle shall at the next timepoint satisfy lift_mode = semi_wing_borne
+    LPC_WB_STAY_ON_NEXT
+        Whenever lift_mode = wing_borne & kias > 90.0 the vehicle shall at the
+        next timepoint satisfy lift_mode = wing_borne
+    LPC_REACH_HOVER_12
+        The vehicle shall within 12 ticks satisfy lift_mode = thrust_borne
+    LPC_REACH_HOVER_06
+        The vehicle shall within 6 ticks satisfy lift_mode = thrust_borne

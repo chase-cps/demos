@@ -1,0 +1,37 @@
+Two robots share a charging station. An arbiter gives the station to the
+robots.
+
+Variables
+    low1, low2        the battery of robot 1 (2) is low (environment)
+    req1, req2        robot 1 (2) asks for the station (robots)
+    grant1, grant2    the station is given to robot 1 (2) (arbiter)
+
+Robot i (i = 1, 2)
+    R1.i  The robot does not ask for the station at the start.
+    R2.i  When its battery is low, the robot asks for the station at the next
+          step.
+    R3.i  When its battery is not low, the robot does not ask for the station
+          at the next step.
+    A1.i  (assumption) The robot is given the station, or does not ask for
+          it, infinitely often.
+
+Arbiter
+    R4.i  The station is not given to robot i at the start.
+    R5    The station is never given to both robots.
+    R6.i  (Greedy) When robot i asks for the station, it is given the station
+          at the next step.
+    R7.i  (Fair) Robot i is given the station, or does not ask for it,
+          infinitely often.
+    R8    (Fair) Robot 1 is given the station, robot 1 does not ask for it, or
+          robot 2 is given the station, infinitely often.
+    A2    (Pushy, Polite; assumption) Robot 1 asks for the station infinitely
+          often.
+    A3    (Pushy; assumption) After robot 1 is given the station, it does not
+          ask for it at the next step.
+    A4    (Polite; assumption) After robot 1 is given the station it asked
+          for, it does not ask for it at the next step.
+
+System
+    S1.i  Robot i is given the station, or does not ask for it, infinitely
+          often.
+    S2    The station is never given to both robots.

@@ -1,9 +1,10 @@
 """Charging station: finding and fixing the problems of the requirements.
 
 Two robots share a charging station through an arbiter. charger.ltl has the
-contracts of the robots, of four arbiters, and of the whole system. This
-script follows one design iteration with the CHASE Python package
-(pip install chase-cps):
+contracts of the robots, of four arbiters, and of the whole system; the
+requirements are in requirements.txt. This script follows one design
+iteration with the CHASE Python package (pip install chase-cps), and gives
+the cores by the numbers of the requirements:
 
   1. The Greedy arbiter grants each request at the next step and never
      grants both robots: it is unrealizable, and the unrealizable core gives
@@ -26,13 +27,15 @@ script follows one design iteration with the CHASE Python package
     python charger.py --expect     # exit code 1 when a result is not the expected one
 
 The checks need slugs (realizability, synthesis, well-separation) and nuXmv
-or NuSMV (vacuity, discharge, refinement).
+or NuSMV (vacuity, discharge, refinement). charger.chase does steps 1, 2,
+and 5 with logics_tool (see Charger.md).
 """
 
 from __future__ import annotations
 
 import argparse
 import os
+import re
 import sys
 import time
 
@@ -40,10 +43,33 @@ from chase_cps import (load_spec, is_realizable, synthesize, is_well_separated,
                        remove_vacuous, refines, ltl)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+SPEC = os.path.join(HERE, "charger.ltl")
 
 
-def terms(formulas) -> str:
-    return "\n".join("      " + ltl.to_str(f) for f in formulas)
+def numbers(path: str) -> dict[str, dict[str, str]]:
+    """The number of each term of each contract: the comment at the end of
+    its line in the specification file."""
+    out, contract = {}, None
+    for line in open(path):
+        m = re.match(r"CONTRACT (\w+):", line)
+        if m:
+            contract = m.group(1)
+            out[contract] = {}
+        m = re.match(r"\s*(.+);\s*# (\S+)\s*$", line)
+        if m and contract:
+            out[contract][ltl.to_str(ltl.parse(m.group(1)))] = m.group(2)
+    return out
+
+
+NUMBERS = numbers(SPEC)
+
+
+def number(f, contract: str) -> str:
+    return NUMBERS.get(contract, {}).get(ltl.to_str(f), "")
+
+
+def terms(formulas, contract: str) -> str:
+    return "\n".join(f"      {number(f, contract):6}{ltl.to_str(f)}" for f in formulas)
 
 
 def main() -> int:
@@ -53,7 +79,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=float, default=120.0,
                         help="time limit of each check, in seconds")
     args = parser.parse_args()
-    c = load_spec(os.path.join(HERE, "charger.ltl"))
+    c = load_spec(SPEC)
     t = args.timeout
     wrong = []
 
@@ -72,7 +98,7 @@ def main() -> int:
         r = is_realizable(c["Greedy"], core=True, timeout=t)
         text = ""
         if r.core is not None and r.core.status == "found":
-            text = "   unrealizable core:\n" + terms(r.core.core.guarantees)
+            text = "   unrealizable core:\n" + terms(r.core.core.guarantees, "Greedy")
         return r.status, text
     step("1. Greedy is realizable", "unrealizable", greedy)
 
@@ -94,7 +120,7 @@ def main() -> int:
         text = ""
         if r.core is not None and r.core.status == "found":
             text = ("   the arbiter can force a violation of these assumptions:\n"
-                    + terms(r.core.core.assumptions))
+                    + terms(r.core.core.assumptions, "Pushy"))
         return r.status, text
     step("3. Pushy is well separated", "not_separated", pushy)
     step("   Polite is well separated", "separated",
@@ -102,8 +128,9 @@ def main() -> int:
 
     def vacuous():
         v = remove_vacuous(c["Fair"], core=True, timeout=t)
-        text = "\n".join(f"   removed {x.part} {ltl.to_str(x.term)} ({x.kind}),"
-                         f" implied by {', '.join(ltl.to_str(f) for f in x.core or [])}"
+        text = "\n".join(f"   removed {x.part} {number(x.term, 'Fair')} {ltl.to_str(x.term)}"
+                         f" ({x.kind}), implied by "
+                         + ", ".join(f"{number(f, 'Fair')} {ltl.to_str(f)}" for f in x.core or [])
                          for x in v.removed)
         return f"{len(v.removed)} removed", text
     step("4. Vacuous terms of Fair", "1 removed", vacuous)
@@ -114,7 +141,7 @@ def main() -> int:
         charging = charging.compose(c["Robot2"], name="Charging", discharge=True, timeout=t)
         r = refines(charging, c["System"], timeout=t)
         text = ("   composition with discharge:\n   assumptions:\n"
-                + (terms(charging.assumptions) or "      (none)")
+                + (terms(charging.assumptions, "Charging") or "      (none)")
                 + f"\n   {len(charging.guarantees)} guarantees")
         return r.status, text
     step("5. Fair, Robot1, Robot2 refine System", "valid", composition)

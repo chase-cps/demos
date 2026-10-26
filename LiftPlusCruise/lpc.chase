@@ -1,0 +1,7 @@
+saturate Vehicle;
+saturate Reach12;
+saturate Reach06;
+conjoin Vehicle Reach12 Vehicle12;
+conjoin Vehicle Reach06 Vehicle06;
+verify Vehicle12 vehicle12.smv;
+verify Vehicle06 vehicle06.smv;

@@ -1,0 +1,9 @@
+synthesize Greedy greedy.structuredSlugs;
+synthesize Fair fair.structuredSlugs;
+saturate Robot1;
+saturate Robot2;
+saturate Fair;
+saturate System;
+compose Fair Robot1 FairRobot1;
+compose FairRobot1 Robot2 Charging;
+refinement Charging System refinement.smv;

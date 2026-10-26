@@ -1,0 +1,90 @@
+NAME: LiftPlusCruise;
+
+# Requirements of the LPC_mini project of the FRET case study
+# Lift-Plus-Cruise (https://github.com/NASA-SW-VnV/fret, caseStudies/
+# LiftPlusCruise), written by hand in the CHASE language from the future
+# time LTL that FRET gives for them. The text of each requirement is in
+# requirements.txt; the comment at the end of a line is its name. A
+# requirement "upon T ... at the next timepoint R" is written on two lines:
+# at the start, and when T becomes true.
+
+# The lift modes.
+integer constant thrust_borne 0;
+integer constant semi_thrust_borne 1;
+integer constant semi_wing_borne 2;
+integer constant wing_borne 3;
+
+# All the requirements but the two LPC_REACH_HOVER ones.
+CONTRACT Vehicle:
+    output real variable kias;
+    output real variable kgs;
+    output boolean variable hover_control_mode;
+    output integer (0:3) variable lift_mode;
+    Assumptions:
+        true;
+    Guarantees:
+        G(((lift_mode = thrust_borne) & (kgs <= 20.0) & hover_control_mode) -> X(lift_mode = thrust_borne)); # LPC_TB_STAY_ON_NEXT
+        G(((lift_mode = semi_thrust_borne) & (kias <= 40.0) & ((kgs > 20.0) | !hover_control_mode)) -> X(lift_mode = semi_thrust_borne)); # LPC_STB_STAY_ON_NEXT
+        G((!((lift_mode = semi_wing_borne) & (kias <= 30.0)) & X((lift_mode = semi_wing_borne) & (kias <= 30.0))) -> X(X(lift_mode = semi_thrust_borne))); # LPC_SWB_TO_STB
+        ((lift_mode = semi_wing_borne) & (kias <= 30.0)) -> X(lift_mode = semi_thrust_borne); # LPC_SWB_TO_STB
+        G((!((lift_mode = semi_thrust_borne) & (kias > 40.0)) & X((lift_mode = semi_thrust_borne) & (kias > 40.0))) -> X(X(lift_mode = semi_wing_borne))); # LPC_STB_TO_SWB
+        ((lift_mode = semi_thrust_borne) & (kias > 40.0)) -> X(lift_mode = semi_wing_borne); # LPC_STB_TO_SWB
+        G((!((lift_mode = semi_thrust_borne) & hover_control_mode & (kgs <= 20.0)) & X((lift_mode = semi_thrust_borne) & hover_control_mode & (kgs <= 20.0))) -> X(X(lift_mode = thrust_borne))); # LPC_STB_TO_TB
+        ((lift_mode = semi_thrust_borne) & hover_control_mode & (kgs <= 20.0)) -> X(lift_mode = thrust_borne); # LPC_STB_TO_TB
+        G((!((lift_mode = semi_wing_borne) & (kias > 100.0)) & X((lift_mode = semi_wing_borne) & (kias > 100.0))) -> X(X(lift_mode = wing_borne))); # LPC_SWB_TO_WB
+        ((lift_mode = semi_wing_borne) & (kias > 100.0)) -> X(lift_mode = wing_borne); # LPC_SWB_TO_WB
+        G((!((lift_mode = thrust_borne) & (!hover_control_mode | (kgs > 20.0))) & X((lift_mode = thrust_borne) & (!hover_control_mode | (kgs > 20.0)))) -> X(X(lift_mode = semi_thrust_borne))); # LPC_TB_TO_STB
+        ((lift_mode = thrust_borne) & (!hover_control_mode | (kgs > 20.0))) -> X(lift_mode = semi_thrust_borne); # LPC_TB_TO_STB
+        (lift_mode = wing_borne) <-> (kias >= 90.0); # LPC_INIT_LIFT_MODE
+        G((lift_mode = thrust_borne) | (lift_mode = semi_thrust_borne) | (lift_mode = semi_wing_borne) | (lift_mode = wing_borne)); # LPC_LIFT_MODE
+        kias = 120.0; # LPC_INIT_KIAS
+        G(kias = kgs); # LPC_KIAS_KGS
+        # FTP | absReal(preReal(0.0, kias) - kias) <= 10.0: after the first step,
+        # kias changes by 10 at most (kias' is its value at the next step).
+        G((kias' - kias <= 10.0) & (kias - kias' <= 10.0)); # LPC_KIAS_DERIVATIVE
+        G((!((lift_mode = wing_borne) & (kias <= 90.0)) & X((lift_mode = wing_borne) & (kias <= 90.0))) -> X(X(lift_mode = semi_wing_borne))); # LPC_WB_TO_SWB
+        ((lift_mode = wing_borne) & (kias <= 90.0)) -> X(lift_mode = semi_wing_borne); # LPC_WB_TO_SWB
+        hover_control_mode <-> (kgs < 20.0); # LPC_INIT_HOVER_MODE
+        G(kias >= 0.0); # LPC_KIAS_0
+        G(((lift_mode = semi_wing_borne) & (kias <= 100.0) & (kias > 30.0)) -> X(lift_mode = semi_wing_borne)); # LPC_SWB_STAY_ON_NEXT
+        G(((lift_mode = wing_borne) & (kias > 90.0)) -> X(lift_mode = wing_borne)); # LPC_WB_STAY_ON_NEXT
+
+# Hover within 12 steps.
+CONTRACT Reach12:
+    output real variable kias;
+    output real variable kgs;
+    output boolean variable hover_control_mode;
+    output integer (0:3) variable lift_mode;
+    Assumptions:
+        true;
+    Guarantees:
+        (lift_mode = thrust_borne) |
+            (X(lift_mode = thrust_borne)) |
+            (X(X(lift_mode = thrust_borne))) |
+            (X(X(X(lift_mode = thrust_borne)))) |
+            (X(X(X(X(lift_mode = thrust_borne))))) |
+            (X(X(X(X(X(lift_mode = thrust_borne)))))) |
+            (X(X(X(X(X(X(lift_mode = thrust_borne))))))) |
+            (X(X(X(X(X(X(X(lift_mode = thrust_borne)))))))) |
+            (X(X(X(X(X(X(X(X(lift_mode = thrust_borne))))))))) |
+            (X(X(X(X(X(X(X(X(X(lift_mode = thrust_borne)))))))))) |
+            (X(X(X(X(X(X(X(X(X(X(lift_mode = thrust_borne))))))))))) |
+            (X(X(X(X(X(X(X(X(X(X(X(lift_mode = thrust_borne)))))))))))) |
+            X(X(X(X(X(X(X(X(X(X(X(X(lift_mode = thrust_borne)))))))))))); # LPC_REACH_HOVER_12
+
+# Hover within 6 steps.
+CONTRACT Reach06:
+    output real variable kias;
+    output real variable kgs;
+    output boolean variable hover_control_mode;
+    output integer (0:3) variable lift_mode;
+    Assumptions:
+        true;
+    Guarantees:
+        (lift_mode = thrust_borne) |
+            (X(lift_mode = thrust_borne)) |
+            (X(X(lift_mode = thrust_borne))) |
+            (X(X(X(lift_mode = thrust_borne)))) |
+            (X(X(X(X(lift_mode = thrust_borne))))) |
+            (X(X(X(X(X(lift_mode = thrust_borne)))))) |
+            X(X(X(X(X(X(lift_mode = thrust_borne)))))); # LPC_REACH_HOVER_06
