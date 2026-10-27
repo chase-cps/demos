@@ -12,8 +12,8 @@ python plot_scaling.py results/scaling.csv results/scaling_discharge.csv
 `--discharge` composes with `compose(..., discharge=True)` (chase-cps after
 0.1.0).
 
-Machine: Apple M4 Pro, 24 GB RAM, macOS 26.5. chase-cps 0.1.0, nuXmv 2.2.0
-(IC3), Python 3.13.
+Machine: Apple M4 Pro, 24 GB RAM, macOS 26.5. nuXmv 2.2.0 (IC3), Python 3.13.
+`scaling.csv`: chase-cps 0.1.0; `scaling_discharge.csv`: chase-cps 0.3.2.
 
 Columns:
 
@@ -32,9 +32,14 @@ version is found up to 8 joints.
 
 With `--discharge` the composite keeps the terms of the joint contracts, and
 the refinement is proved up to 8 joints in 3.3 s. The composition itself
-takes 140 s for 8 joints: the redundant terms are removed after each of the
+takes 21 s for 8 joints: the redundant terms are removed after each of the
 7 compositions, one nuXmv call per term. The joints share no variable, so no
-assumption is discharged here. The gain comes from the form of the
+assumption is discharged here, and each call has only the terms of one
+joint: a term is implied by the others iff it is implied by those that
+share variables with it, when all the terms are satisfiable (chase-cps
+0.3.2). `discharge_speedup.csv` compares the composition time before (0.3.1,
+140 s for 8 joints) and after, on the same machine; the composite contracts
+are the same. The gain comes from the form of the
 composite: it is the list of the joint terms, the same terms as the arm
 contract, instead of the nested formula (A1 & A2) | !(G1 & G2) of the closed
 form.

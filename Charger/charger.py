@@ -15,8 +15,12 @@ the cores by the numbers of the requirements:
   3. The Pushy arbiter is realizable for a bad reason: it can win by making
      the robots violate its assumptions. The well-separation check finds it,
      and its core gives the two assumptions. The Polite arbiter fixes it.
-  4. One guarantee of Fair is implied by another one: remove_vacuous removes
-     it and keeps realizability.
+  4. Fair is not vacuous: it cannot win without granting each robot. An
+     arbiter that trusts the robots to stop asking on their own (G F !req1,
+     G F !req2) is vacuous: it wins without ever granting, and is_vacuous
+     gives the assumptions that let it. One guarantee of Fair, R8, is
+     redundant, implied by R7.1: remove_vacuous removes it and keeps
+     realizability.
   5. The arbiter and the robots feed each other (req and grant). Composed
      with discharge, the assumptions of the robots on the grants are
      discharged by the arbiter: no assumption is left, and the composition
@@ -26,8 +30,8 @@ the cores by the numbers of the requirements:
     python charger.py
     python charger.py --expect     # exit code 1 when a result is not the expected one
 
-The checks need slugs (realizability, synthesis, well-separation) and nuXmv
-or NuSMV (vacuity, discharge, refinement). charger.chase does steps 1, 2,
+The checks need slugs (realizability, synthesis, well-separation, vacuity)
+and nuXmv or NuSMV (redundancy, discharge, refinement). charger.chase does steps 1, 2,
 and 5 with logics_tool (see Charger.md).
 """
 
@@ -39,8 +43,8 @@ import re
 import sys
 import time
 
-from chase_cps import (load_spec, is_realizable, synthesize, is_well_separated,
-                       remove_vacuous, refines, ltl)
+from chase_cps import (Contract, load_spec, is_realizable, synthesize, is_well_separated,
+                       is_vacuous, remove_vacuous, refines, ltl)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "charger.ltl")
@@ -126,6 +130,22 @@ def main() -> int:
     step("   Polite is well separated", "separated",
          lambda: (is_well_separated(c["Polite"], timeout=t).status, ""))
 
+    step("4. Fair is vacuous", "not_vacuous",
+         lambda: (is_vacuous(c["Fair"], timeout=t).status, ""))
+
+    def trusting():
+        fair = c["Fair"]
+        trust = Contract("Trusting", dict(fair.inputs), dict(fair.outputs),
+                         [ltl.parse("G F !req1"), ltl.parse("G F !req2")],
+                         list(fair.guarantees))
+        r = is_vacuous(trust, core=True, timeout=t)
+        text = "\n".join(f"   {v.output} is not needed ({v.mode}): {len(v.controller['nodes'])} "
+                         "states without it; assumptions: "
+                         + ", ".join(ltl.to_str(a) for a in v.core.core)
+                         for v in r.vacuous)
+        return r.status, text
+    step("   Trusting is vacuous", "vacuous", trusting)
+
     def vacuous():
         v = remove_vacuous(c["Fair"], core=True, timeout=t)
         text = "\n".join(f"   removed {x.part} {number(x.term, 'Fair')} {ltl.to_str(x.term)}"
@@ -133,7 +153,7 @@ def main() -> int:
                          + ", ".join(f"{number(f, 'Fair')} {ltl.to_str(f)}" for f in x.core or [])
                          for x in v.removed)
         return f"{len(v.removed)} removed", text
-    step("4. Vacuous terms of Fair", "1 removed", vacuous)
+    step("   Redundant terms of Fair (GR(1))", "1 removed", vacuous)
 
     def composition():
         fair = remove_vacuous(c["Fair"], timeout=t).contract

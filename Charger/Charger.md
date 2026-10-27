@@ -71,8 +71,13 @@ The script prints the result of each step:
    without serving anybody. The well-separation check finds it, and its core
    is A2 and A3. The _Polite_ arbiter assumes A4 instead of A3, and is well
    separated.
-4. R8 is vacuous: R7.1 implies it. `remove_vacuous` removes it, and the
-   contract stays realizable.
+4. _Fair_ is not vacuous: it cannot win without granting each robot
+   (`is_vacuous`). An arbiter that trusts the robots to stop asking on
+   their own (it assumes G F !req1 and G F !req2) is vacuous: R7.1 and R7.2
+   then hold without any grant, and `is_vacuous` gives the strategy that
+   never grants and the assumptions that allow it. R8 is redundant: R7.1
+   implies it. `remove_vacuous` removes it, and the contract stays
+   realizable.
 5. The arbiter and the robots feed each other (`req` and `grant`). Composed
    with discharge, the assumptions of the robots (A1.1, A1.2) are discharged
    by the guarantees of the arbiter (R7.1, R7.2): no assumption is left, and
