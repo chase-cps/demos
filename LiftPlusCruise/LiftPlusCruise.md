@@ -44,9 +44,10 @@ and nuXmv checks them with its SMT engine:
 `nuXmv > check_ltlspec_ic3`
 
 The second formula, the negation of the guarantees, is false: the
-requirements with LPC_REACH_HOVER_12 are consistent. With
-`/tmp/lpc/vehicle06.smv` the second formula is true: the requirements with
-LPC_REACH_HOVER_06 are not consistent.
+requirements with LPC_REACH_HOVER_12 are consistent. The third one, the
+negation of A & G, is false too: the assumptions and the guarantees can hold
+together. With `/tmp/lpc/vehicle06.smv` the second and the third formulas
+are true: the requirements with LPC_REACH_HOVER_06 are not consistent.
 
 ### Python Flow
 
