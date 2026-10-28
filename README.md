@@ -22,12 +22,18 @@ This repository contains the demonstrations of [CHASE][WEB]:
     of [FRET][FRET], with real variables. The consistency of two subsets of
     the requirements, a behavior of the consistent one, and the requirements
     in conflict in the other one.
+- [**BufferSwap**][BUFFERSWAP]: the replacement of a buffer of a circuit
+    (BaseJump STL), with contracts in SystemVerilog Assertions. The new
+    buffer does not refine the old one, but it refines the quotient of the
+    system by its neighbours, so it can replace it; the quotient is written
+    as SVA and checked on the RTL with Yosys and nuXmv, and with Jasper.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger and LiftPlusCruise
-need version 0.2.0).
+need version 0.2.0, BufferSwap version 0.4.1 with `pip install
+chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md
@@ -35,3 +41,4 @@ need version 0.2.0).
 [FRET]: https://github.com/NASA-SW-VnV/fret
 [CHARGER]: Charger/Charger.md
 [LPC]: LiftPlusCruise/LiftPlusCruise.md
+[BUFFERSWAP]: BufferSwap/BufferSwap.md
