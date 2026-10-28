@@ -1,0 +1,115 @@
+NAME: LMFSM;
+
+# The finite state machine of the Ten Lockheed Martin Cyber-Physical
+# Challenges. The comment at the end of a line is the number of the
+# requirement in requirements.txt. The transitions are written one step
+# early: the autopilot reads the state it was in and the sensor of the
+# previous step, so "from S when c" is STATE = S & c -> STATE' = ..., with the
+# inputs of the new step primed.
+
+# The requirements as first written: some of them conflict.
+CONTRACT AutopilotFirst:
+    input boolean variable standby;
+    input boolean variable apfail;
+    input boolean variable supported;
+    input boolean variable good;
+    output integer (0:3) variable STATE;
+    Assumptions:
+        true;
+    Guarantees:
+        STATE = 0;  # AP-I
+        G((STATE = 0 & standby') -> STATE' = 3);  # FSM-002
+        G((STATE = 0 & supported' & good) -> STATE' = 1);  # FSM-003
+        G((STATE = 1 & !good) -> STATE' = 2);  # FSM-004
+        G((STATE = 1 & standby') -> STATE' = 3);  # FSM-005
+        G((STATE = 2 & standby' & good) -> STATE' = 3);  # FSM-006
+        G((STATE = 2 & supported' & good) -> STATE' = 0);  # FSM-007
+        G((STATE = 3 & !standby') -> STATE' = 0);  # FSM-008
+        G((STATE = 3 & apfail') -> STATE' = 2);  # FSM-009
+
+CONTRACT SensorFirst:
+    input boolean variable limits;
+    input boolean variable MODE;
+    input boolean variable REQUEST;
+    output integer (0:2) variable SENSTATE;
+    Assumptions:
+        true;
+    Guarantees:
+        SENSTATE = 0;  # SEN-I
+        G((SENSTATE = 0 & limits') -> SENSTATE' = 2);  # FSM-010
+        G((SENSTATE = 0 & !REQUEST') -> SENSTATE' = 1);  # FSM-011
+        G((SENSTATE = 2 & !REQUEST' & !limits') -> SENSTATE' = 1);  # FSM-012
+        G((SENSTATE = 1 & REQUEST' & MODE') -> SENSTATE' = 0);  # FSM-013
+
+# The corrected requirements, with what the Simulink model does otherwise.
+CONTRACT Autopilot:
+    input boolean variable standby;
+    input boolean variable apfail;
+    input boolean variable supported;
+    input boolean variable good;
+    output integer (0:3) variable STATE;
+    output boolean variable MODE;
+    output boolean variable REQUEST;
+    output boolean variable pullup;
+    Assumptions:
+        true;
+    Guarantees:
+        STATE = 0;  # AP-I
+        G((STATE = 0 & standby') -> STATE' = 3);  # FSM-002
+        G((STATE = 0 & supported' & good & !standby') -> STATE' = 1);  # FSM-003v2
+        G((STATE = 0 & !standby' & !(supported' & good)) -> STATE' = 0);  # AP-S
+        G((STATE = 1 & standby') -> STATE' = 3);  # FSM-005
+        G((STATE = 1 & !good & !standby') -> STATE' = 2);  # FSM-004v2
+        G((STATE = 1 & good & !standby') -> STATE' = 1);  # AP-S
+        G((STATE = 2 & standby' & good) -> STATE' = 3);  # FSM-006
+        G((STATE = 2 & supported' & good & !standby') -> STATE' = 0);  # FSM-007v2
+        G((STATE = 2 & !(good & (standby' | supported'))) -> STATE' = 2);  # AP-S
+        G((STATE = 3 & apfail') -> STATE' = 2);  # FSM-009
+        G((STATE = 3 & !standby' & !apfail') -> STATE' = 0);  # FSM-008v2
+        G((STATE = 3 & standby' & !apfail') -> STATE' = 3);  # AP-S
+        G(MODE <-> !(STATE = 0));  # AP-O
+        G(REQUEST <-> (STATE = 0 | STATE = 1));  # AP-O
+        G(pullup <-> STATE = 2);  # AP-O
+
+CONTRACT Sensor:
+    input boolean variable limits;
+    input boolean variable MODE;
+    input boolean variable REQUEST;
+    output integer (0:2) variable SENSTATE;
+    output boolean variable good;
+    Assumptions:
+        true;
+    Guarantees:
+        SENSTATE = 0;  # SEN-I
+        G((SENSTATE = 0 & limits') -> SENSTATE' = 2);  # FSM-010
+        G((SENSTATE = 0 & !REQUEST' & !limits') -> SENSTATE' = 1);  # FSM-011v2
+        G((SENSTATE = 0 & REQUEST' & !limits') -> SENSTATE' = 0);  # SEN-S
+        G((SENSTATE = 2 & (!REQUEST' | !limits')) -> SENSTATE' = 1);  # FSM-012w
+        G((SENSTATE = 2 & REQUEST' & limits') -> SENSTATE' = 2);  # SEN-S
+        G((SENSTATE = 1 & REQUEST' & MODE') -> SENSTATE' = 0);  # FSM-013
+        G((SENSTATE = 1 & !(REQUEST' & MODE')) -> SENSTATE' = 1);  # SEN-S
+        G(good <-> !(SENSTATE = 2));  # SEN-O
+
+# The system: a pullup when the limits are exceeded, at once or with the time
+# it takes.
+CONTRACT System:
+    input boolean variable standby;
+    input boolean variable apfail;
+    input boolean variable supported;
+    input boolean variable limits;
+    output boolean variable pullup;
+    Assumptions:
+        true;
+    Guarantees:
+        G((limits & !standby & !apfail & supported) -> pullup);  # FSM-001
+
+CONTRACT SystemTimed:
+    input boolean variable standby;
+    input boolean variable apfail;
+    input boolean variable supported;
+    input boolean variable limits;
+    output boolean variable pullup;
+    Assumptions:
+        true;
+    Guarantees:
+        G((!limits & (X !limits) & (X X !limits) & (X X X limits) & (X (!standby & !apfail & supported)) & (X X (!standby & !apfail & supported)) & (X X X (!standby & !apfail & supported)) & (X X X X (!standby & !apfail & supported))) -> X X X X pullup);  # FSM-001t

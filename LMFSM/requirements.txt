@@ -1,0 +1,79 @@
+Finite state machine of the Ten Lockheed Martin Cyber-Physical Challenges
+(Mavridou et al., RE 2020). An autopilot commands a safety maneuver (pullup)
+when a sensor reports a hazard. The requirements are those of the paper and
+of the FRET case study LMCPS (NASA-SW-VnV/fret, caseStudies/LMCPS); the
+numbers are theirs.
+
+Variables
+    standby       the pilot is in control (environment)
+    apfail        a failure from an external source (environment)
+    supported     the system is healthy enough to operate (environment)
+    limits        the sensor limits are exceeded (environment)
+    STATE         the state of the autopilot: 0 TRANSITION, 1 NOMINAL,
+                  2 MANEUVER, 3 STANDBY (autopilot)
+    MODE          the autopilot is not in TRANSITION (autopilot)
+    REQUEST       the autopilot is in TRANSITION or NOMINAL (autopilot)
+    pullup        the autopilot is in MANEUVER (autopilot)
+    SENSTATE      the state of the sensor: 0 NOMINAL, 1 TRANSITION,
+                  2 FAULT (sensor)
+    good          the sensor is not in FAULT (sensor)
+
+The autopilot reads the sensor (good) of the previous step; the sensor reads
+the autopilot (MODE, REQUEST) of the same step.
+
+System
+    FSM-001     Exceeding sensor limits shall latch an autopilot pullup when
+                the pilot is not in control (not standby) and the system is
+                supported without failures (not apfail).
+    FSM-001t    The same with the time it takes: when the limits are not
+                exceeded for three steps and exceeded at the fourth, and the
+                pilot is not in control and the system is supported without
+                failures from the second step to the fifth, there is a
+                pullup at the fifth. (FSM-001v3 in FRET, with the limits not
+                exceeded for one step less.)
+
+Autopilot
+    FSM-002     The autopilot shall change states from TRANSITION to STANDBY
+                when the pilot is in control (standby).
+    FSM-003     The autopilot shall change states from TRANSITION to NOMINAL
+                when the system is supported and sensor data is good.
+    FSM-003v2   Same, when the pilot is not in control.
+    FSM-004     The autopilot shall change states from NOMINAL to MANEUVER
+                when the sensor data is not good.
+    FSM-004v2   Same, when the pilot is not in control.
+    FSM-005     The autopilot shall change states from NOMINAL to STANDBY
+                when the pilot is in control (standby).
+    FSM-006     The autopilot shall change states from MANEUVER to STANDBY
+                when the pilot is in control (standby) and sensor data is
+                good.
+    FSM-007     The autopilot shall change states from MANEUVER to
+                TRANSITION when the system is supported and sensor data is
+                good.
+    FSM-007v2   Same, when the pilot is not in control.
+    FSM-008     The autopilot shall change states from STANDBY to TRANSITION
+                when the pilot is not in control (not standby).
+    FSM-008v2   Same, without a failure (not apfail).
+    FSM-009     The autopilot shall change states from STANDBY to MANEUVER
+                when a failure occurs (apfail).
+    AP-I        The autopilot starts in TRANSITION.
+    AP-S        In any other case the autopilot stays in its state (the
+                Simulink model).
+    AP-O        MODE, REQUEST, and pullup as defined above (the model).
+
+Sensor
+    FSM-010     The sensor shall change states from NOMINAL to FAULT when
+                limits are exceeded.
+    FSM-011     The sensor shall change states from NOMINAL to TRANSITION
+                when the autopilot is not requesting support (not request).
+    FSM-011v2   Same, when the limits are not exceeded.
+    FSM-012     The sensor shall change states from FAULT to TRANSITION when
+                the autopilot is not requesting support (not request) and
+                limits are not exceeded (not limits).
+    FSM-012w    The same when the autopilot is not requesting support or the
+                limits are not exceeded (FSM-012_weak in FRET; the model).
+    FSM-013     The sensor shall change states from TRANSITION to NOMINAL
+                when the autopilot is requesting support (request) and the
+                autopilot reports the correct active mode (mode).
+    SEN-I       The sensor starts in NOMINAL.
+    SEN-S       In any other case the sensor stays in its state (the model).
+    SEN-O       good as defined above (the model).

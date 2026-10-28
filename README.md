@@ -27,6 +27,11 @@ This repository contains the demonstrations of [CHASE][WEB]:
     buffer does not refine the old one, but it refines the quotient of the
     system by its neighbours, so it can replace it; the quotient is written
     as SVA and checked on the RTL with Yosys and nuXmv, and with Jasper.
+- [**LMFSM**][LMFSM]: the finite state machine of the Ten Lockheed Martin
+    Cyber-Physical Challenges, an autopilot and a sensor. The unrealizable
+    cores of the requirements as first written, fixed one by one; the
+    composition of the corrected autopilot and sensor, which does not give
+    the pullup at once, and the time it takes.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
@@ -42,3 +47,4 @@ chase-cps[rtl]`).
 [CHARGER]: Charger/Charger.md
 [LPC]: LiftPlusCruise/LiftPlusCruise.md
 [BUFFERSWAP]: BufferSwap/BufferSwap.md
+[LMFSM]: LMFSM/FSM.md
