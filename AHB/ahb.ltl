@@ -1,0 +1,35 @@
+NAME: AHB;
+
+# The arbiter of the AMBA AHB bus, simplified (requirements.txt), as two
+# viewpoints. The comment at the end of a line is the number of the
+# requirement.
+
+CONTRACT Grant:
+    input boolean variable req1;
+    input boolean variable req2;
+    output boolean variable grant1;
+    output boolean variable grant2;
+    Assumptions:
+        true;
+    Guarantees:
+        grant1;  # GR1
+        G(grant1 <-> !grant2);  # GR2
+        G(F(!req1 | grant1));  # GR3.1
+        G(F(!req2 | grant2));  # GR3.2
+
+CONTRACT Lock:
+    input boolean variable req1;
+    input boolean variable req2;
+    input boolean variable lock1;
+    input boolean variable lock2;
+    output boolean variable grant1;
+    output boolean variable grant2;
+    output boolean variable locked;
+    Assumptions:
+        G(lock1 -> req1);  # LA1.1
+        G(lock2 -> req2);  # LA1.2
+        G(F(!(locked & ((grant1 & req1) | (grant2 & req2)))));  # LA2
+    Guarantees:
+        G(locked <-> ((grant1 & lock1) | (grant2 & lock2)));  # LK1
+        G((locked & grant1 & req1') -> grant1');  # LK2.1
+        G((locked & grant2 & req2') -> grant2');  # LK2.2

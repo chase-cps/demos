@@ -1,0 +1,35 @@
+Arbiter of the AMBA AHB bus, simplified from the specification of R. Bloem,
+S. Galler, B. Jobstmann, N. Piterman, A. Pnueli, and M. Weiglhofer,
+"Specify, Compile, Run: Hardware from PSL" (COCV 2007, ENTCS 190(4)), after
+the AMBA specification of ARM (rev. 2.0). Two masters ask for the bus; the
+arbiter gives it to one of them. A master can lock the bus: the arbiter then
+lets it keep the bus while it asks for it. The simplification: two masters,
+no bursts, no HREADY, and the master that has the grant is the one that has
+the bus.
+
+Variables
+    req1, req2      master 1 or 2 asks for the bus (HBUSREQ; environment)
+    lock1, lock2    master 1 or 2 asks for a locked access (HLOCK; environment)
+    grant1, grant2  the bus is given to master 1 or 2 (HGRANT; arbiter)
+    locked          the master that has the bus has locked it (HMASTLOCK;
+                    arbiter)
+
+The requirements are written as two viewpoints of the same arbiter.
+
+Grant
+    GR1     Master 1 has the bus at the start (the default master).
+    GR2     The bus is given to exactly one master.
+    GR3.1   Master 1 does not wait forever: infinitely often it does not
+            ask, or it has the bus (G9 of Bloem et al.).
+    GR3.2   The same for master 2.
+
+Lock
+    LA1.1   Master 1 asks for the bus when it asks for a locked access (A3
+            of Bloem et al.).
+    LA1.2   The same for master 2.
+    LA2     A master that has locked the bus stops asking for it sooner or
+            later (A1 of Bloem et al.).
+    LK1     The bus is locked when its master asks for a locked access.
+    LK2.1   While master 1 has locked the bus and asks for it, it keeps the
+            bus (G2 of Bloem et al.).
+    LK2.2   The same for master 2.

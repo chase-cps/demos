@@ -32,6 +32,10 @@ This repository contains the demonstrations of [CHASE][WEB]:
     cores of the requirements as first written, fixed one by one; the
     composition of the corrected autopilot and sensor, which does not give
     the pullup at once, and the time it takes.
+- [**AHB**][AHB]: the arbiter of the AMBA AHB bus (Bloem et al., COCV 2007),
+    simplified, as two viewpoints. Their merge is realizable and synthesized;
+    their conjunction refines the merge, and the controller does not
+    implement it.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
@@ -48,3 +52,4 @@ chase-cps[rtl]`).
 [LPC]: LiftPlusCruise/LiftPlusCruise.md
 [BUFFERSWAP]: BufferSwap/BufferSwap.md
 [LMFSM]: LMFSM/FSM.md
+[AHB]: AHB/AHB.md
