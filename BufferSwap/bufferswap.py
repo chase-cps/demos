@@ -73,10 +73,10 @@ def fifo(name: str) -> Model:
         files += ["bsg_mem_1r1w_synth.sv", "bsg_mem_1r1w.sv"]
     files.append(f"{name}.sv")
     ready = {"bsg_one_fifo": "ready_and_o", "bsg_two_fifo": "ready_param_o"}[name]
-    return Model.from_verilog([os.path.join(RTL, f) for f in files], name,
-                              parameters={"width_p": 4}, reset="reset_i",
-                              names={ready: "ready_o"},
-                              defines={"BSG_HIDE_FROM_SYNTHESIS": 1, "XCELIUM": 1})
+    return Model.from_rtl([os.path.join(RTL, f) for f in files], name,
+                          parameters={"width_p": 4}, reset="reset_i",
+                          names={ready: "ready_o"},
+                          defines={"BSG_HIDE_FROM_SYNTHESIS": 1, "XCELIUM": 1})
 
 
 def main() -> int:
