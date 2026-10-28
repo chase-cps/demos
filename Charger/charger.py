@@ -19,8 +19,8 @@ the cores by the numbers of the requirements:
      arbiter that trusts the robots to stop asking on their own (G F !req1,
      G F !req2) is vacuous: it wins without ever granting, and is_vacuous
      gives the assumptions that let it. One guarantee of Fair, R8, is
-     redundant, implied by R7.1: remove_vacuous removes it and keeps
-     realizability.
+     redundant, implied by R7.1: remove_redundant with synth=True removes it
+     and keeps realizability.
   5. The arbiter and the robots feed each other (req and grant). Composed
      with discharge, the assumptions of the robots on the grants are
      discharged by the arbiter: no assumption is left, and the composition
@@ -44,7 +44,7 @@ import sys
 import time
 
 from chase_cps import (Contract, load_spec, is_realizable, synthesize, is_well_separated,
-                       is_vacuous, remove_vacuous, refines, ltl)
+                       is_vacuous, remove_redundant, refines, ltl)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "charger.ltl")
@@ -146,17 +146,17 @@ def main() -> int:
         return r.status, text
     step("   Trusting is vacuous", "vacuous", trusting)
 
-    def vacuous():
-        v = remove_vacuous(c["Fair"], core=True, timeout=t)
+    def redundant():
+        v = remove_redundant(c["Fair"], synth=True, core=True, timeout=t)
         text = "\n".join(f"   removed {x.part} {number(x.term, 'Fair')} {ltl.to_str(x.term)}"
                          f" ({x.kind}), implied by "
                          + ", ".join(f"{number(f, 'Fair')} {ltl.to_str(f)}" for f in x.core or [])
                          for x in v.removed)
         return f"{len(v.removed)} removed", text
-    step("   Redundant terms of Fair (GR(1))", "1 removed", vacuous)
+    step("   Redundant terms of Fair (GR(1))", "1 removed", redundant)
 
     def composition():
-        fair = remove_vacuous(c["Fair"], timeout=t).contract
+        fair = remove_redundant(c["Fair"], synth=True, timeout=t).contract
         charging = fair.compose(c["Robot1"], discharge=True, timeout=t)
         charging = charging.compose(c["Robot2"], name="Charging", discharge=True, timeout=t)
         r = refines(charging, c["System"], timeout=t)
