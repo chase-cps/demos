@@ -5,9 +5,9 @@ module Slot_sva (
   input logic reset_i,
   (* chase = "input" *) input logic v_i,
   (* chase = "input" *) input logic yumi_i,
+  (* chase = "output" *) input logic [3:0] data_o,
   (* chase = "output" *) input logic ready_o,
-  (* chase = "output" *) input logic v_o,
-  (* chase = "output" *) input logic [3:0] data_o
+  (* chase = "output" *) input logic v_o
 );
   // assumptions
   A0: assume property (@(posedge clk_i) disable iff (reset_i)

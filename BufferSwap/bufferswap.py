@@ -14,11 +14,11 @@ Python package (pip install chase-cps):
      contract alone.
   3. The quotient of the system by the producer and the consumer is the
      contract of the place of the buffer: the weakest one with which the
-     system meets its requirements. The one-entry FIFO refines it, so it can
-     replace the two-entry one, and the new system refines the requirements.
-     The quotient is equivalent to a contract that is easier to read: it
+     system meets its requirements. With discharge it keeps the terms: it
      assumes the guarantees of the producer and of the consumer, and
-     guarantees the requirements of the system.
+     guarantees the requirements of the system. The one-entry FIFO refines
+     it, so it can replace the two-entry one, and the new system refines the
+     requirements.
   4. That contract is written as SVA, to check the RTL of a buffer
      (out/slot.sv, bound to bsg_one_fifo), and the RTL of both FIFOs is
      checked against the contracts with Yosys and nuXmv.
@@ -38,7 +38,7 @@ import os
 import sys
 import time
 
-from chase_cps import Contract, Model, implements, ltl, parse_sva, refines, to_sva
+from chase_cps import Model, implements, ltl, parse_sva, refines, to_sva
 from chase_cps.rtl import yosys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -115,12 +115,15 @@ def main() -> int:
         return r.status, text
     step("2. OneFifo refines TwoFifo", "invalid", swap)
 
-    slot = system.divide(producer.compose(consumer), name="Slot")
+    # the quotient, with its terms: the guarantees of the neighbours are
+    # assumed, and the guarantees of the system are guaranteed
+    slot = system.divide(producer.compose(consumer), name="Slot", discharge=True)
 
     def quotient():
         r = refines(one, slot)
-        return r.status, ("   Slot = System / (Producer, Consumer): "
-                          f"{len(slot.assumptions)} assumption, {len(slot.guarantees)} guarantee")
+        return r.status, ("   Slot = System / (Producer, Consumer)"
+                          "\n   assume: " + "; ".join(ltl.to_str(f) for f in slot.assumptions)
+                          + "\n   guarantee: " + "; ".join(ltl.to_str(f) for f in slot.guarantees))
     step("3. OneFifo refines Slot", "valid", quotient)
 
     def new_system():
@@ -128,21 +131,10 @@ def main() -> int:
         return refines(s, system).status, ""
     step("   Producer, OneFifo, Consumer refine System", "valid", new_system)
 
-    # the quotient, as the guarantees of the neighbours and of the system
-    readable = Contract("Slot", dict(slot.inputs), dict(slot.outputs),
-                        producer.guarantees + consumer.guarantees, list(system.guarantees))
-
-    def same():
-        both = refines(readable, slot).status == "valid" == refines(slot, readable).status
-        text = ("   assume: " + "; ".join(ltl.to_str(f) for f in readable.assumptions)
-                + "\n   guarantee: " + "; ".join(ltl.to_str(f) for f in readable.guarantees))
-        return ("equivalent" if both else "different"), text
-    step("   Slot is", "equivalent", same)
-
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     out = os.path.join(HERE, "out", "slot.sv")
     with open(out, "w") as f:
-        f.write(to_sva(readable, clock="clk_i", reset="reset_i", bind="bsg_one_fifo",
+        f.write(to_sva(slot, clock="clk_i", reset="reset_i", bind="bsg_one_fifo",
                        names={"ready_o": "ready_and_o"}))
     print(f"\n4. Slot as SVA, bound to bsg_one_fifo: {os.path.relpath(out, HERE)}")
 

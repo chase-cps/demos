@@ -8,13 +8,14 @@ no bursts, no HREADY, and the master that has the grant is the one that has
 the bus.
 
 Variables
-    req1, req2      master 1 or 2 asks for the bus (HBUSREQ; environment)
-    lock1, lock2    master 1 or 2 asks for a locked access (HLOCK; environment)
-    grant1, grant2  the bus is given to master 1 or 2 (HGRANT; arbiter)
-    locked          the master that has the bus has locked it (HMASTLOCK;
-                    arbiter)
+    hbusreq1, hbusreq2  master 1 or 2 asks for the bus (environment)
+    hlock1, hlock2      master 1 or 2 asks for a locked access (environment)
+    hgrant1, hgrant2    the bus is given to master 1 or 2 (arbiter)
+    hmastlock           the master that has the bus has locked it (arbiter)
 
-The requirements are written as two viewpoints of the same arbiter.
+The requirements are written as two viewpoints of the same arbiter, in
+SystemVerilog Assertions (sva/grant.sv, sva/lock.sv); the labels of the
+assertions are the numbers below, with _ for the dot.
 
 Grant
     GR1     Master 1 has the bus at the start (the default master).

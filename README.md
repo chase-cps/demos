@@ -33,16 +33,16 @@ This repository contains the demonstrations of [CHASE][WEB]:
     composition of the corrected autopilot and sensor, which does not give
     the pullup at once, and the time it takes.
 - [**AHB**][AHB]: the arbiter of the AMBA AHB bus (Bloem et al., COCV 2007),
-    simplified, as two viewpoints. Their merge is realizable and synthesized;
-    their conjunction refines the merge, and the controller does not
-    implement it.
+    simplified, as two viewpoints in SystemVerilog Assertions. Their merge is
+    realizable and synthesized; their conjunction refines the merge, and the
+    controller does not implement it.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger and LiftPlusCruise
-need version 0.2.0, BufferSwap version 0.4.1 with `pip install
-chase-cps[rtl]`).
+need version 0.2.0, AHB version 0.4.1, BufferSwap version 0.4.1 with `pip
+install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md

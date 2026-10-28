@@ -50,12 +50,11 @@ It prints the result of each step:
    alone, _OneFifo_ cannot replace _TwoFifo_.
 3. _Slot_, the quotient of _System_ by the composition of _Producer_ and
    _Consumer_, is the contract of the place of the buffer: the weakest
-   contract with which the system meets its requirements. _OneFifo_ refines
-   _Slot_, so it can replace _TwoFifo_, and the composition of _Producer_,
-   _OneFifo_, and _Consumer_ refines _System_. _Slot_ is equivalent to a
-   contract that is easier to read: it assumes the guarantees of _Producer_
-   and _Consumer_, and guarantees the requirements of _System_ (CHASE checks
-   that each refines the other).
+   contract with which the system meets its requirements. With discharge,
+   the quotient keeps the terms: it assumes the guarantees of _Producer_
+   and _Consumer_, and guarantees the requirements of _System_. _OneFifo_
+   refines _Slot_, so it can replace _TwoFifo_, and the composition of
+   _Producer_, _OneFifo_, and _Consumer_ refines _System_.
 4. _Slot_ is written as SVA (`out/slot.sv`), with a bind statement for
    `bsg_one_fifo`. The RTL of both buffers is read with Yosys and checked
    with nuXmv: `bsg_two_fifo` implements _TwoFifo_, `bsg_one_fifo` implements

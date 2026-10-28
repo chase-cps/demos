@@ -11,9 +11,13 @@ viewpoints is not the arbiter.
 ### Content of the directory
 The directory of the demo contains:
 - `requirements.txt`: the requirements, numbered;
-- `ahb.ltl`: the two viewpoints, _Grant_ and _Lock_. The comment at the end
-  of each line is the number of the requirement;
-- `ahb.py`: the steps with the CHASE Python package.
+- `sva/`: the two viewpoints in SystemVerilog Assertions, one module each,
+  whose ports give the inputs and the outputs: _Grant_ (`grant.sv`) and
+  _Lock_ (`lock.sv`). The label of each assertion is the number of the
+  requirement;
+- `ahb.py`: the steps with the CHASE Python package;
+- `out/arbiter.sv`: the merge of the viewpoints as SVA, written by
+  `ahb.py`.
 
 ### The contracts
 - _Grant_ gives the bus to exactly one master, master 1 at the start, and no
@@ -24,17 +28,18 @@ The directory of the demo contains:
   stops asking for it sooner or later (LA2).
 
 ### Python Flow
-The script needs the CHASE Python package (`pip install chase-cps`), slugs,
-and nuXmv or NuSMV:
+The script needs the CHASE Python package (`pip install chase-cps`, version
+0.4.1), slugs, and nuXmv or NuSMV:
 
 `$> python3 ahb.py`
 
 It prints the result of each step:
 1. _Grant_ and _Lock_ are each realizable.
-2. The merge of the viewpoints, (A1 & A2, (G1 & G2) | !(A1 & A2)), is
-   equivalent to _Arbiter_, the contract with the assumptions of _Lock_ and
-   the guarantees of both (CHASE checks that each refines the other).
-   _Arbiter_ is realizable, and slugs synthesizes a controller.
+2. The merge of the viewpoints, with discharge, keeps their terms: it
+   assumes the assumptions of both and guarantees the guarantees of both,
+   (A1 & A2, G1 & G2), the same contract as the closed form
+   (A1 & A2, (G1 & G2) | !(A1 & A2)). This is _Arbiter_. It is realizable,
+   slugs synthesizes a controller, and _Arbiter_ is written as SVA.
 3. The conjunction of the viewpoints, (A1 | A2, G1 & G2), refines _Arbiter_,
    and _Arbiter_ does not refine it. The conjunction asks for each viewpoint
    on its own: the guarantees of _Grant_ hold even when the assumptions of
@@ -51,8 +56,9 @@ It prints the result of each step:
 The conjunction is the weakest contract that refines both viewpoints: a
 component that implements it can be used wherever either viewpoint is asked
 for. The merge is for viewpoints that describe one component together: each
-viewpoint holds under the assumptions of both. The realizability of the conjunction is not checked with slugs: its
-assumption, A1 | A2, is not GR(1).
+viewpoint holds under the assumptions of both. The realizability of the
+conjunction is not checked with slugs: its assumption, A1 | A2, is not
+GR(1), and it has no form with terms.
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
