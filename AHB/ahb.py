@@ -36,7 +36,7 @@ import os
 import sys
 import time
 
-from chase_cps import Model, implements, is_realizable, parse_sva, refines, synthesize, to_sva
+from chase_cps import Model, is_implementation, is_realizable, parse_sva, refines, synthesize, to_sva
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SIGNALS = ("hbusreq1", "hlock1", "hbusreq2", "hlock2", "hgrant1", "hgrant2", "hmastlock")
@@ -118,10 +118,10 @@ def main() -> int:
     else:
         model = Model.from_controller(found["controller"], arbiter)
         step("4. The controller implements Arbiter", "valid",
-             lambda: (implements(model, arbiter, timeout=t).status, ""))
+             lambda: (is_implementation(model, arbiter, timeout=t).status, ""))
 
         def conjunction():
-            r = implements(model, conjoined, timeout=t)
+            r = is_implementation(model, conjoined, timeout=t)
             text = "   a counterexample:\n" + trace(r) if r.trace is not None else ""
             return r.status, text
         step("   The controller implements the conjunction", "invalid", conjunction)

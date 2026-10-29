@@ -38,7 +38,7 @@ import os
 import sys
 import time
 
-from chase_cps import Model, implements, ltl, parse_sva, refines, to_sva
+from chase_cps import Model, is_implementation, ltl, parse_sva, refines, to_sva
 from chase_cps.rtl import yosys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -142,7 +142,7 @@ def main() -> int:
         print("   the RTL checks need Yosys (pip install chase-cps[rtl]): skipped")
     else:
         def rtl_check(model, contract):
-            return lambda: (implements(model, contract).status, "")
+            return lambda: (is_implementation(model, contract).status, "")
         one_rtl, two_rtl = fifo("bsg_one_fifo"), fifo("bsg_two_fifo")
         step("   the RTL of bsg_two_fifo implements TwoFifo", "valid", rtl_check(two_rtl, two))
         step("   the RTL of bsg_one_fifo implements OneFifo", "valid", rtl_check(one_rtl, one))

@@ -41,7 +41,7 @@ The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger and LiftPlusCruise
-need version 0.2.0, AHB version 0.4.1, BufferSwap version 0.4.1 with `pip
+need version 0.2.0, AHB and BufferSwap version 0.4.2, BufferSwap with `pip
 install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
