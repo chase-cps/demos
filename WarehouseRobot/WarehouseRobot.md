@@ -40,7 +40,7 @@ The directory of the demo contains:
 
 ### Python Flow
 The script needs the CHASE Python package (`pip install chase-cps`, version
-0.4.2) and nuXmv, whose SMT engine checks the real variables:
+0.5.0) and nuXmv, whose SMT engine checks the real variables:
 
 `$> python3 warehouse.py`
 

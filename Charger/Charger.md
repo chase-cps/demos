@@ -58,7 +58,7 @@ Both formulas are true: the composition refines _System_.
 ### Python Flow
 
 The checks that find why a contract fails are in the CHASE Python package
-(`pip install chase-cps`, version 0.2.0):
+(`pip install chase-cps`, version 0.5.0):
 
 `$> python3 charger.py`
 

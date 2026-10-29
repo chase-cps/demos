@@ -44,7 +44,8 @@ The directory of the demo contains:
 
 ### Python Flow
 The script needs the CHASE Python package with the RTL reader
-(`pip install chase-cps[rtl]`, version 0.4.2) and nuXmv:
+(`pip install chase-cps[rtl]`, version
+0.5.0) and nuXmv:
 
 `$> python3 bufferswap.py`
 

@@ -47,7 +47,7 @@ the Venmo tool writes. The contract of the parent guarantees:
 
 ### Python Flow
 The script needs the CHASE Python package (`pip install chase-cps`, version
-0.4.2) and nuXmv or NuSMV:
+0.5.0) and nuXmv or NuSMV:
 
 `$> python3 assistant.py`
 

@@ -58,9 +58,9 @@ The scripts expect `dsl_tool`, `logics_tool`, `slugs` (with its compiler,
 `$SLUGS/tools/StructuredSlugsParser/compiler.py`), and `nuXmv` to be in the
 `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
-CHASE Python package (`pip install chase-cps`; Charger needs version 0.2.0,
-AHB, BufferSwap, Escalation, LiftPlusCruise, PaymentAssistant, and WarehouseRobot version 0.4.2,
-BufferSwap and Escalation with `pip install chase-cps[rtl]`).
+CHASE Python package, version 0.5.0 or later, which draws the diagrams
+(`pip install chase-cps`; BufferSwap and Escalation with
+`pip install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md

@@ -57,7 +57,7 @@ are true: the requirements with LPC_REACH_HOVER_06 are not consistent.
 `$> python3 lpc.py`
 
 The script needs the CHASE Python package (`pip install chase-cps`, version
-0.4.2) and nuXmv. It prints:
+0.5.0) and nuXmv. It prints:
 1. a behavior of the requirements with LPC_REACH_HOVER_12. In the one that
    nuXmv finds, `kias` goes down from 120 by 10 at each step, the vehicle
    leaves the wing borne mode when `kias` is 90, and it hovers at step 11;

@@ -36,7 +36,7 @@ The directory of the demo contains:
 
 ### Python Flow
 The script needs the CHASE Python package (`pip install chase-cps`, version
-0.4.2), slugs, and nuXmv or NuSMV:
+0.5.0), slugs, and nuXmv or NuSMV:
 
 `$> python3 ahb.py`
 
