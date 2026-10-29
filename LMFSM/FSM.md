@@ -70,3 +70,20 @@ FAULT while the autopilot is in TRANSITION, and the limits stay exceeded,
 the sensor stays in FAULT (the autopilot requests support) and the
 autopilot stays in TRANSITION (the sensor data is not good), so there is
 never a pullup.
+
+### Diagram
+`out/fsm.html`, written by `fsm.py`, draws _AutopilotFirst_ and
+_SensorFirst_ with their realizability (R, red), and _Autopilot_ ∥ _Sensor_
+inside _System_ (⪯, red) and inside _SystemTimed_ (⪯, green), with the
+realizability of each (R, green). It opens in a browser; a click on a name
+shows the contract, and a click on a red R marks the first unrealizable core
+in it.
+
+![The contracts as first written are unrealizable; a click on R marks the requirements in conflict](diagram-1.png)
+_The contracts as first written are unrealizable; a click on R marks the requirements in conflict._
+
+![Autopilot ∥ Sensor does not refine System (FSM-001): the pullup does not come at once](diagram-2.png)
+_Autopilot ∥ Sensor does not refine System (FSM-001): the pullup does not come at once._
+
+![Autopilot ∥ Sensor refines SystemTimed (FSM-001t)](diagram-3.png)
+_Autopilot ∥ Sensor refines SystemTimed (FSM-001t)._

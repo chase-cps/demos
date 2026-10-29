@@ -23,6 +23,9 @@ Python package (pip install chase-cps):
      (out/slot.sv, bound to bsg_one_fifo), and the RTL of both FIFOs is
      checked against the contracts with Yosys and nuXmv.
 
+The page out/bufferswap.html draws the system with the two-entry FIFO, and
+Slot with the one-entry FIFO in its hole.
+
     python bufferswap.py
     python bufferswap.py --expect     # exit code 1 when a result is not the expected one
 
@@ -38,7 +41,8 @@ import os
 import sys
 import time
 
-from chase_cps import Model, is_implementation, ltl, parse_sva, refines, to_sva
+from chase_cps import (Component, Model, System, is_implementation, ltl, parse_sva, refines,
+                       to_sva, viz)
 from chase_cps.rtl import yosys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -96,6 +100,7 @@ def main() -> int:
             print(text)
         if status != expected:
             wrong.append(title)
+        return status
 
     c = {name: read(name) for name in NAMES}
     producer, consumer, system = c["producer"], c["consumer"], c["system"]
@@ -106,7 +111,10 @@ def main() -> int:
         r = refines(s, system)
         return r.status, ("   assumptions left after discharge: "
                           + (", ".join(ltl.to_str(f) for f in s.assumptions) or "none"))
-    step("1. Producer, TwoFifo, Consumer refine System", "valid", old_system)
+    old_fifo, new_fifo = Component("TwoFifo", two), Component("OneFifo", one)
+    old = System("Buffer", [Component("Producer", producer), old_fifo,
+                            Component("Consumer", consumer)], contract=system)
+    old.status = step("1. Producer, TwoFifo, Consumer refine System", "valid", old_system)
 
     def swap():
         r = refines(one, two)
@@ -124,7 +132,7 @@ def main() -> int:
         return r.status, ("   Slot = System / (Producer, Consumer)"
                           "\n   assume: " + "; ".join(ltl.to_str(f) for f in slot.assumptions)
                           + "\n   guarantee: " + "; ".join(ltl.to_str(f) for f in slot.guarantees))
-    step("3. OneFifo refines Slot", "valid", quotient)
+    in_slot = step("3. OneFifo refines Slot", "valid", quotient)
 
     def new_system():
         s = producer.compose(one, discharge=True).compose(consumer, discharge=True)
@@ -144,10 +152,17 @@ def main() -> int:
         def rtl_check(model, contract):
             return lambda: (is_implementation(model, contract).status, "")
         one_rtl, two_rtl = fifo("bsg_one_fifo"), fifo("bsg_two_fifo")
-        step("   the RTL of bsg_two_fifo implements TwoFifo", "valid", rtl_check(two_rtl, two))
-        step("   the RTL of bsg_one_fifo implements OneFifo", "valid", rtl_check(one_rtl, one))
+        old_fifo.implementation, new_fifo.implementation = two_rtl, one_rtl
+        old_fifo.status = step("   the RTL of bsg_two_fifo implements TwoFifo", "valid",
+                               rtl_check(two_rtl, two))
+        new_fifo.status = step("   the RTL of bsg_one_fifo implements OneFifo", "valid",
+                               rtl_check(one_rtl, one))
         step("   the RTL of bsg_one_fifo implements Slot", "valid", rtl_check(one_rtl, slot))
         step("   the RTL of bsg_one_fifo implements TwoFifo", "invalid", rtl_check(one_rtl, two))
+
+    page = viz.save(viz.diagram(old, slot, refines=[(new_fifo, slot, in_slot)], title="Buffer swap"),
+                    os.path.join(HERE, "out", "bufferswap.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

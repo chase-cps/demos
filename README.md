@@ -43,6 +43,11 @@ This repository contains the demonstrations of [CHASE][WEB]:
     perception and localization is its contract, with the bound on the yaw
     rate that perception assumes; the requirements written for the mission
     alone do not refine it.
+- [**Escalation**][ESCALATION]: the escalation link of a security chip (a
+    toy version of the one of OpenTitan), checked module by module: the RTL
+    of each module implements its contract in SVA, and the composition of
+    the contracts refines the requirements, with no check on the whole
+    design. A faster sender breaks its contract, and the link with it.
 - [**AIAgents**][AIAGENTS]: a task in natural language (AppWorld) becomes the
     contract of an AI agent, over its tool calls, decomposed among three
     sub-agents. The decomposition misses a deliverable; the quotient says
@@ -53,8 +58,8 @@ The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger needs version 0.2.0,
-AHB, AIAgents, BufferSwap, LiftPlusCruise, and WarehouseRobot version 0.4.2, BufferSwap
-with `pip install chase-cps[rtl]`).
+AHB, AIAgents, BufferSwap, Escalation, LiftPlusCruise, and WarehouseRobot version 0.4.2,
+BufferSwap and Escalation with `pip install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md
@@ -67,3 +72,4 @@ with `pip install chase-cps[rtl]`).
 [AHB]: AHB/AHB.md
 [WAREHOUSE]: WarehouseRobot/WarehouseRobot.md
 [AIAGENTS]: AIAgents/AIAgents.md
+[ESCALATION]: Escalation/Escalation.md

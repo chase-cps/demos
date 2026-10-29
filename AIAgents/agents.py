@@ -41,10 +41,13 @@ as CHASE reads them.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 
-from chase_cps import Contract, is_consistent, ltl, refines
+from chase_cps import Component, Contract, System, is_consistent, ltl, refines, viz
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 B = "bool"
 # The variables: one per tool call of a sub-agent (a call does not say who
@@ -115,6 +118,7 @@ def main() -> int:
             show(r.guarantees.trace)
         if r.status != expected:
             wrong.append(title)
+        return r
 
     step("1. Messages || Payment || Text (from the tools) || Keep refines Parent", "invalid",
          lambda: refines(compose([MESSAGES, PAYMENT, TEXT_FROM_TOOLS, KEEP], "Plan"), PARENT,
@@ -126,9 +130,10 @@ def main() -> int:
     for g in q3.guarantees:
         print("      " + ltl.to_str(g))
 
-    step("3. Text refines Q3", "valid", lambda: refines(TEXT, q3, timeout=t))
-    step("   Messages || Payment || Text || Keep refines Parent", "valid",
-         lambda: refines(compose([MESSAGES, PAYMENT, TEXT, KEEP], "Plan"), PARENT, timeout=t))
+    text_q3 = step("3. Text refines Q3", "valid", lambda: refines(TEXT, q3, timeout=t))
+    plan = step("   Messages || Payment || Text || Keep refines Parent", "valid",
+                lambda: refines(compose([MESSAGES, PAYMENT, TEXT, KEEP], "Plan"), PARENT,
+                                timeout=t))
 
     start = time.time()
     slip = PARENT.ensure("G !tx2", name="ParentWithSlip")
@@ -146,6 +151,15 @@ def main() -> int:
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))
+
+    system = System("Plan", [Component("Messages", MESSAGES), Component("Payment", PAYMENT),
+                             Component("Text", TEXT), Component("Keep", KEEP)],
+                    contract=PARENT, status=plan.status)
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(system, q3, refines=[(TEXT, q3, text_q3)],
+                                title="AI agents: decomposing a task"),
+                    os.path.join(HERE, "out", "agents.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 
 

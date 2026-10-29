@@ -27,6 +27,9 @@ the cores by the numbers of the requirements:
      refines System. (The exact composition refines System too, but its
      assumption is the closed form (A1 & A2) | !(G1 & G2).)
 
+The page out/charger.html draws the arbiters with the results of the
+checks and their cores, and the composition inside System.
+
     python charger.py
     python charger.py --expect     # exit code 1 when a result is not the expected one
 
@@ -44,7 +47,7 @@ import sys
 import time
 
 from chase_cps import (Contract, load_spec, is_realizable, synthesize, is_well_separated,
-                       is_vacuous, remove_redundant, refines, ltl)
+                       is_vacuous, remove_redundant, refines, ltl, viz)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "charger.ltl")
@@ -86,6 +89,7 @@ def main() -> int:
     c = load_spec(SPEC)
     t = args.timeout
     wrong = []
+    found = {}
 
     def step(title, expected, run):
         start = time.time()
@@ -99,7 +103,7 @@ def main() -> int:
             wrong.append(title)
 
     def greedy():
-        r = is_realizable(c["Greedy"], core=True, timeout=t)
+        r = found["Greedy"] = is_realizable(c["Greedy"], core=True, timeout=t)
         text = ""
         if r.core is not None and r.core.status == "found":
             text = "   unrealizable core:\n" + terms(r.core.core.guarantees, "Greedy")
@@ -112,7 +116,7 @@ def main() -> int:
     step("   Greedy, Robot1, Robot2 refine System", "valid", greedy_system)
 
     def fair():
-        r = synthesize(c["Fair"], timeout=t)
+        r = found["Fair"] = synthesize(c["Fair"], timeout=t)
         text = ""
         if r.controller is not None:
             text = f"   controller with {len(r.controller['nodes'])} states"
@@ -120,18 +124,22 @@ def main() -> int:
     step("2. Fair is realizable", "realizable", fair)
 
     def pushy():
-        r = is_well_separated(c["Pushy"], core=True, timeout=t)
+        r = found["Pushy"] = is_well_separated(c["Pushy"], core=True, timeout=t)
         text = ""
         if r.core is not None and r.core.status == "found":
             text = ("   the arbiter can force a violation of these assumptions:\n"
                     + terms(r.core.core.assumptions, "Pushy"))
         return r.status, text
     step("3. Pushy is well separated", "not_separated", pushy)
+
+    def check(key, run, contract):
+        found[key] = run(contract, timeout=t)
+        return found[key].status, ""
     step("   Polite is well separated", "separated",
-         lambda: (is_well_separated(c["Polite"], timeout=t).status, ""))
+         lambda: check("Polite", is_well_separated, c["Polite"]))
 
     step("4. Fair is vacuous", "not_vacuous",
-         lambda: (is_vacuous(c["Fair"], timeout=t).status, ""))
+         lambda: check("Fair vacuous", is_vacuous, c["Fair"]))
 
     def trusting():
         fair = c["Fair"]
@@ -139,6 +147,7 @@ def main() -> int:
                          [ltl.parse("G F !req1"), ltl.parse("G F !req2")],
                          list(fair.guarantees))
         r = is_vacuous(trust, core=True, timeout=t)
+        found["Trusting"] = trust, r
         text = "\n".join(f"   {v.output} is not needed ({v.mode}): {len(v.controller['nodes'])} "
                          "states without it; assumptions: "
                          + ", ".join(ltl.to_str(a) for a in v.core.core)
@@ -160,11 +169,24 @@ def main() -> int:
         charging = fair.compose(c["Robot1"], discharge=True, timeout=t)
         charging = charging.compose(c["Robot2"], name="Charging", discharge=True, timeout=t)
         r = refines(charging, c["System"], timeout=t)
+        found["Charging"] = charging, r
         text = ("   composition with discharge:\n   assumptions:\n"
                 + (terms(charging.assumptions, "Charging") or "      (none)")
                 + f"\n   {len(charging.guarantees)} guarantees")
         return r.status, text
     step("5. Fair, Robot1, Robot2 refine System", "valid", composition)
+
+    trust, vacuity = found["Trusting"]
+    charging, r = found["Charging"]
+    checks = [(c["Greedy"], found["Greedy"]), (c["Fair"], found["Fair"]),
+              (c["Fair"], found["Fair vacuous"]), (c["Pushy"], found["Pushy"]),
+              (c["Polite"], found["Polite"]), (trust, vacuity)]
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(c["Greedy"], c["Fair"], c["Pushy"], c["Polite"], trust,
+                                refines=[(charging, c["System"], r)], checks=checks,
+                                title="Charging station"),
+                    os.path.join(HERE, "out", "charger.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

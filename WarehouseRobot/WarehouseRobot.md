@@ -48,11 +48,11 @@ It prints the result of each step:
    0.8, the assumption of perception (the one of localization, |w| <= 1.0,
    is implied by it).
 2. _MissionOnly_ does not refine _Q_. In the counterexample the reported
-   clearance is 0.40 and the true one is 0: the controller turns at 0.9,
-   faster than perception allows, and perception no longer bounds its
-   error.
+   clearance is 0.40 and the true one is 0.10, which the error of
+   perception (0.3) allows. At the next step the controller turns at -0.82,
+   faster than perception allows.
 3. _Margins_ does not refine _Q_ either: the margins hold, but the
-   controller turns at 1.2, and again the true clearance is 0.
+   controller turns at -1.20, and the true clearance is 0.
 4. _Dispatched_ refines _Q_, so _Perception_ ∥ _Localization_ ∥
    _Dispatched_ refines _System_ (the script checks it too). This is the
    contract to hand to the designer.
@@ -65,3 +65,18 @@ engineer on what the controller sees, and checked against the quotient.
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
+
+### Diagram
+`out/warehouse.html`, written by `warehouse.py`, draws _Q_ as the hole next
+to _Perception_ and _Localization_, once for each candidate in it:
+_MissionOnly_ and _Margins_ (⪯, red), and _Dispatched_ (⪯, green). It opens
+in a browser; a click on a name shows the contract.
+
+![Q = System / (Perception ∥ Localization): MissionOnly does not refine it](diagram-1.png)
+_Q = System / (Perception ∥ Localization): MissionOnly does not refine it._
+
+![Margins does not refine Q](diagram-2.png)
+_Margins does not refine Q._
+
+![Dispatched refines Q](diagram-3.png)
+_Dispatched refines Q._

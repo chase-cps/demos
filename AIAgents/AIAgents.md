@@ -67,3 +67,14 @@ calls at run time, for instance with ContrAgent.
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
+
+### Diagram
+At the end the script writes `out/agents.html`, a page to open in a browser:
+the four sub-agents inside the contract of _Parent_, with the result of the
+refinement, and _Q3_ with _Text_ in its hole.
+
+![The four sub-agents inside the contract of the parent: their composition refines it](diagram-1.png)
+_The four sub-agents inside the contract of the parent: their composition refines it._
+
+![Q3 = Parent / Rest, what sub-agent 3 must do: Text refines it](diagram-2.png)
+_Q3 = Parent / Rest, what sub-agent 3 must do: Text refines it._

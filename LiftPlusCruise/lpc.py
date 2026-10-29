@@ -48,7 +48,7 @@ import re
 import sys
 import time
 
-from chase_cps import Contract, load_spec, is_consistent, refines
+from chase_cps import Contract, load_spec, is_consistent, refines, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "lpc.ltl")
@@ -120,7 +120,8 @@ def main() -> int:
 
     c, _ = vehicle(contracts, "Reach12")
     start = time.time()
-    r = is_consistent(c, timeout=args.timeout)
+    r = reach12 = is_consistent(c, timeout=args.timeout)
+    vehicle12 = c
     print(f"1. Vehicle and Reach12 are consistent: {r.status} "
           f"[{time.time() - start:.1f} s, reals: {r.reals}]")
     if r.trace is not None:
@@ -131,7 +132,8 @@ def main() -> int:
 
     c, terms = vehicle(contracts, "Reach06")
     start = time.time()
-    r = is_consistent(c, core=True, timeout=args.timeout)
+    r = reach06 = is_consistent(c, core=True, timeout=args.timeout)
+    vehicle06 = c
     print(f"\n2. Vehicle and Reach06 are consistent: {r.status} "
           f"[{time.time() - start:.1f} s, reals: {r.reals}]")
     if r.core is not None:
@@ -156,25 +158,39 @@ def main() -> int:
             behavior(r.guarantees.trace)
         if r.status != expected:
             wrong.append(title)
+        return r
 
     mode, pilot = split(contracts)
-    step("3. ModeLogic || Pilot refines Vehicle", "valid",
-         lambda: refines(mode.compose(pilot, name="Split"), contracts["Vehicle"], timeout=t))
+    both = mode.compose(pilot, name="Split")
+    split_vehicle = step("3. ModeLogic || Pilot refines Vehicle", "valid",
+                         lambda: refines(both, contracts["Vehicle"], timeout=t))
     q12 = contracts["Reach12"].divide(mode, name="Q12", discharge=True, timeout=t)
-    step("4. Pilot refines Q12 = Reach12 / ModeLogic", "invalid",
-         lambda: refines(pilot, q12, timeout=t), show=True)
+    pilot_q12 = step("4. Pilot refines Q12 = Reach12 / ModeLogic", "invalid",
+                     lambda: refines(pilot, q12, timeout=t), show=True)
     slow = pilot.ensure("G((kias > 0.0) -> (kias' = kias - 10.0))", name="Slow")
-    step("5. Slow refines Q12", "invalid", lambda: refines(slow, q12, timeout=t), show=True)
+    slow_q12 = step("5. Slow refines Q12", "invalid", lambda: refines(slow, q12, timeout=t),
+                    show=True)
     decel = slow.ensure("G(hover_control_mode <-> (kgs < 20.0))", name="Decel")
-    step("6. Decel refines Q12", "valid", lambda: refines(decel, q12, timeout=t))
+    decel_q12 = step("6. Decel refines Q12", "valid", lambda: refines(decel, q12, timeout=t))
     step("   ModeLogic || Decel refines Reach12", "valid",
          lambda: refines(mode.compose(decel, name="Hover"), contracts["Reach12"], timeout=t))
     q06 = contracts["Reach06"].divide(mode, name="Q06", discharge=True, timeout=t)
-    step("   Decel refines Q06 = Reach06 / ModeLogic", "invalid",
-         lambda: refines(decel, q06, timeout=t))
+    decel_q06 = step("   Decel refines Q06 = Reach06 / ModeLogic", "invalid",
+                     lambda: refines(decel, q06, timeout=t))
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))
+
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(vehicle12, vehicle06, contracts["Vehicle"], q12,
+                                refines=[(both, contracts["Vehicle"], split_vehicle),
+                                         (pilot, q12, pilot_q12), (slow, q12, slow_q12),
+                                         (decel, q12, decel_q12), (decel, q06, decel_q06)],
+                                checks=[(vehicle12, "consistent", reach12),
+                                        (vehicle06, "consistent", reach06)],
+                                title="Lift-Plus-Cruise: what the pilot must do"),
+                    os.path.join(HERE, "out", "lpc.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 
 

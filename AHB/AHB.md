@@ -20,7 +20,8 @@ The directory of the demo contains:
   requirement;
 - `ahb.py`: the steps with the CHASE Python package;
 - `out/arbiter.sv`: the merge of the viewpoints as SVA, written by
-  `ahb.py`.
+  `ahb.py`;
+- `out/arbiter.html`: the diagram, written by `ahb.py`.
 
 ### The contracts
 - _Grant_ gives the bus to exactly one master, master 1 at the start, and no
@@ -53,3 +54,18 @@ masters release a locked bus sooner or later (LA2).
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
+
+### Diagram
+`out/arbiter.html` draws _Arbiter_ with its two viewpoints, the merge
+without LA2 with its unrealizable core (a click on its red tag R), and the
+controller. The page opens in a browser; a click on a name opens its
+contract.
+
+![Grant and Lock merged into Arbiter: each viewpoint and the merge are realizable (R)](diagram-1.png)
+_Grant and Lock merged into Arbiter: each viewpoint and the merge are realizable (R)._
+
+![Without LA2 the merge is unrealizable; a click on R marks the core: GR1, GR2, GR3.2, LK1, LK2.1](diagram-2.png)
+_Without LA2 the merge is unrealizable; a click on R marks the core: GR1, GR2, GR3.2, LK1, LK2.1._
+
+![The synthesized controller implements Arbiter (M ⊨ C)](diagram-3.png)
+_The synthesized controller implements Arbiter (M ⊨ C)._

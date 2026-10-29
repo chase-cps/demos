@@ -35,7 +35,7 @@ import re
 import sys
 import time
 
-from chase_cps import Contract, load_spec, is_realizable, refines, ltl
+from chase_cps import Contract, load_spec, is_realizable, refines, ltl, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "fsm.ltl")
@@ -91,7 +91,8 @@ def main() -> int:
 
     def step(title, expected, run):
         start = time.time()
-        status, text = run()
+        r, text = run()
+        status = r.status
         seconds = time.time() - start
         mark = "" if status == expected else f"   (expected {expected})"
         print(f"\n{title}: {status} [{seconds:.1f} s]{mark}")
@@ -99,6 +100,9 @@ def main() -> int:
             print(text)
         if status != expected:
             wrong.append(title)
+        return r
+
+    cores = {}                      # the first check of each contract, with its core
 
     def fix(first: str, fixed: str):
         """Replace a requirement of each unrealizable core by its corrected
@@ -108,6 +112,7 @@ def main() -> int:
             corrected = {n: f for f, n in ((ltl.parse(s), n) for s, n in NUMBERS[fixed].items())}
             while True:
                 r = is_realizable(contract, core=True, timeout=t)
+                cores.setdefault(first, r)
                 if r.status != "unrealizable" or r.core is None or r.core.status != "found":
                     break
                 core = r.core.core.guarantees
@@ -121,17 +126,17 @@ def main() -> int:
                 g = [corrected[n + "v2"] if f is old[0] else f for f in contract.guarantees]
                 contract = Contract(first, dict(contract.inputs), dict(contract.outputs),
                                     list(contract.assumptions), g)
-            return r.status, "\n".join(lines)
+            return r, "\n".join(lines)
         return run
     step("1. AutopilotFirst, corrected at each core, is realizable", "realizable",
          fix("AutopilotFirst", "Autopilot"))
     step("   SensorFirst, corrected at each core, is realizable", "realizable",
          fix("SensorFirst", "Sensor"))
 
-    step("2. Autopilot is realizable", "realizable",
-         lambda: (is_realizable(c["Autopilot"], timeout=t).status, ""))
-    step("   Sensor is realizable", "realizable",
-         lambda: (is_realizable(c["Sensor"], timeout=t).status, ""))
+    autopilot = step("2. Autopilot is realizable", "realizable",
+                     lambda: (is_realizable(c["Autopilot"], timeout=t), ""))
+    sensor = step("   Sensor is realizable", "realizable",
+                  lambda: (is_realizable(c["Sensor"], timeout=t), ""))
 
     fsm = c["Autopilot"].compose(c["Sensor"], discharge=True)
 
@@ -142,14 +147,26 @@ def main() -> int:
         if part is not None and part.trace is not None:
             text = (f"   assumptions left after discharge: {len(fsm.assumptions)}\n"
                     f"   the {r.failed} fail; a counterexample:\n" + trace(part))
-        return r.status, text
-    step("3. Autopilot, Sensor refine System (FSM-001)", "invalid", system)
+        return r, text
+    untimed = step("3. Autopilot, Sensor refine System (FSM-001)", "invalid", system)
 
-    step("4. Autopilot, Sensor refine SystemTimed (FSM-001t)", "valid",
-         lambda: (refines(fsm, c["SystemTimed"], timeout=t).status, ""))
+    timed = step("4. Autopilot, Sensor refine SystemTimed (FSM-001t)", "valid",
+                 lambda: (refines(fsm, c["SystemTimed"], timeout=t), ""))
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))
+
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(c["AutopilotFirst"], c["SensorFirst"],
+                                refines=[(fsm, c["System"], untimed),
+                                         (fsm, c["SystemTimed"], timed)],
+                                checks=[(c[k], "realizable", r) for k, r in
+                                        [("AutopilotFirst", cores["AutopilotFirst"]),
+                                         ("SensorFirst", cores["SensorFirst"]),
+                                         ("Autopilot", autopilot), ("Sensor", sensor)]],
+                                title="Finite state machine: conflicting requirements"),
+                    os.path.join(HERE, "out", "fsm.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 
 

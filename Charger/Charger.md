@@ -14,7 +14,8 @@ The directory of the demo contains:
   (_System_). The comment at the end of each line is the number of the
   requirement;
 - `charger.chase`: the commands of the logics-based flow;
-- `charger.py`: the whole iteration with the CHASE Python package.
+- `charger.py`: the whole iteration with the CHASE Python package;
+- `out/charger.html`: the diagram, written by `charger.py`.
 
 ### Logic-based Flow
 
@@ -85,3 +86,15 @@ The script prints the result of each step:
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
+
+### Diagram
+`out/charger.html` draws the arbiters with the results of their checks (R,
+WS, ¬V), and the composition of _Fair_ with the robots inside _System_. The
+page opens in a browser; a click on a name opens its contract, and a click
+on a red tag shows its core.
+
+![The arbiters: Greedy is unrealizable, Fair is realizable and not vacuous, Pushy is not well separated, Polite is, and Trusting is vacuous](diagram-1.png)
+_The arbiters: Greedy is unrealizable, Fair is realizable and not vacuous, Pushy is not well separated, Polite is, and Trusting is vacuous._
+
+![Fair composed with the two robots, with discharge, refines System](diagram-2.png)
+_Fair composed with the two robots, with discharge, refines System._

@@ -38,10 +38,13 @@ with its SMT engine (go_msat).
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 
-from chase_cps import Contract, ltl, refines
+from chase_cps import Contract, ltl, refines, viz
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 REAL = "real"
 YAW = ("w", "c_true", "c_rep", "e_true", "e_est")
@@ -100,6 +103,7 @@ def main() -> int:
             show(r.guarantees.trace)
         if r.status != expected:
             wrong.append(title)
+        return r
 
     fixed = PERCEPTION.compose(LOCALIZATION, name="Fixed", discharge=True, timeout=t)
     q = SYSTEM.divide(fixed, name="Q", discharge=True, timeout=t)
@@ -111,17 +115,25 @@ def main() -> int:
     for g in q.guarantees:
         print("      " + ltl.to_str(g))
 
-    step("2. MissionOnly refines Q", "invalid", lambda: refines(MISSION_ONLY, q, timeout=t),
-         counterexample=True)
-    step("3. Margins refines Q", "invalid", lambda: refines(MARGINS, q, timeout=t),
-         counterexample=True)
-    step("4. Dispatched refines Q", "valid", lambda: refines(DISPATCHED, q, timeout=t))
+    mission_only = step("2. MissionOnly refines Q", "invalid",
+                        lambda: refines(MISSION_ONLY, q, timeout=t), counterexample=True)
+    margins = step("3. Margins refines Q", "invalid", lambda: refines(MARGINS, q, timeout=t),
+                   counterexample=True)
+    dispatched = step("4. Dispatched refines Q", "valid",
+                      lambda: refines(DISPATCHED, q, timeout=t))
     step("   Perception || Localization || Dispatched refines System", "valid",
          lambda: refines(fixed.compose(DISPATCHED, name="Robot", discharge=True, timeout=t),
                          SYSTEM, timeout=t))
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))
+
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(q, refines=[(MISSION_ONLY, q, mission_only),
+                                            (MARGINS, q, margins), (DISPATCHED, q, dispatched)],
+                                title="Warehouse robot: a controller to delegate"),
+                    os.path.join(HERE, "out", "warehouse.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 
 

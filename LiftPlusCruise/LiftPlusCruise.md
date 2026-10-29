@@ -89,3 +89,30 @@ LPC_KIAS_DERIVATIVE, LPC_KIAS_0, LPC_INIT_HOVER_MODE).
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
+
+### Diagram
+`out/lpc.html`, written by `lpc.py`, draws _Vehicle_ with each of
+LPC_REACH_HOVER_12 and LPC_REACH_HOVER_06 and whether it is consistent (G,
+green and red), _ModeLogic_ ∥ _Pilot_ inside _Vehicle_, and the quotient
+_Q12_ once for each pilot in its hole (_Pilot_, _Slow_, _Decel_), then _Q06_
+with _Decel_, with the result of each refinement (⪯, green when it holds,
+red when it does not). It opens in a browser; a click on a name shows the
+contract, and a click on the red G marks the unsat core in it.
+
+![The requirements are consistent with the deadline of 12 s, not with 6 s; a click on the red G marks the 8 requirements in conflict](diagram-1.png)
+_The requirements are consistent with the deadline of 12 s, not with 6 s; a click on the red G marks the 8 requirements in conflict._
+
+![ModeLogic ∥ Pilot refines Vehicle](diagram-2.png)
+_ModeLogic ∥ Pilot refines Vehicle._
+
+![Q12 = Reach12 / ModeLogic: Pilot does not refine it](diagram-3.png)
+_Q12 = Reach12 / ModeLogic: Pilot does not refine it._
+
+![Slow does not refine Q12](diagram-4.png)
+_Slow does not refine Q12._
+
+![Decel refines Q12](diagram-5.png)
+_Decel refines Q12._
+
+![Decel does not refine Q06 = Reach06 / ModeLogic](diagram-6.png)
+_Decel does not refine Q06 = Reach06 / ModeLogic._

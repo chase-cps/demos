@@ -21,6 +21,9 @@ the design with the CHASE Python package (pip install chase-cps):
      SVA.
   4. The controller implements the merge.
 
+The page out/arbiter.html draws the two merges, with their realizability
+and the core, and the controller.
+
     python ahb.py
     python ahb.py --expect     # exit code 1 when a result is not the expected one
 
@@ -36,7 +39,8 @@ import os
 import sys
 import time
 
-from chase_cps import Model, is_implementation, is_realizable, parse_sva, synthesize, to_sva
+from chase_cps import (Component, Model, is_implementation, is_realizable, parse_sva, synthesize,
+                       to_sva, viz)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -69,14 +73,18 @@ def main() -> int:
             print(text)
         if status != expected:
             wrong.append(title)
+        return status
 
     grant, labels = read("grant")
     lock, more = read("lock")
     labels.update(more)
-    step("1. Grant is realizable", "realizable",
-         lambda: (is_realizable(grant, timeout=t).status, ""))
-    step("   Lock is realizable", "realizable",
-         lambda: (is_realizable(lock, timeout=t).status, ""))
+    found = {}
+
+    def realizable(c):
+        found[c.name] = is_realizable(c, timeout=t)
+        return found[c.name].status, ""
+    step("1. Grant is realizable", "realizable", lambda: realizable(grant))
+    step("   Lock is realizable", "realizable", lambda: realizable(lock))
 
     # Lock without LA2, its only liveness assumption
     lock_without = dataclasses.replace(
@@ -84,8 +92,9 @@ def main() -> int:
         assumptions=[a for a in lock.assumptions if labels.get(repr(a)) != "LA2"])
 
     def without_la2():
-        merged = grant.merge(lock_without, name="Arbiter", discharge=True, timeout=t)
+        merged = grant.merge(lock_without, name="Arbiter_without_LA2", discharge=True, timeout=t)
         r = is_realizable(merged, core=True, timeout=t)
+        found["without"] = merged, r
         text = ""
         if r.core is not None and r.core.core is not None:
             core = sorted(labels.get(repr(g), "?") for g in r.core.core.guarantees)
@@ -94,7 +103,6 @@ def main() -> int:
     step("2. Grant merged with Lock, without LA2, is realizable", "unrealizable", without_la2)
 
     arbiter = grant.merge(lock, name="Arbiter", discharge=True, timeout=t)
-    found = {}
 
     def synthesis():
         r = synthesize(arbiter, timeout=t)
@@ -112,12 +120,22 @@ def main() -> int:
         f.write(to_sva(arbiter, clock="clk"))
     print(f"   Arbiter as SVA: {os.path.relpath(out, HERE)}")
 
+    merged, r = found["without"]
+    shown = [arbiter, merged]
     if found["controller"].controller is None:
         print("\n4. no controller: skipped")
     else:
         model = Model.from_controller(found["controller"], arbiter)
-        step("4. The controller implements Arbiter", "valid",
-             lambda: (is_implementation(model, arbiter, timeout=t).status, ""))
+        controller = Component("Controller", arbiter, model)
+        controller.status = step("4. The controller implements Arbiter", "valid",
+                                 lambda: (is_implementation(model, arbiter, timeout=t).status, ""))
+        shown.append(controller)
+
+    checks = [(grant, found["Grant"]), (lock, found["Lock"]), (arbiter, found["controller"]),
+              (merged, r)]
+    page = viz.save(viz.diagram(*shown, checks=checks, title="AHB arbiter"),
+                    os.path.join(HERE, "out", "arbiter.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

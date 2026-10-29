@@ -136,7 +136,7 @@ def main() -> int:
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(link, title="Escalation link"),
                     os.path.join(HERE, "out", "escalation.html"))
-    print(f"\nThe system: {os.path.relpath(page, HERE)}")
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

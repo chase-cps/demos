@@ -151,6 +151,21 @@ The file `solution.script` is a script specifying all the commands for the
 logics tool. The script will produce the files: `MT.smv`, `TM.smv`,
 `system.smv`, and `coordinator.spc` in the chosen output directory.
 
+### Diagram
+`sh diagram.sh` writes `out/robotic_arm.html`, a page to open in a browser:
+_Mission_ inside _Target_ and _Target_ inside _Mission_, with the result of
+each refinement, and _Mission_ ∥ _Coordinator_ with its compatibility (A) and
+consistency (G). It needs `chase-cps` and nuXmv.
+
+![Mission ∥ Coordinator, with the checks of each contract (A, G)](diagram-1.png)
+_Mission ∥ Coordinator, with the checks of each contract (A, G)._
+
+![Mission refines Target](diagram-2.png)
+_Mission refines Target._
+
+![Target does not refine Mission](diagram-3.png)
+_Target does not refine Mission._
+
 ### References
 [1] Nuzzo, Pierluigi, et al. _CHASE: Contract-based requirement engineering for 
 cyber-physical system design._ in Proceeding of the 2018 Design, Automation and 
