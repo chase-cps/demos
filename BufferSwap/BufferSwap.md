@@ -11,6 +11,9 @@ which is smaller, and checks with CHASE that the system still meets its
 requirements. The contracts are written in SystemVerilog Assertions, and
 the RTL is that of BaseJump STL.
 
+![The system: a producer, the buffer (bsg_two_fifo, with its RTL), and a consumer, with a ready/valid handshake](diagram-system.png)
+_The system: a producer, the buffer (bsg_two_fifo, with its RTL), and a consumer, with a ready/valid handshake._
+
 ### Content of the directory
 The directory of the demo contains:
 - `sva/`: the contracts, one module per contract, whose ports give the
@@ -69,7 +72,6 @@ It prints the result of each step:
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-### Diagram
 `out/bufferswap.html` draws _Producer_, _TwoFifo_, and _Consumer_ inside
 _System_, and _Slot_ as a hole next to _Producer_ and _Consumer_, with
 _OneFifo_ inside it. With Yosys, the two buffers are drawn with their RTL.

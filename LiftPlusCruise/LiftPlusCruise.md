@@ -18,6 +18,9 @@ the first one, and unrealizable with the second one. All the variables are
 outputs of the vehicle, so the requirements are realizable when they are
 consistent: CHASE checks their consistency.
 
+![The vehicle: the mode logic and the pilot, wired by the speeds, the hover control, and the lift mode](diagram-system.png)
+_The vehicle: the mode logic and the pilot, wired by the speeds, the hover control, and the lift mode._
+
 ### Content of the directory
 The directory of the demo contains:
 - `requirements.txt`: the requirements in FRETish, as in FRET;
@@ -90,7 +93,6 @@ LPC_KIAS_DERIVATIVE, LPC_KIAS_0, LPC_INIT_HOVER_MODE).
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-### Diagram
 `out/lpc.html`, written by `lpc.py`, draws _Vehicle_ with each of
 LPC_REACH_HOVER_12 and LPC_REACH_HOVER_06 and whether it is consistent (G,
 green and red), _ModeLogic_ ∥ _Pilot_ inside _Vehicle_, and the quotient

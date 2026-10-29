@@ -16,6 +16,9 @@ fixed components: the weakest contract of the controller with which the
 system meets its requirements. It holds what the neighbours assume of the
 controller, which a requirement written for the mission alone leaves out.
 
+![The system with the place of the controller: the hole Q next to perception and localization](diagram-system.png)
+_The system with the place of the controller: the hole Q next to perception and localization._
+
 ### Content of the directory
 The directory of the demo contains:
 - `requirements.txt`: the variables, the contracts, and the three candidate
@@ -66,7 +69,6 @@ engineer on what the controller sees, and checked against the quotient.
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-### Diagram
 `out/warehouse.html`, written by `warehouse.py`, draws _Q_ as the hole next
 to _Perception_ and _Localization_, once for each candidate in it:
 _MissionOnly_ and _Margins_ (⪯, red), and _Dispatched_ (⪯, green). It opens

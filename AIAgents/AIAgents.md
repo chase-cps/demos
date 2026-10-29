@@ -12,6 +12,9 @@ The question: do the contracts of the sub-agents, together, refine the
 contract of the parent? If not, what is missing, and which sub-agent must
 do it?
 
+![The plan: the four sub-agents inside the contract of the parent, wired by the variables they share](diagram-system.png)
+_The plan: the four sub-agents inside the contract of the parent, wired by the variables they share._
+
 ### Content of the directory
 The directory of the demo contains:
 - `requirements.txt`: the task, the plan, the variables, the contract of
@@ -68,7 +71,6 @@ calls at run time, for instance with ContrAgent.
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-### Diagram
 At the end the script writes `out/agents.html`, a page to open in a browser:
 the four sub-agents inside the contract of _Parent_, with the result of the
 refinement, and _Q3_ with _Text_ in its hole.

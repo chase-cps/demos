@@ -13,6 +13,9 @@ and the sender detect. The requirements follow the end-to-end assertions of
 OpenTitan (`prim_esc_rxtx_assert_fpv`): _Functional_ (escalation, no false
 escalation, ping) and _Integrity_ (a single wrong wire is detected).
 
+![The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements](diagram-system.png)
+_The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements._
+
 ### Content of the directory
 The directory of the demo contains:
 - `sva/`: the contracts in SystemVerilog Assertions, one module each:
@@ -46,7 +49,6 @@ It prints the result of each step:
 `$> python3 escalation.py --expect` exits with code 1 when a result is not
 the expected one.
 
-### Diagram
 `out/escalation.html` draws the link inside _Functional_: the three modules
 with their RTL as state machines, wired by their ports, and the result of
 each check (M ⊨ C on each module, ⪯ on _Functional_). It opens in a

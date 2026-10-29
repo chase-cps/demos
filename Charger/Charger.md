@@ -6,6 +6,9 @@ requirements of a first arbiter cannot be realized, a second one can be
 realized but for a bad reason, and a third one is composed with the robots
 and checked against the requirements of the whole system.
 
+![The system: an arbiter and two robots, which feed each other with requests and grants](diagram-system.png)
+_The system: an arbiter and two robots, which feed each other with requests and grants._
+
 ### Content of the directory
 The directory of the demo contains:
 - `requirements.txt`: the requirements, numbered;
@@ -87,7 +90,6 @@ The script prints the result of each step:
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-### Diagram
 `out/charger.html` draws the arbiters with the results of their checks (R,
 WS, ¬V), and the composition of _Fair_ with the robots inside _System_. The
 page opens in a browser; a click on a name opens its contract, and a click

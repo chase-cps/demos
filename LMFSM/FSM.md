@@ -13,6 +13,9 @@ requirements in conflict, checks that the corrected ones can be realized,
 and checks the requirement of the whole system on the composition of the
 autopilot and the sensor.
 
+![The system: the autopilot and the sensor, which feed each other](diagram-system.png)
+_The system: the autopilot and the sensor, which feed each other._
+
 ### Content of the directory
 The directory of the demo contains:
 - `requirements.txt`: the requirements, with the numbers of the paper;
@@ -71,7 +74,6 @@ the sensor stays in FAULT (the autopilot requests support) and the
 autopilot stays in TRANSITION (the sensor data is not good), so there is
 never a pullup.
 
-### Diagram
 `out/fsm.html`, written by `fsm.py`, draws _AutopilotFirst_ and
 _SensorFirst_ with their realizability (R, red), and _Autopilot_ ∥ _Sensor_
 inside _System_ (⪯, red) and inside _SystemTimed_ (⪯, green), with the

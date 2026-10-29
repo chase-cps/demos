@@ -11,6 +11,9 @@ bus. The requirements are simplified from those of R. Bloem et al.,
 GR(1) synthesis: two masters, no bursts, and no HREADY. The viewpoints are
 put together by merging, the operation for viewpoints of one component.
 
+![The arbiter: the merge of the two viewpoints, Grant and Lock, over the requests and the locks of two masters](diagram-system.png)
+_The arbiter: the merge of the two viewpoints, Grant and Lock, over the requests and the locks of two masters._
+
 ### Content of the directory
 The directory of the demo contains:
 - `requirements.txt`: the requirements, numbered;
@@ -55,7 +58,6 @@ masters release a locked bus sooner or later (LA2).
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-### Diagram
 `out/arbiter.html` draws _Arbiter_ with its two viewpoints, the merge
 without LA2 with its unrealizable core (a click on its red tag R), and the
 controller. The page opens in a browser; a click on a name opens its
