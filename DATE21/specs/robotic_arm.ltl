@@ -62,7 +62,6 @@ CONTRACT Coordinator:
         !placed;
         !picked;
         !adone;
-        !pdone;
         !grip;
 
         G F (pdone & adone);
