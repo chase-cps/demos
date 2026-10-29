@@ -1,18 +1,16 @@
 Task 530b157_1 of AppWorld (H. Trivedi et al., "AppWorld: A Controllable
 World of Apps and People for Benchmarking Interactive Coding Agents", ACL
-2024), with the plan and the contracts of one run of ACORN (contracts of
-ContrAgent over the tool calls of the agents):
+2024). The task, in natural language:
 
     Kristin paid for the groceries. Pay her back on Venmo the amount in
     her text messages, with the note "Groceries", then send her the text
-    message "It is done."
+    message "It is done." (a text message, not a voice message).
 
 The parent agent does not use the apps itself: it splits the task among
 three sub-agents, in this order, and keeps the completion of the task.
 
     1 Messages   find the amount and the phone number of Kristin in the
-                 text messages (phone tools; it also holds the tool of
-                 voice messages)
+                 text messages (phone tools, among them voice messages)
     2 Payment    pay Kristin on Venmo (the only one with the Venmo tools)
     3 Text       send the text message (phone tools)
 
@@ -26,8 +24,8 @@ not say who makes it
     msg_ok           the text is "It is done."
     complete         the parent marks the task complete
 
-The rules of the user and what the user asked for (H, the contract of the
-parent)
+The contract of the parent: the rules of the user and what the user asked
+for (H)
     H1   G (text3 -> paid)        the text comes after the payment
     H2   G (paid -> G !tx2)       pay once
     H3   G (tx2 -> desc_ok)       the note is "Groceries"
@@ -38,10 +36,9 @@ parent)
     H8   F complete               deliver: the task marked complete
 
 The contracts of the sub-agents
-    Messages   G !voice1 (the rule of the tool it holds)
-    Payment    the rules of Venmo (H2, H3), the payment (H6), and how the
-               Venmo tool writes paid
-    Text       from the tools alone: H1, H4, G !voice3
-               as written in the run: also F text3, under the start
+    Messages   G !voice1 (the rule of the voice tool it holds)
+    Payment    H2, H3, H6, and how the Venmo tool writes paid
+    Text       from the rules of its tools: H1, H4, G !voice3
+               after the quotient: also F text3, under the start
                condition that the payment is done (F paid)
-    Keep       F complete (the parent)
+    Keep       H8 (the parent)

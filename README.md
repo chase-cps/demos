@@ -38,22 +38,22 @@ This repository contains the demonstrations of [CHASE][WEB]:
     unrealizable without the assumption that a master releases a locked bus,
     with the requirements in conflict as its core; with it, it is
     synthesized and written as SVA.
-- [**Warehouse**][WAREHOUSE]: the local controller of a warehouse robot is
+- [**WarehouseRobot**][WAREHOUSE]: the local controller of a warehouse robot is
     delegated (Damera, Matheu, Baras, 2026). The quotient of the system by
     perception and localization is its contract, with the bound on the yaw
     rate that perception assumes; the requirements written for the mission
     alone do not refine it.
-- [**Delegation**][DELEGATION]: a task of an AI agent (AppWorld) split among
-    three sub-agents, with contracts over their tool calls. The contracts
-    that follow from the tools miss a deliverable; the quotient says which
-    sub-agent must do it; an unsat core finds a clause of the parent that
+- [**AIAgents**][AIAGENTS]: a task in natural language (AppWorld) becomes the
+    contract of an AI agent, over its tool calls, decomposed among three
+    sub-agents. The decomposition misses a deliverable; the quotient says
+    which sub-agent must do it; an unsat core finds a clause that
     contradicts the rules of the user.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger needs version 0.2.0,
-AHB, BufferSwap, Delegation, LiftPlusCruise, and Warehouse version 0.4.2, BufferSwap
+AHB, AIAgents, BufferSwap, LiftPlusCruise, and WarehouseRobot version 0.4.2, BufferSwap
 with `pip install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
@@ -65,5 +65,5 @@ with `pip install chase-cps[rtl]`).
 [BUFFERSWAP]: BufferSwap/BufferSwap.md
 [LMFSM]: LMFSM/FSM.md
 [AHB]: AHB/AHB.md
-[WAREHOUSE]: Warehouse/Warehouse.md
-[DELEGATION]: Delegation/Delegation.md
+[WAREHOUSE]: WarehouseRobot/WarehouseRobot.md
+[AIAGENTS]: AIAgents/AIAgents.md

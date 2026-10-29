@@ -1,4 +1,4 @@
-"""Warehouse: the contract of a controller to delegate.
+"""Warehouse robot: a controller to delegate.
 
 The question: the local controller of a warehouse robot is given to a
 designer (a person, or a language model) while perception and localization

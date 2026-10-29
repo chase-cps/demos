@@ -1,33 +1,38 @@
-"""Delegation: a task of an AI agent split among three sub-agents.
+"""AI agents: decomposing a task among sub-agents.
 
-The question: a parent agent splits a task among three sub-agents and
-gives each one a contract over its tool calls. Do the sub-agents, together,
-keep every rule of the user and deliver what the user asked for? If not,
-what is missing, and who should do it?
+A user gives an AI agent a task in natural language, with rules: "Kristin
+paid for the groceries. Pay her back on Venmo the amount in her text
+messages, with the note 'Groceries', then text her 'It is done.' Do not
+send voice messages." (task 530b157_1 of AppWorld, Trivedi et al., ACL
+2024; requirements.txt). The rules and what the user asked for become a set
+of contracts over the tool calls of the agent: the contract of the parent
+agent. The parent splits the task among three sub-agents, 1 Messages (finds
+the amount), 2 Payment (pays on Venmo), and 3 Text (sends the text), and
+keeps the completion of the task.
 
-The task is 530b157_1 of AppWorld (Trivedi et al., ACL 2024), with the
-plan and the contracts of a run of ACORN, whose contracts are those of
-ContrAgent (temporal formulas over the tool calls of an agent): "Kristin
-paid for the groceries; pay her back on Venmo the amount in her text
-messages, with the note 'Groceries', then text her 'It is done.'"
-(requirements.txt). The sub-agents are 1, Messages (finds the amount), 2,
-Payment (pays on Venmo), and 3, Text (sends the text); the parent keeps
-the completion of the task. This script follows the check of the plan with
-the CHASE Python package (pip install chase-cps):
+The question: do the contracts of the sub-agents, together, refine the
+contract of the parent? If not, what is missing, and which sub-agent must
+do it? This script follows the decomposition with the CHASE Python package
+(pip install chase-cps):
 
-  1. The contracts that follow from the tools alone (each rule goes to the
-     sub-agents that hold its tools; the payment to the only one that holds
-     Venmo) do not refine the contract of the parent. The counterexample
-     pays and never sends the text: no sub-agent has to.
+  1. Each sub-agent gets the rules of the tools it holds, and the payment
+     goes to the only one that holds Venmo. These contracts, composed, do
+     not refine the contract of the parent: the counterexample pays and
+     never sends the text.
   2. Q3 = Parent / (Messages || Payment || Keep), the quotient with
-     discharge, is what Text must do: its rules, and F text3.
+     discharge, is what sub-agent 3 must guarantee: the rules of its tools,
+     and F text3.
   3. Text, with F text3 and the start condition that the payment is done,
-     refines Q3, so the plan refines the contract of the parent.
-  4. A plan in which the parent also writes "never pay" (a slip) is not
-     consistent, and the unsat core names the two clauses in conflict.
+     refines Q3, so the decomposition refines the contract of the parent.
+  4. A clause that contradicts the rules of the user (the parent also
+     writes "never pay") makes the contract inconsistent, and the unsat
+     core names the two clauses in conflict.
 
-    python delegation.py
-    python delegation.py --expect     # exit code 1 when a result is not the expected one
+Once checked, the contracts of the sub-agents can be enforced on their
+tool calls at run time, for instance with ContrAgent.
+
+    python agents.py
+    python agents.py --expect     # exit code 1 when a result is not the expected one
 
 The checks need nuXmv or NuSMV. The formulas are read on infinite traces,
 as CHASE reads them.
