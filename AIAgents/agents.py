@@ -120,9 +120,11 @@ def main() -> int:
             wrong.append(title)
         return r
 
-    step("1. Messages || Payment || Text (from the tools) || Keep refines Parent", "invalid",
-         lambda: refines(compose([MESSAGES, PAYMENT, TEXT_FROM_TOOLS, KEEP], "Plan"), PARENT,
-                         timeout=t), counterexample=True)
+    tools = step("1. Messages || Payment || Text (from the tools) || Keep refines Parent",
+                 "invalid",
+                 lambda: refines(compose([MESSAGES, PAYMENT, TEXT_FROM_TOOLS, KEEP], "Plan"),
+                                 PARENT, timeout=t),
+                 counterexample=True)
 
     q3 = PARENT.divide(compose([MESSAGES, PAYMENT, KEEP], "Rest"), name="Q3", discharge=True,
                        timeout=t)
@@ -131,13 +133,12 @@ def main() -> int:
         print("      " + ltl.to_str(g))
 
     text_q3 = step("3. Text refines Q3", "valid", lambda: refines(TEXT, q3, timeout=t))
-    plan = step("   Messages || Payment || Text || Keep refines Parent", "valid",
-                lambda: refines(compose([MESSAGES, PAYMENT, TEXT, KEEP], "Plan"), PARENT,
-                                timeout=t))
+    step("   Messages || Payment || Text || Keep refines Parent", "valid",
+         lambda: refines(compose([MESSAGES, PAYMENT, TEXT, KEEP], "Plan"), PARENT, timeout=t))
 
     start = time.time()
     slip = PARENT.ensure("G !tx2", name="ParentWithSlip")
-    r = is_consistent(slip, core=True, timeout=t)
+    r = slip_consistent = is_consistent(slip, core=True, timeout=t)
     mark = "" if r.status == "unsat" else "   (expected unsat)"
     print(f"\n4. The parent with 'never pay' is consistent: {r.status} "
           f"[{time.time() - start:.1f} s]{mark}")
@@ -152,11 +153,17 @@ def main() -> int:
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))
 
-    system = System("Plan", [Component("Messages", MESSAGES), Component("Payment", PAYMENT),
-                             Component("Text", TEXT), Component("Keep", KEEP)],
-                    contract=PARENT, status=plan.status)
+    # The diagram, one picture per step: the plan with sub-agent 3 from its
+    # tools, inside the parent (1); Q3, with Text in its hole (2, 3); the
+    # parent with the slip, and its core (4). The plan with Text inside the
+    # parent is drawn like the first one, and is left out.
+    plan = System("Plan", [Component("Messages", MESSAGES), Component("Payment", PAYMENT),
+                           Component("Text", TEXT_FROM_TOOLS), Component("Keep", KEEP)],
+                  contract=PARENT, status=tools.status)
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
-    page = viz.save(viz.diagram(system, q3, refines=[(TEXT, q3, text_q3)],
+    page = viz.save(viz.diagram(plan, q3, slip, refines=[(TEXT, q3, text_q3)],
+                                checks=[(slip, "consistent", slip_consistent)],
+                                open=[PARENT, TEXT_FROM_TOOLS, q3, TEXT, slip],
                                 title="AI agents: decomposing a task"),
                     os.path.join(HERE, "out", "agents.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")

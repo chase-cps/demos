@@ -71,14 +71,15 @@ expected one.
 
 `out/warehouse.html`, written by `warehouse.py`, draws _Q_ as the hole next
 to _Perception_ and _Localization_, once for each candidate in it:
-_MissionOnly_ and _Margins_ (⪯, red), and _Dispatched_ (⪯, green). It opens
-in a browser; a click on a name shows the contract.
+_MissionOnly_ and _Margins_ (⪯, red), and _Dispatched_ (⪯, green). The hole
+and each candidate are drawn open, to compare their terms. It opens in a
+browser; a click on a name opens or closes the contract.
 
-![Q = System / (Perception ∥ Localization): MissionOnly does not refine it](diagram-1.png)
-_Q = System / (Perception ∥ Localization): MissionOnly does not refine it._
+![Q = System / (Perception ∥ Localization) guarantees the requirements and |w| <= 0.8, the assumption of perception; MissionOnly, the requirements written on what the controller sees, does not refine it](diagram-1.png)
+_Q = System / (Perception ∥ Localization) guarantees the requirements and |w| <= 0.8, the assumption of perception; MissionOnly, the requirements written on what the controller sees, does not refine it._
 
-![Margins does not refine Q](diagram-2.png)
-_Margins does not refine Q._
+![Margins, which adds the errors of perception and localization to the bounds, does not refine Q either: it does not bound the yaw rate](diagram-2.png)
+_Margins, which adds the errors of perception and localization to the bounds, does not refine Q either: it does not bound the yaw rate._
 
-![Dispatched refines Q](diagram-3.png)
-_Dispatched refines Q._
+![Dispatched, Margins with |w| <= 0.8, refines Q](diagram-3.png)
+_Dispatched, Margins with |w| <= 0.8, refines Q._

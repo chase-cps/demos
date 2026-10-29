@@ -71,12 +71,15 @@ calls at run time, for instance with ContrAgent.
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-At the end the script writes `out/agents.html`, a page to open in a browser:
-the four sub-agents inside the contract of _Parent_, with the result of the
-refinement, and _Q3_ with _Text_ in its hole.
+At the end the script writes `out/agents.html`, a page to open in a
+browser, with one picture for each of the steps 1, 2-3, and 4. A click on a
+name opens or closes the contract, and a click on a red tag shows its core.
 
-![The four sub-agents inside the contract of the parent: their composition refines it](diagram-1.png)
-_The four sub-agents inside the contract of the parent: their composition refines it._
+![Step 1: the plan inside the contract of the parent does not refine it (⪯, red). The parent asks for F text3 (H7); Text, with the rules of its tools only, does not promise it](diagram-1.png)
+_Step 1: the plan inside the contract of the parent does not refine it (⪯, red). The parent asks for F text3 (H7); Text, with the rules of its tools only, does not promise it._
 
-![Q3 = Parent / Rest, what sub-agent 3 must do: Text refines it](diagram-2.png)
-_Q3 = Parent / Rest, what sub-agent 3 must do: Text refines it._
+![Steps 2 and 3: Q3 = Parent / (Messages ∥ Payment ∥ Keep), the hole, is what sub-agent 3 must do: the rules of its tools and F text3. Text, which sends the text once the payment is done, refines it](diagram-2.png)
+_Steps 2 and 3: Q3 = Parent / (Messages ∥ Payment ∥ Keep), the hole, is what sub-agent 3 must do: the rules of its tools and F text3. Text, which sends the text once the payment is done, refines it._
+
+![Step 4: a parent that also says "never pay" is inconsistent (G, red); its core, on a red ground, is F tx2 and G !tx2](diagram-3.png)
+_Step 4: a parent that also says "never pay" is inconsistent (G, red); its core, on a red ground, is F tx2 and G !tx2._

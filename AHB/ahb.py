@@ -133,7 +133,7 @@ def main() -> int:
 
     checks = [(grant, found["Grant"]), (lock, found["Lock"]), (arbiter, found["controller"]),
               (merged, r)]
-    page = viz.save(viz.diagram(*shown, checks=checks, title="AHB arbiter"),
+    page = viz.save(viz.diagram(*shown, checks=checks, open=[merged], title="AHB arbiter"),
                     os.path.join(HERE, "out", "arbiter.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 

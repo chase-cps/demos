@@ -184,6 +184,7 @@ def main() -> int:
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(c["Greedy"], c["Fair"], c["Pushy"], c["Polite"], trust,
                                 refines=[(charging, c["System"], r)], checks=checks,
+                                open=[c["Greedy"], c["Pushy"], trust],
                                 title="Charging station"),
                     os.path.join(HERE, "out", "charger.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")

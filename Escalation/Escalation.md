@@ -51,9 +51,10 @@ the expected one.
 
 `out/escalation.html` draws the link inside _Functional_: the three modules
 with their RTL as state machines, wired by their ports, and the result of
-each check (M ⊨ C on each module, ⪯ on _Functional_). It opens in a
-browser; a click on a name shows the contract, a click on the state icon
-shows the model.
+each check (M ⊨ C on each module, ⪯ on _Functional_). _Functional_ and the
+receiver are drawn open: the contract, and the four states of the RTL of
+the receiver. It opens in a browser; a click on a name opens or closes the
+contract, a click on the state icon the model.
 
-![The link inside Functional: the RTL of each module implements its contract (M ⊨ C), and the composition refines Functional (⪯)](diagram-1.png)
-_The link inside Functional: the RTL of each module implements its contract (M ⊨ C), and the composition refines Functional (⪯)._
+![The link inside Functional: the RTL of each module implements its contract (M ⊨ C), and the composition refines Functional (⪯); the receiver shows its contract and its four states](diagram-1.png)
+_The link inside Functional: the RTL of each module implements its contract (M ⊨ C), and the composition refines Functional (⪯); the receiver shows its contract and its four states._

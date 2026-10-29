@@ -81,7 +81,7 @@ First, let's read the system specification:
 
 `$> show`
 
-The system is described by six contracts: 
+The system is described by seven contracts:
 - _Target_: requirements of the mission; 
 - _Mission_: modeling the actions to be completed by the robot;
 - _Coordinator_: modeling the controller of the system;
@@ -101,7 +101,7 @@ Once back to the system console:
 
 `$> nuXmv /tmp/TM.smv`
 
-The second formula is false, then _Target_ do not refine _Mission_.
+The second formula is false, then _Target_ does not refine _Mission_.
 
 Then:
 
@@ -149,22 +149,25 @@ implementing the controller implementing the coordinator specification.
 
 The file `solution.script` is a script specifying all the commands for the
 logics tool. The script will produce the files: `MT.smv`, `TM.smv`,
-`system.smv`, and `coordinator.spc` in the chosen output directory.
+`top.smv`, `system.smv`, and `coordinator.spc` in the chosen output
+directory.
 
 ### Diagram
 `sh diagram.sh` writes `out/robotic_arm.html`, a page to open in a browser:
-_Mission_ inside _Target_ and _Target_ inside _Mission_, with the result of
-each refinement, and _Mission_ ∥ _Coordinator_ with its compatibility (A) and
-consistency (G). It needs `chase-cps` and nuXmv.
+_Mission_ inside _Target_ and _Target_ inside _Mission_, drawn open, with the
+result of each refinement, and the whole system, _Mission_ ∥ _Coordinator_ ∥
+_Move_ ∥ _Turn_ ∥ _Pick_ ∥ _Place_, with the compatibility (A), the
+consistency (G), and the realizability (R) of each contract. It needs
+`chase-cps` and nuXmv.
 
-![Mission ∥ Coordinator, with the checks of each contract (A, G)](diagram-1.png)
-_Mission ∥ Coordinator, with the checks of each contract (A, G)._
+![Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees](diagram-1.png)
+_Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees._
 
-![Mission refines Target](diagram-2.png)
-_Mission refines Target._
+![Target does not refine Mission: it does not set the target position or the angle](diagram-2.png)
+_Target does not refine Mission: it does not set the target position or the angle._
 
-![Target does not refine Mission](diagram-3.png)
-_Target does not refine Mission._
+![The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables](diagram-3.png)
+_The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables._
 
 ### References
 [1] Nuzzo, Pierluigi, et al. _CHASE: Contract-based requirement engineering for 

@@ -131,6 +131,7 @@ def main() -> int:
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(q, refines=[(MISSION_ONLY, q, mission_only),
                                             (MARGINS, q, margins), (DISPATCHED, q, dispatched)],
+                                open=[q, MISSION_ONLY, MARGINS, DISPATCHED],
                                 title="Warehouse robot: a controller to delegate"),
                     os.path.join(HERE, "out", "warehouse.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")

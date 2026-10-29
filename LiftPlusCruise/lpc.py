@@ -188,6 +188,7 @@ def main() -> int:
                                          (decel, q12, decel_q12), (decel, q06, decel_q06)],
                                 checks=[(vehicle12, "consistent", reach12),
                                         (vehicle06, "consistent", reach06)],
+                                open=[vehicle06, q12, decel],
                                 title="Lift-Plus-Cruise: what the pilot must do"),
                     os.path.join(HERE, "out", "lpc.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")

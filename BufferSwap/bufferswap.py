@@ -23,8 +23,9 @@ Python package (pip install chase-cps):
      (out/slot.sv, bound to bsg_one_fifo), and the RTL of both FIFOs is
      checked against the contracts with Yosys and nuXmv.
 
-The page out/bufferswap.html draws the system with the two-entry FIFO, and
-Slot with the one-entry FIFO in its hole.
+The page out/bufferswap.html draws the system with the two-entry FIFO, the
+one-entry FIFO inside the two-entry one, which it does not refine, and Slot
+with the one-entry FIFO in its hole.
 
     python bufferswap.py
     python bufferswap.py --expect     # exit code 1 when a result is not the expected one
@@ -121,7 +122,7 @@ def main() -> int:
         part = getattr(r, r.failed) if r.failed else None
         text = f"   the {r.failed} fail; a counterexample:\n" + trace(part) if part is not None else ""
         return r.status, text
-    step("2. OneFifo refines TwoFifo", "invalid", swap)
+    swapped = step("2. OneFifo refines TwoFifo", "invalid", swap)
 
     # the quotient, with its terms: the guarantees of the neighbours are
     # assumed, and the guarantees of the system are guaranteed
@@ -160,7 +161,9 @@ def main() -> int:
         step("   the RTL of bsg_one_fifo implements Slot", "valid", rtl_check(one_rtl, slot))
         step("   the RTL of bsg_one_fifo implements TwoFifo", "invalid", rtl_check(one_rtl, two))
 
-    page = viz.save(viz.diagram(old, slot, refines=[(new_fifo, slot, in_slot)], title="Buffer swap"),
+    # the old system; OneFifo inside TwoFifo, which it does not refine; OneFifo in the hole of Slot
+    page = viz.save(viz.diagram(old, refines=[(new_fifo, two, swapped), (new_fifo, slot, in_slot)],
+                                open=[slot], title="Buffer swap"),
                     os.path.join(HERE, "out", "bufferswap.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 

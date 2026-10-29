@@ -21,7 +21,7 @@ CONTRACT Mission:
     output boolean variable rplace;
     output integer (0:4) variable xtarget;
     output integer (0:4) variable ytarget;
-    output integer (0:4) variable desired_angle;
+    output integer (0:15) variable desired_angle;
 
     input boolean variable picked;
     input boolean variable placed;
@@ -96,25 +96,25 @@ CONTRACT Move:
     # 2 - move down: decrease x;
     # 3 - move right: increase y;
     # 4 - move left: decrease y;
-    output integer (0:4) variable command;
+    output integer (0:4) variable move_command;
 
     Assumptions:
         xpos = 0;
         ypos = 0;
         xtarget = 0;
         ytarget = 0;
-        G (command = 0 -> (xpos' = xpos & ypos' = ypos));
-        G (command = 1 -> (xpos' = xpos + 1 & ypos' = ypos));
-        G (command = 2 -> (xpos = xpos' + 1 & ypos' = ypos));
-        G (command = 3 -> (ypos' = ypos + 1 & xpos' = xpos));
-        G (command = 4 -> (ypos = ypos + 1 & xpos' = xpos));
+        G (move_command = 0 -> (xpos' = xpos & ypos' = ypos));
+        G (move_command = 1 -> (xpos' = xpos + 1 & ypos' = ypos));
+        G (move_command = 2 -> (xpos = xpos' + 1 & ypos' = ypos));
+        G (move_command = 3 -> (ypos' = ypos + 1 & xpos' = xpos));
+        G (move_command = 4 -> (ypos = ypos' + 1 & xpos' = xpos));
 
     Guarantees:
-        command = 0;
-        G (xpos = 0 -> command != 2);
-        G (xpos = 4 -> command != 1);
-        G (ypos = 0 -> command != 4);
-        G (ypos = 4 -> command != 3);
+        move_command = 0;
+        G (xpos = 0 -> move_command != 2);
+        G (xpos = 4 -> move_command != 1);
+        G (ypos = 0 -> move_command != 4);
+        G (ypos = 4 -> move_command != 3);
         G ((xpos = xtarget & ypos = ytarget) -> pdone);
         G ((xpos != xtarget | ypos != ytarget) -> !pdone);
         G F (xpos = xtarget & ypos = ytarget);
@@ -127,15 +127,15 @@ CONTRACT Turn:
     input integer (0:15) variable desired_angle;
     input integer (0:15) variable angle;
 
-    output integer (0:2) variable command;
+    output integer (0:2) variable turn_command;
 
     Assumptions:
-        G (command = 1 -> angle' = angle + 1);
-        G (command = 2 -> angle = angle' + 1);
-        G (command = 0 -> angle' = angle);
+        G (turn_command = 1 -> angle' = angle + 1);
+        G (turn_command = 2 -> angle = angle' + 1);
+        G (turn_command = 0 -> angle' = angle);
 
     Guarantees:
-        command = 0;
+        turn_command = 0;
         G ((angle = desired_angle) -> adone);
         G ((angle != desired_angle) -> !adone);
         G F (angle = desired_angle);

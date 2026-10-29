@@ -164,6 +164,8 @@ def main() -> int:
                                         [("AutopilotFirst", cores["AutopilotFirst"]),
                                          ("SensorFirst", cores["SensorFirst"]),
                                          ("Autopilot", autopilot), ("Sensor", sensor)]],
+                                open=[c["AutopilotFirst"], c["SensorFirst"], c["System"],
+                                      c["SystemTimed"]],
                                 title="Finite state machine: conflicting requirements"),
                     os.path.join(HERE, "out", "fsm.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")

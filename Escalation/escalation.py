@@ -27,7 +27,8 @@ The contracts are in SystemVerilog Assertions (sva/), the RTL in Verilog
      not implement the contract of the sender: its pulses last more than
      one cycle. In the whole link, a ping escalates the receiver.
 
-The page out/escalation.html draws the system, with its contracts.
+The page out/escalation.html draws the system inside Functional, with
+Functional and the receiver open.
 
     python escalation.py
     python escalation.py --expect     # exit code 1 when a result is not the expected one
@@ -134,7 +135,11 @@ def main() -> int:
          lambda: is_implementation(whole_fast, functional, timeout=t), show=True)
 
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
-    page = viz.save(viz.diagram(link, title="Escalation link"),
+    # Functional and the receiver are drawn open: the requirement, and the
+    # contract and the state machine (4 states) of the receiver. The sender
+    # (23 states) stays closed; the channel has no registers.
+    page = viz.save(viz.diagram(link, title="Escalation link",
+                                open=[functional, link.components[2]]),
                     os.path.join(HERE, "out", "escalation.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 

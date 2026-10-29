@@ -91,12 +91,16 @@ With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
 `out/charger.html` draws the arbiters with the results of their checks (R,
-WS, ¬V), and the composition of _Fair_ with the robots inside _System_. The
-page opens in a browser; a click on a name opens its contract, and a click
-on a red tag shows its core.
+WS, ¬V), the three that fail drawn open on their cores, and the composition
+of _Fair_ with the robots inside _System_. The page opens in a browser; a
+click on a name opens its contract, and a click on a red tag shows its
+core.
 
-![The arbiters: Greedy is unrealizable, Fair is realizable and not vacuous, Pushy is not well separated, Polite is, and Trusting is vacuous](diagram-1.png)
-_The arbiters: Greedy is unrealizable, Fair is realizable and not vacuous, Pushy is not well separated, Polite is, and Trusting is vacuous._
+![The arbiters: Greedy is unrealizable (its core: R5, R6.1, R6.2), Fair is realizable and not vacuous, Pushy is not well separated (it can win by making the robots break A2 and A3), and Polite is](diagram-1.png)
+_The arbiters: Greedy is unrealizable (its core: R5, R6.1, R6.2), Fair is realizable and not vacuous, Pushy is not well separated (it can win by making the robots break A2 and A3), and Polite is._
 
-![Fair composed with the two robots, with discharge, refines System](diagram-2.png)
+![Trusting assumes that the robots stop asking on their own, G F !req1 and G F !req2, so it wins without any grant: it is vacuous, and these two assumptions are the core](diagram-2.png)
+_Trusting assumes that the robots stop asking on their own, G F !req1 and G F !req2, so it wins without any grant: it is vacuous, and these two assumptions are the core._
+
+![Fair composed with the two robots, with discharge, refines System](diagram-3.png)
 _Fair composed with the two robots, with discharge, refines System._
