@@ -33,20 +33,22 @@ blackn () {
 less requirements.txt
 
 less template_0_unrealizable.txt
-clear && echo -n "$> dsl_tool -i template_0_unrealizable.txt -o $WD/unrealizable.structuredSlugs"
+# slugs reads its own format: the compiler of slugs translates the file of dsl_tool
+COMPILER=${SLUGSCOMPILER:-$SLUGS/tools/StructuredSlugsParser/compiler.py}
+
+clear && echo -n "$> dsl_tool -i template_0_unrealizable.txt -o $WD/unrealizable"
 read ans
-dsl_tool -i template_0_unrealizable.txt -o $WD/unrealizable.spc -b gr1c
-gr1c -r $WD/unrealizable.spc
+dsl_tool -i template_0_unrealizable.txt -o $WD/unrealizable
+python3 $COMPILER $WD/unrealizable.structuredSlugs > $WD/unrealizable.slugsin
+slugs $WD/unrealizable.slugsin
 read ans
 echo
 echo
 
-echo -n "$> dsl_tool -i template_0_realizable.txt -o $WD/realizable.structuredSlugs"
+echo -n "$> dsl_tool -i template_0_realizable.txt -o $WD/realizable"
 read ans
-dsl_tool -i template_0_realizable.txt -o $WD/realizable.spc -b gr1c
-gr1c -r $WD/realizable.spc
-gr1c $WD/realizable.spc &> $WD/EPS.json | less
-
-gr1c -t dot $WD/realizable.spc > $WD/EPS.dot
-dot -Tpdf $WD/EPS.dot > $WD/EPS.pdf
-
+dsl_tool -i template_0_realizable.txt -o $WD/realizable
+python3 $COMPILER $WD/realizable.structuredSlugs > $WD/realizable.slugsin
+slugs $WD/realizable.slugsin
+slugs --explicitStrategy --jsonOutput $WD/realizable.slugsin > $WD/EPS.json
+less $WD/EPS.json

@@ -54,8 +54,9 @@ This repository contains the demonstrations of [CHASE][WEB]:
     which sub-agent must do it; an unsat core finds a clause that
     contradicts the rules of the user.
 
-The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
-be in the `PATH`. All of them are available in the Docker image of CHASE,
+The scripts expect `dsl_tool`, `logics_tool`, `slugs` (with its compiler,
+`$SLUGS/tools/StructuredSlugsParser/compiler.py`), and `nuXmv` to be in the
+`PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger needs version 0.2.0,
 AHB, AIAgents, BufferSwap, Escalation, LiftPlusCruise, and WarehouseRobot version 0.4.2,

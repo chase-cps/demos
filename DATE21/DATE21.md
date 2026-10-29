@@ -39,12 +39,17 @@ The requirements are expressed using the DSL in
 
 The first step, is to formalize the requirements by using CHASE:
 
-`$> dsl_tool -i specs/template_0_unrealizable.txt -o /tmp/template_0 -b gr1c`
+`$> dsl_tool -i specs/template_0_unrealizable.txt -o /tmp/template_0`
 
-Then, verify the realizability of the specifications, using GR1C:
+The command writes `/tmp/template_0.structuredSlugs`, the specification for
+slugs. Then, verify the realizability of the specifications, using slugs.
+Slugs reads its own input format, so the file is first translated with the
+compiler distributed with slugs (`$SLUGS` is the directory of slugs; with
+`chase-cps install slugs`, it is under `~/.chase`):
 
-`$> gr1c -r /tmp/template_0.spc`\
-`Not realizable.`
+`$> python3 $SLUGS/tools/StructuredSlugsParser/compiler.py /tmp/template_0.structuredSlugs > /tmp/template_0.slugsin`\
+`$> slugs /tmp/template_0.slugsin`\
+`RESULT: Specification is unrealizable.`
 
 However, the requirements are not realizable. Thus, replace the second and
 fourth requirements with the following:
@@ -54,13 +59,20 @@ fourth requirements with the following:
 The file `specs/template_0_synthesizable.txt` specifies these requirements.
 Thus, first let's verify its realizability and try to synthesize it:
 
-`$> dsl_tool -i specs/template_0_synthesizable.txt -o /tmp/template_0 -b gr1c`\
-`$> gr1c -r /tmp/template_0.spc`\
-`Realizable.`\
-`$> gr1c -t dot /tmp/template_0.spc > /tmp/template_0.dot`
+`$> dsl_tool -i specs/template_0_synthesizable.txt -o /tmp/template_0`\
+`$> python3 $SLUGS/tools/StructuredSlugsParser/compiler.py /tmp/template_0.structuredSlugs > /tmp/template_0.slugsin`\
+`$> slugs /tmp/template_0.slugsin`\
+`RESULT: Specification is realizable.`\
+`$> slugs --explicitStrategy --jsonOutput /tmp/template_0.slugsin > /tmp/template_0.json`
 
-The last command will generate a graphical representation (in the _dot_
-format) of the Mealy Machine implementing the control strategy for the system.
+The last command writes the Mealy Machine implementing the control strategy
+for the system (in JSON).
+
+The same checks can be run with the CHASE Python package, which calls slugs
+itself:
+
+`$> python3 -c "from chase_cps import load_dsl, is_realizable; print(is_realizable(load_dsl('specs/template_0_unrealizable.txt')).status)"`\
+`unrealizable`
 
 ### Logic-based Flow
 
@@ -122,7 +134,7 @@ The objective is to compose the system by using the logics tool.
 `$> compose MT Pick MTP`\
 `$> compose MTP Place Bottom`\
 `$> compose Top Bottom System` \
-`$> synthesize Coordinator coordinator gr1c`
+`$> synthesize Coordinator coordinator slugs`
 
 Finally, it is possible to verify the consistency and compatibility of the
 _System_ contract.
@@ -140,16 +152,20 @@ counterexamples at once:
 For both assertions, the model checker returns a counter strategy: the
 contract is consistent and compatible.
 
-Finally, it is possible to synthesize the coordinator controller by using GR1C.
+Finally, it is possible to synthesize the coordinator controller by using
+slugs, from the file written by `synthesize`:
 
-`$> gr1c -t dot /tmp/coordinator.spc > /tmp/fsm.dot`
+`$> python3 $SLUGS/tools/StructuredSlugsParser/compiler.py /tmp/coordinator.structuredSlugs > /tmp/coordinator.slugsin`\
+`$> slugs /tmp/coordinator.slugsin`\
+`RESULT: Specification is realizable.`\
+`$> slugs --explicitStrategy --jsonOutput /tmp/coordinator.slugsin > /tmp/coordinator.json`
 
-This command will generate a _dot_ representation of the Finite State Machine
-implementing the controller implementing the coordinator specification.
+The last command writes the Finite State Machine implementing the
+coordinator specification (in JSON).
 
 The file `solution.script` is a script specifying all the commands for the
 logics tool. The script will produce the files: `MT.smv`, `TM.smv`,
-`top.smv`, `system.smv`, and `coordinator.spc` in the chosen output
+`top.smv`, `system.smv`, and `coordinator.structuredSlugs` in the chosen output
 directory.
 
 ### Diagram
