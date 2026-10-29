@@ -48,7 +48,7 @@ This repository contains the demonstrations of [CHASE][WEB]:
     of each module implements its contract in SVA, and the composition of
     the contracts refines the requirements, with no check on the whole
     design. A faster sender breaks its contract, and the link with it.
-- [**AIAgents**][AIAGENTS]: a task in natural language (AppWorld) becomes the
+- [**PaymentAssistant**][PAYMENT]: a task in natural language (AppWorld) becomes the
     contract of an AI agent, over its tool calls, decomposed among three
     sub-agents. The decomposition misses a deliverable; the quotient says
     which sub-agent must do it; an unsat core finds a clause that
@@ -59,7 +59,7 @@ The scripts expect `dsl_tool`, `logics_tool`, `slugs` (with its compiler,
 `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger needs version 0.2.0,
-AHB, AIAgents, BufferSwap, Escalation, LiftPlusCruise, and WarehouseRobot version 0.4.2,
+AHB, BufferSwap, Escalation, LiftPlusCruise, PaymentAssistant, and WarehouseRobot version 0.4.2,
 BufferSwap and Escalation with `pip install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
@@ -72,5 +72,5 @@ BufferSwap and Escalation with `pip install chase-cps[rtl]`).
 [LMFSM]: LMFSM/FSM.md
 [AHB]: AHB/AHB.md
 [WAREHOUSE]: WarehouseRobot/WarehouseRobot.md
-[AIAGENTS]: AIAgents/AIAgents.md
+[PAYMENT]: PaymentAssistant/PaymentAssistant.md
 [ESCALATION]: Escalation/Escalation.md

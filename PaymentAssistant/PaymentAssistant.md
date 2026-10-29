@@ -1,4 +1,4 @@
-## AI agents: decomposing a task
+## Payment assistant: decomposing a task
 
 A user gives an AI agent a task in natural language, with rules: pay a
 friend back on Venmo the amount in her text messages, with the note
@@ -19,7 +19,7 @@ _The plan: the four sub-agents inside the contract of the parent, wired by the v
 The directory of the demo contains:
 - `requirements.txt`: the task, the plan, the variables, the contract of
   the parent (H1 to H8), and the contracts of the sub-agents;
-- `agents.py`: the steps with the CHASE Python package.
+- `assistant.py`: the steps with the CHASE Python package.
 
 ### From the task to contracts
 Each tool call of a sub-agent is a Boolean variable (a call does not say
@@ -49,7 +49,7 @@ the Venmo tool writes. The contract of the parent guarantees:
 The script needs the CHASE Python package (`pip install chase-cps`, version
 0.4.2) and nuXmv or NuSMV:
 
-`$> python3 agents.py`
+`$> python3 assistant.py`
 
 It prints the result of each step:
 1. Messages ∥ Payment ∥ Text ∥ Keep does not refine _Parent_. In the
@@ -71,7 +71,7 @@ calls at run time, for instance with ContrAgent.
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
 
-At the end the script writes `out/agents.html`, a page to open in a
+At the end the script writes `out/assistant.html`, a page to open in a
 browser, with one picture for each of the steps 1, 2-3, and 4. A click on a
 name opens or closes the contract, and a click on a red tag shows its core.
 

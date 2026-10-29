@@ -1,4 +1,4 @@
-"""AI agents: decomposing a task among sub-agents.
+"""Payment assistant: decomposing a task among sub-agents.
 
 A user gives an AI agent a task in natural language, with rules: "Kristin
 paid for the groceries. Pay her back on Venmo the amount in her text
@@ -31,8 +31,8 @@ do it? This script follows the decomposition with the CHASE Python package
 Once checked, the contracts of the sub-agents can be enforced on their
 tool calls at run time, for instance with ContrAgent.
 
-    python agents.py
-    python agents.py --expect     # exit code 1 when a result is not the expected one
+    python assistant.py
+    python assistant.py --expect     # exit code 1 when a result is not the expected one
 
 The checks need nuXmv or NuSMV. The formulas are read on infinite traces,
 as CHASE reads them.
@@ -164,8 +164,8 @@ def main() -> int:
     page = viz.save(viz.diagram(plan, q3, slip, refines=[(TEXT, q3, text_q3)],
                                 checks=[(slip, "consistent", slip_consistent)],
                                 open=[PARENT, TEXT_FROM_TOOLS, q3, TEXT, slip],
-                                title="AI agents: decomposing a task"),
-                    os.path.join(HERE, "out", "agents.html"))
+                                title="Payment assistant: decomposing a task"),
+                    os.path.join(HERE, "out", "assistant.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 
