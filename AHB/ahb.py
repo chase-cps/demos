@@ -1,64 +1,52 @@
-"""AHB arbiter: two viewpoints of one component, merged or conjoined.
+"""AHB arbiter: two viewpoints of one component, merged.
 
-The arbiter of the AMBA AHB bus gives the bus to one of two masters, and a
-master can lock the bus (requirements.txt, simplified from Bloem et al.,
-COCV 2007). The two viewpoints of the arbiter are written in SystemVerilog
-Assertions (sva/): Grant (the bus is given to one master, and no master
-waits forever) and Lock (a master that has locked the bus keeps it while it
-asks for it, under the assumption that it stops asking sooner or later).
-This script follows the design with the CHASE Python package (pip install
-chase-cps):
+The question: two teams wrote two viewpoints of the arbiter of the AMBA AHB
+bus, which gives the bus to one of two masters, and lets a master lock it
+(requirements.txt, simplified from Bloem et al., COCV 2007). Is there an
+arbiter that meets both viewpoints, and what must it assume of the masters?
 
-  1. Each viewpoint is realizable.
-  2. The merge of the viewpoints, with discharge, keeps their terms:
-     (A1 & A2, G1 & G2). It is the arbiter. It is realizable, a controller
-     is synthesized, and the merge is written as SVA (out/arbiter.sv).
-  3. The conjunction of the viewpoints, (A1 | A2, G1 & G2), refines the
-     merge, and the merge does not refine it: the conjunction asks for each
-     viewpoint under its own assumptions, so no master may wait forever even
-     when a master keeps the bus locked.
-  4. The controller implements the merge, and not the conjunction. The
-     counterexample: master 2 locks the bus and never stops asking, and
-     master 1 waits forever. No arbiter can do better: it would have to let
-     master 2 keep the bus (Lock) and take it from it (Grant).
+The viewpoints are written in SystemVerilog Assertions (sva/): Grant (the
+bus is given to one master, and no master waits forever) and Lock (a master
+that has locked the bus keeps it while it asks for it). This script follows
+the design with the CHASE Python package (pip install chase-cps):
+
+  1. Each viewpoint is realizable on its own.
+  2. Arbiter = Grant . Lock, the merge, without the assumption LA2 of Lock
+     (a master that has locked the bus stops asking for it sooner or later),
+     is unrealizable. Its unrealizable core is GR1, GR2, GR3.2, LK1, LK2.1:
+     master 1 locks the bus and keeps asking for it, Lock lets it keep the
+     bus, and Grant says that master 2 does not wait forever.
+  3. With LA2, the merge is realizable. A controller is synthesized, and
+     the merge is written as SVA (out/arbiter.sv), for a tool that reads
+     SVA.
+  4. The controller implements the merge.
 
     python ahb.py
     python ahb.py --expect     # exit code 1 when a result is not the expected one
 
-The checks need slugs (realizability, synthesis) and nuXmv or NuSMV
-(refinement, the controller).
+The checks need slugs (realizability, synthesis) and nuXmv or NuSMV (the
+controller).
 """
 
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import os
 import sys
 import time
 
-from chase_cps import Model, is_implementation, is_realizable, parse_sva, refines, synthesize, to_sva
+from chase_cps import Model, is_implementation, is_realizable, parse_sva, synthesize, to_sva
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SIGNALS = ("hbusreq1", "hlock1", "hbusreq2", "hlock2", "hgrant1", "hgrant2", "hmastlock")
 
 
 def read(name: str):
-    """The contract of sva/<name>.sv."""
+    """The contract of sva/<name>.sv, and the label of each of its formulas."""
     with open(os.path.join(HERE, "sva", f"{name}.sv")) as f:
         r = parse_sva(f.read(), name=name.capitalize())
     assert not r.skipped, r.skipped
-    return r.contract
-
-
-def trace(result) -> str:
-    """The steps of a counterexample, one line per step."""
-    t = result.trace
-    lines = []
-    for i, state in enumerate(t.prefix + t.loop):
-        loop = "  <- loop" if t.loop and i == len(t.prefix) else ""
-        lines.append(f"      {i}: " + " ".join(f"{s}={int(bool(state.get(s)))}"
-                                              for s in SIGNALS) + loop)
-    return "\n".join(lines)
+    return r.contract, {repr(p.formula): p.label.replace("_", ".") for p in r.properties}
 
 
 def main() -> int:
@@ -82,14 +70,30 @@ def main() -> int:
         if status != expected:
             wrong.append(title)
 
-    grant, lock = read("grant"), read("lock")
+    grant, labels = read("grant")
+    lock, more = read("lock")
+    labels.update(more)
     step("1. Grant is realizable", "realizable",
          lambda: (is_realizable(grant, timeout=t).status, ""))
     step("   Lock is realizable", "realizable",
          lambda: (is_realizable(lock, timeout=t).status, ""))
 
+    # Lock without LA2, its only liveness assumption
+    lock_without = dataclasses.replace(
+        lock, name="Lock_without_LA2",
+        assumptions=[a for a in lock.assumptions if labels.get(repr(a)) != "LA2"])
+
+    def without_la2():
+        merged = grant.merge(lock_without, name="Arbiter", discharge=True, timeout=t)
+        r = is_realizable(merged, core=True, timeout=t)
+        text = ""
+        if r.core is not None and r.core.core is not None:
+            core = sorted(labels.get(repr(g), "?") for g in r.core.core.guarantees)
+            text = "   unrealizable core: " + ", ".join(core)
+        return r.status, text
+    step("2. Grant merged with Lock, without LA2, is realizable", "unrealizable", without_la2)
+
     arbiter = grant.merge(lock, name="Arbiter", discharge=True, timeout=t)
-    conjoined = grant.conjoin(lock, name="Conjoined")
     found = {}
 
     def synthesis():
@@ -100,7 +104,7 @@ def main() -> int:
         if r.controller:
             text += f"\n   controller with {len(r.controller['nodes'])} states"
         return r.status, text
-    step("2. Arbiter is realizable", "realizable", synthesis)
+    step("3. Grant merged with Lock is realizable", "realizable", synthesis)
 
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     out = os.path.join(HERE, "out", "arbiter.sv")
@@ -108,23 +112,12 @@ def main() -> int:
         f.write(to_sva(arbiter, clock="clk"))
     print(f"   Arbiter as SVA: {os.path.relpath(out, HERE)}")
 
-    step("3. The conjunction refines Arbiter", "valid",
-         lambda: (refines(conjoined, arbiter, timeout=t).status, ""))
-    step("   Arbiter refines the conjunction", "invalid",
-         lambda: (refines(arbiter, conjoined, timeout=t).status, ""))
-
     if found["controller"].controller is None:
         print("\n4. no controller: skipped")
     else:
         model = Model.from_controller(found["controller"], arbiter)
         step("4. The controller implements Arbiter", "valid",
              lambda: (is_implementation(model, arbiter, timeout=t).status, ""))
-
-        def conjunction():
-            r = is_implementation(model, conjoined, timeout=t)
-            text = "   a counterexample:\n" + trace(r) if r.trace is not None else ""
-            return r.status, text
-        step("   The controller implements the conjunction", "invalid", conjunction)
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

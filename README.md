@@ -21,7 +21,8 @@ This repository contains the demonstrations of [CHASE][WEB]:
 - [**LiftPlusCruise**][LPC]: requirements of the Lift-Plus-Cruise case study
     of [FRET][FRET], with real variables. The consistency of two subsets of
     the requirements, a behavior of the consistent one, and the requirements
-    in conflict in the other one.
+    in conflict in the other one; then the quotient of the deadline by the
+    mode logic, which says what the pilot must do to hover in time.
 - [**BufferSwap**][BUFFERSWAP]: the replacement of a buffer of a circuit
     (BaseJump STL), with contracts in SystemVerilog Assertions. The new
     buffer does not refine the old one, but it refines the quotient of the
@@ -34,15 +35,21 @@ This repository contains the demonstrations of [CHASE][WEB]:
     the pullup at once, and the time it takes.
 - [**AHB**][AHB]: the arbiter of the AMBA AHB bus (Bloem et al., COCV 2007),
     simplified, as two viewpoints in SystemVerilog Assertions. Their merge is
-    realizable and synthesized; their conjunction refines the merge, and the
-    controller does not implement it.
+    unrealizable without the assumption that a master releases a locked bus,
+    with the requirements in conflict as its core; with it, it is
+    synthesized and written as SVA.
+- [**Warehouse**][WAREHOUSE]: the local controller of a warehouse robot is
+    delegated (Damera, Matheu, Baras, 2026). The quotient of the system by
+    perception and localization is its contract, with the bound on the yaw
+    rate that perception assumes; the requirements written for the mission
+    alone do not refine it.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
-CHASE Python package (`pip install chase-cps`; Charger and LiftPlusCruise
-need version 0.2.0, AHB and BufferSwap version 0.4.2, BufferSwap with `pip
-install chase-cps[rtl]`).
+CHASE Python package (`pip install chase-cps`; Charger needs version 0.2.0,
+AHB, BufferSwap, LiftPlusCruise, and Warehouse version 0.4.2, BufferSwap
+with `pip install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md
@@ -53,3 +60,4 @@ install chase-cps[rtl]`).
 [BUFFERSWAP]: BufferSwap/BufferSwap.md
 [LMFSM]: LMFSM/FSM.md
 [AHB]: AHB/AHB.md
+[WAREHOUSE]: Warehouse/Warehouse.md

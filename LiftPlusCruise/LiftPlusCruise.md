@@ -54,7 +54,7 @@ are true: the requirements with LPC_REACH_HOVER_06 are not consistent.
 `$> python3 lpc.py`
 
 The script needs the CHASE Python package (`pip install chase-cps`, version
-0.2.0) and nuXmv. It prints:
+0.4.2) and nuXmv. It prints:
 1. a behavior of the requirements with LPC_REACH_HOVER_12. In the one that
    nuXmv finds, `kias` goes down from 120 by 10 at each step, the vehicle
    leaves the wing borne mode when `kias` is 90, and it hovers at step 11;
@@ -62,6 +62,30 @@ The script needs the CHASE Python package (`pip install chase-cps`, version
    vehicle stays wing borne while `kias` is above 90 (LPC_WB_STAY_ON_NEXT),
    that is, for 3 steps. Then it is semi wing borne while `kias` is above 30
    (LPC_SWB_STAY_ON_NEXT), and `kias` cannot reach 30 by step 6.
+
+Consistency says that some behavior hovers within 12 steps, not that every
+one does. The next steps ask what makes the vehicle hover. The requirements
+are split between two components: _ModeLogic_ gives `lift_mode` from the
+speeds and the hover control mode (the LPC_*_TO_* and LPC_*_STAY_*
+requirements, LPC_INIT_LIFT_MODE, LPC_LIFT_MODE), and _Pilot_ gives `kias`,
+`kgs`, and `hover_control_mode` (LPC_INIT_KIAS, LPC_KIAS_KGS,
+LPC_KIAS_DERIVATIVE, LPC_KIAS_0, LPC_INIT_HOVER_MODE).
+
+3. _ModeLogic_ ∥ _Pilot_ refines _Vehicle_: the split keeps the
+   requirements.
+4. _Q12_ = _Reach12_ / _ModeLogic_, the quotient with discharge, is what the
+   pilot must do for the vehicle to hover within 12 steps. _Pilot_ does not
+   refine it: the counterexample keeps `kias` at 120, and the vehicle wing
+   borne, forever.
+5. _Slow_, the pilot that slows down by 10 at each step, does not refine it
+   either: the counterexample never turns the hover control mode on, and the
+   vehicle stays semi thrust borne. LPC_INIT_HOVER_MODE ties the hover
+   control mode to `kgs` only at the start.
+6. _Decel_, which also turns the hover control mode on when `kgs` is below
+   20, refines _Q12_. So _ModeLogic_ ∥ _Decel_ refines _Reach12_ (the
+   script checks it too): with this pilot, every behavior hovers within 12
+   steps. _Decel_ does not refine _Q06_ = _Reach06_ / _ModeLogic_, as no
+   pilot can (step 2).
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.

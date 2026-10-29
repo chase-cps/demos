@@ -1,4 +1,8 @@
-## LMFSM: conflicting requirements of a state machine
+## LMFSM: conflicting requirements
+
+The question: which requirements of a state machine, as first written,
+contradict each other, and does the pullup of the corrected system come
+when the requirement of the system says?
 
 An autopilot commands a safety maneuver (pullup) when a sensor reports a
 hazard. The requirements are those of the finite state machine of the Ten

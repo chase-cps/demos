@@ -15,10 +15,26 @@ Python package (pip install chase-cps) this script checks:
      The unsat core gives the requirements in conflict, by name.
 
 These are the results that FRET gives for the two subsets with its
-realizability checker (LPC_instructions.md of the case study). The checks
-need nuXmv: the requirements compare kias at two steps, which nuXmv checks
-with its SMT engine (go_msat). lpc.chase does the same checks with
-logics_tool (see LiftPlusCruise.md).
+realizability checker (LPC_instructions.md of the case study). Consistency
+says that some behavior hovers within 12 steps, not that every one does.
+The next steps ask what makes the vehicle hover: the requirements are split
+between two components, the mode logic (lift_mode, from the speeds and the
+hover control mode) and the pilot (kias, kgs, hover_control_mode).
+
+  3. ModeLogic || Pilot refines Vehicle: the split keeps the requirements.
+  4. Q12 = Reach12 / ModeLogic is what the pilot must do for the vehicle to
+     hover within 12 steps. Pilot, with the requirements alone, does not
+     refine it: kias may stay at 120.
+  5. Slow, a pilot that slows down by 10 at each step, does not refine it
+     either: the hover control mode is never on, and the vehicle stays semi
+     thrust borne.
+  6. Decel, which also turns the hover control mode on when kgs < 20,
+     refines Q12, so ModeLogic || Decel refines Reach12. Decel does not
+     refine Q06 = Reach06 / ModeLogic (no pilot does, step 2).
+
+The checks need nuXmv: the requirements compare kias at two steps, which
+nuXmv checks with its SMT engine (go_msat). lpc.chase does steps 1 and 2
+with logics_tool (see LiftPlusCruise.md).
 
     python lpc.py
     python lpc.py --expect     # exit code 1 when a result is not the expected one
@@ -32,7 +48,7 @@ import re
 import sys
 import time
 
-from chase_cps import Contract, load_spec, is_consistent
+from chase_cps import Contract, load_spec, is_consistent, refines
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "lpc.ltl")
@@ -68,6 +84,30 @@ def vehicle(contracts, reach: str) -> tuple[Contract, dict[str, str]]:
     return c, terms
 
 
+# The requirements of the pilot; the others are those of the mode logic.
+PILOT = ("LPC_INIT_KIAS", "LPC_KIAS_KGS", "LPC_KIAS_DERIVATIVE", "LPC_KIAS_0",
+         "LPC_INIT_HOVER_MODE")
+
+
+def split(contracts) -> tuple[Contract, Contract]:
+    """Vehicle as two components: the mode logic, which gives lift_mode, and
+    the pilot, which gives kias, kgs, and hover_control_mode."""
+    v = contracts["Vehicle"]
+    pilot = [g for g, n in zip(v.guarantees, names(SPEC)["Vehicle"]) if n in PILOT]
+    mode = [g for g, n in zip(v.guarantees, names(SPEC)["Vehicle"]) if n not in PILOT]
+    speeds = {x: v.outputs[x] for x in ("kias", "kgs", "hover_control_mode")}
+    return (Contract("ModeLogic", speeds, {"lift_mode": v.outputs["lift_mode"]}, [], mode),
+            Contract("Pilot", {}, speeds, [], pilot))
+
+
+def behavior(trace) -> None:
+    """The steps of a trace, one line per step."""
+    for i, s in enumerate(trace.prefix + trace.loop):
+        loop = "   <- the loop starts" if trace.loop and i == len(trace.prefix) else ""
+        print(f"   {i:3}: kias = {float(s['kias']):6.1f}   {MODES[s['lift_mode']]:17}"
+              f"   hover_control_mode = {s['hover_control_mode']}{loop}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--expect", action="store_true",
@@ -85,10 +125,7 @@ def main() -> int:
           f"[{time.time() - start:.1f} s, reals: {r.reals}]")
     if r.trace is not None:
         print("   a behavior:")
-        for i, s in enumerate(r.trace.prefix + r.trace.loop):
-            loop = "   <- the loop starts" if i == len(r.trace.prefix) else ""
-            print(f"   {i:3}: kias = {float(s['kias']):6.1f}   {MODES[s['lift_mode']]:17}"
-                  f"   hover_control_mode = {s['hover_control_mode']}{loop}")
+        behavior(r.trace)
     if r.status != "sat":
         wrong.append("Reach12")
 
@@ -106,6 +143,35 @@ def main() -> int:
             print(f"   unsat core: {r.core.status} {r.core.reason}")
     if r.status != "unsat":
         wrong.append("Reach06")
+
+    t = args.timeout
+
+    def step(title, expected, run, show=False):
+        start = time.time()
+        r = run()
+        mark = "" if r.status == expected else f"   (expected {expected})"
+        print(f"\n{title}: {r.status} [{time.time() - start:.1f} s, reals: {r.reals}]{mark}")
+        if show and r.guarantees.trace is not None:
+            print("   a counterexample:")
+            behavior(r.guarantees.trace)
+        if r.status != expected:
+            wrong.append(title)
+
+    mode, pilot = split(contracts)
+    step("3. ModeLogic || Pilot refines Vehicle", "valid",
+         lambda: refines(mode.compose(pilot, name="Split"), contracts["Vehicle"], timeout=t))
+    q12 = contracts["Reach12"].divide(mode, name="Q12", discharge=True, timeout=t)
+    step("4. Pilot refines Q12 = Reach12 / ModeLogic", "invalid",
+         lambda: refines(pilot, q12, timeout=t), show=True)
+    slow = pilot.ensure("G((kias > 0.0) -> (kias' = kias - 10.0))", name="Slow")
+    step("5. Slow refines Q12", "invalid", lambda: refines(slow, q12, timeout=t), show=True)
+    decel = slow.ensure("G(hover_control_mode <-> (kgs < 20.0))", name="Decel")
+    step("6. Decel refines Q12", "valid", lambda: refines(decel, q12, timeout=t))
+    step("   ModeLogic || Decel refines Reach12", "valid",
+         lambda: refines(mode.compose(decel, name="Hover"), contracts["Reach12"], timeout=t))
+    q06 = contracts["Reach06"].divide(mode, name="Q06", discharge=True, timeout=t)
+    step("   Decel refines Q06 = Reach06 / ModeLogic", "invalid",
+         lambda: refines(decel, q06, timeout=t))
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

@@ -1,5 +1,9 @@
 ## BufferSwap: replacing a block of a circuit
 
+The question: a buffer of a circuit is replaced by a smaller one, whose
+contract does not refine the old one. Can it take its place, and what must
+any buffer in that place satisfy?
+
 A producer sends data to a consumer through a buffer, with a ready/valid
 handshake. The buffer is `bsg_two_fifo` of BaseJump STL, a FIFO of two
 entries. The demo replaces it with `bsg_one_fifo`, a FIFO of one entry,

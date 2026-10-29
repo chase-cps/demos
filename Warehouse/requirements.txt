@@ -1,0 +1,39 @@
+Warehouse robot, simplified from S. S. Damera, R. Matheu, and J. S. Baras,
+"Contract-Based Agentic Systems Engineering: Delegation as Quotient for
+Assured System Design" (arXiv 2610.33349, 2026), Table 2. A robot crosses
+the floor of a warehouse, keeps clear of a worker, and rests at a dock.
+Perception and localization are fixed; the local controller is delegated.
+The bounds are those of the paper; the simplification: one step of time,
+no speed, no age of the observations, and "within 90 s" read as "sooner or
+later".
+
+Variables (real numbers but rest)
+    c_true   the true clearance to the worker, in m (environment)
+    e_true   the true distance to the dock, in m (environment)
+    c_rep    the clearance reported by perception, in m
+    e_est    the distance to the dock estimated by localization, in m
+    w        the yaw rate commanded by the controller, in rad/s
+    rest     the robot rests (controller)
+
+Perception (inputs w, c_true; output c_rep)
+    PA1     assumes that the robot turns slowly enough for the camera and
+            the lidar to line up: |w| <= 0.8.
+    PG1     guarantees that the reported clearance is at most 0.3 more
+            than the true one: c_rep <= c_true + 0.3.
+
+Localization (inputs w, e_true; output e_est)
+    LA1     assumes |w| <= 1.0.
+    LG1     guarantees that the true distance to the dock is at most 0.05
+            more than the estimate: e_true <= e_est + 0.05.
+
+System (inputs c_true, e_true)
+    SG1     the robot keeps 0.40 from the worker: c_true >= 0.4.
+    SG2     the robot rests at the dock, within 0.10 of it, sooner or later.
+
+The controller (inputs c_rep, e_est; outputs w, rest), three candidates
+    MissionOnly   SG1 and SG2 written on what the controller sees:
+                  c_rep >= 0.4, and a rest with e_est <= 0.1.
+    Margins       the bounds less the errors of perception and
+                  localization: c_rep >= 0.7, and a rest with
+                  e_est <= 0.05.
+    Dispatched    Margins, and |w| <= 0.8.
