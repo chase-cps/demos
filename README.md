@@ -43,12 +43,17 @@ This repository contains the demonstrations of [CHASE][WEB]:
     perception and localization is its contract, with the bound on the yaw
     rate that perception assumes; the requirements written for the mission
     alone do not refine it.
+- [**Delegation**][DELEGATION]: a task of an AI agent (AppWorld) split among
+    three sub-agents, with contracts over their tool calls. The contracts
+    that follow from the tools miss a deliverable; the quotient says which
+    sub-agent must do it; an unsat core finds a clause of the parent that
+    contradicts the rules of the user.
 
 The scripts expect `dsl_tool`, `logics_tool`, `gr1c`, `slugs`, and `nuXmv` to
 be in the `PATH`. All of them are available in the Docker image of CHASE,
 described in the [core-library][CORE] repository. The Python scripts use the
 CHASE Python package (`pip install chase-cps`; Charger needs version 0.2.0,
-AHB, BufferSwap, LiftPlusCruise, and Warehouse version 0.4.2, BufferSwap
+AHB, BufferSwap, Delegation, LiftPlusCruise, and Warehouse version 0.4.2, BufferSwap
 with `pip install chase-cps[rtl]`).
 
 [WEB]: https://chase-cps.github.io
@@ -61,3 +66,4 @@ with `pip install chase-cps[rtl]`).
 [LMFSM]: LMFSM/FSM.md
 [AHB]: AHB/AHB.md
 [WAREHOUSE]: Warehouse/Warehouse.md
+[DELEGATION]: Delegation/Delegation.md
