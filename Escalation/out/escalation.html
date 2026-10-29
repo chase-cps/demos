@@ -1,0 +1,231 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Escalation link</title>
+<style>
+  :root { --ink:#1f2728; --soft:#586566; --teal:#17393b; --line:#9aa7a7; --fill:#f3f5f5;
+          --ok:#2f7d4f; --bad:#b03a2e; --hole:#fdf6e3; --link:#1c6a6f; }
+  body { margin:0; font:13px/1.4 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color:var(--ink); background:#fff; }
+  header { padding:10px 16px; border-bottom:1px solid #dde3e3; }
+  header b { font-size:15px; margin-right:16px; }
+  .legend { display:inline-flex; gap:18px; color:var(--soft); font-size:12px; align-items:center; flex-wrap:wrap; }
+  .legend i { display:inline-block; width:18px; height:12px; margin-right:6px; vertical-align:-2px; border:1.5px solid var(--teal); }
+  .legend .c { border-radius:5px; } .legend .m { border-color:var(--ink); border-width:2px; }
+  .legend .h { border-style:dashed; border-radius:5px; background:var(--hole); }
+  #view { overflow:auto; padding:16px; }
+  svg text { font-family:-apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .f { font-family:Menlo, Monaco, monospace; font-size:11.5px; fill:var(--ink); }
+  .h { font-weight:600; font-size:13px; fill:var(--ink); cursor:pointer; }
+  .s { font-size:11px; fill:var(--soft); }
+  .k { font-size:9.5px; font-weight:600; letter-spacing:.06em; fill:var(--soft); }
+  .w { font-family:Menlo, Monaco, monospace; font-size:10.5px; fill:var(--soft); }
+  .l { font-size:11.5px; fill:var(--link); cursor:pointer; }
+</style></head><body>
+<header><b>Escalation link</b>
+  <span class="legend"><span><i class="c"></i>contract</span><span><i class="m"></i>component: contract and model</span>
+  <span><i class="h"></i>the missing part of a quotient</span><span>a box inside a box: it refines it</span>
+  <span>click ▸ to open</span></span></header>
+<div id="view"></div>
+<script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
+<script>
+const DATA = {"title": "Escalation link", "nodes": [{"kind": "group", "op": "system", "title": "Functional", "note": "Sender || Channel || Receiver", "contract": {"name": "Functional", "A": ["G (!err_ep & !err_en & !err_rp & !err_rn)"], "G": ["G (esc_req & X esc_req -> X X X esc_req_o)", "G (!esc_req & X !esc_req -> X X X !esc_req_o)", "G (!ping_req & !esc_req & X (ping_req & !esc_req) -> X X X X ping_ok)"]}, "inputs": ["err_en", "err_ep", "err_rn", "err_rp", "esc_req", "ping_req"], "outputs": [], "children": [{"kind": "component", "title": "Sender", "contract": {"name": "Sender", "A": [], "G": ["!esc_p_tx", "G (esc_n_tx <-> !esc_p_tx)", "G (esc_req -> X esc_p_tx)", "G (!esc_req & !ping_req -> X !esc_p_tx)", "G (!esc_req & X (!esc_req & esc_p_tx) -> X X !esc_p_tx)", "G (!ping_req & !esc_req & X (ping_req & !esc_req) -> X X esc_p_tx)", "G (!ping_req & !esc_req & X (ping_req & !esc_req) & X X X (resp_p_tx & !resp_n_tx) -> X X X X ping_ok)", "G ((resp_p_tx <-> resp_n_tx) -> X integ_fail)"]}, "model": {"name": "esc_sender", "fsm": {"states": [{"id": "s0", "label": "esc_n_tx", "init": true}, {"id": "s1", "label": "esc_n_tx integ_fail", "init": false}, {"id": "s2", "label": "esc_p_tx integ_fail sent wait1", "init": false}, {"id": "s3", "label": "esc_p_tx sent wait1", "init": false}, {"id": "s4", "label": "esc_p_tx integ_fail", "init": false}, {"id": "s5", "label": "esc_p_tx", "init": false}, {"id": "s6", "label": "esc_n_tx integ_fail wait2", "init": false}, {"id": "s7", "label": "esc_n_tx wait2", "init": false}, {"id": "s8", "label": "esc_n_tx integ_fail sent wait2", "init": false}, {"id": "s9", "label": "esc_n_tx sent wait2", "init": false}, {"id": "s10", "label": "esc_p_tx integ_fail wait2", "init": false}, {"id": "s11", "label": "esc_p_tx wait2", "init": false}, {"id": "s12", "label": "esc_p_tx integ_fail sent wait2", "init": false}, {"id": "s13", "label": "esc_p_tx sent wait2", "init": false}, {"id": "s14", "label": "esc_n_tx ping_ok", "init": false}, {"id": "s15", "label": "esc_p_tx ping_ok sent wait1", "init": false}, {"id": "s16", "label": "esc_p_tx ping_ok", "init": false}, {"id": "s17", "label": "esc_n_tx integ_fail sent", "init": false}, {"id": "s18", "label": "esc_n_tx sent", "init": false}, {"id": "s19", "label": "esc_n_tx ping_ok sent", "init": false}, {"id": "s20", "label": "esc_p_tx integ_fail sent", "init": false}, {"id": "s21", "label": "esc_p_tx sent", "init": false}, {"id": "s22", "label": "esc_p_tx ping_ok sent", "init": false}], "edges": [{"from": "s0", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s0", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s1", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s4", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s5", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s14", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s16", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}], "count": 23, "registers": ["esc_p_tx", "esc_n_tx", "ping_ok", "integ_fail", "sent", "wait1", "wait2"]}}, "badge": {"text": "model implements contract", "status": "valid"}, "inputs": ["esc_req", "ping_req", "resp_n_tx", "resp_p_tx"], "outputs": ["esc_n_tx", "esc_p_tx", "integ_fail", "ping_ok"], "id": "n1", "children": [], "edges": [], "layout": "row"}, {"kind": "component", "title": "Channel", "contract": {"name": "Channel", "A": [], "G": ["G (esc_p_rx <-> !(esc_p_tx <-> err_ep))", "G (esc_n_rx <-> !(esc_n_tx <-> err_en))", "G (resp_p_tx <-> !(resp_p_rx <-> err_rp))", "G (resp_n_tx <-> !(resp_n_rx <-> err_rn))"]}, "model": {"name": "esc_channel", "fsm": null}, "badge": {"text": "model implements contract", "status": "valid"}, "inputs": ["err_en", "err_ep", "err_rn", "err_rp", "esc_n_tx", "esc_p_tx", "resp_n_rx", "resp_p_rx"], "outputs": ["esc_n_rx", "esc_p_rx", "resp_n_tx", "resp_p_tx"], "id": "n2", "children": [], "edges": [], "layout": "row"}, {"kind": "component", "title": "Receiver", "contract": {"name": "Receiver", "A": [], "G": ["!esc_req_o & X !esc_req_o", "G (esc_p_rx & !esc_n_rx & X (esc_p_rx & !esc_n_rx) -> X X esc_req_o)", "G (esc_p_rx | X X !esc_req_o)", "G (esc_p_rx | X !esc_req_o)", "G ((esc_p_rx <-> esc_n_rx) -> X (resp_p_rx & resp_n_rx))", "G ((esc_p_rx <-> esc_n_rx) | X !(resp_p_rx <-> resp_n_rx))", "G (!esc_p_rx & X (esc_p_rx & !esc_n_rx) -> X X (resp_p_rx & !resp_n_rx))"]}, "model": {"name": "esc_receiver", "fsm": {"states": [{"id": "s0", "label": "resp_n_rx", "init": true}, {"id": "s1", "label": "resp_p_rx resp_n_rx", "init": false}, {"id": "s2", "label": "resp_p_rx on_q", "init": false}, {"id": "s3", "label": "resp_n_rx esc_req_o on_q", "init": false}], "edges": [{"from": "s0", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s0", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s0", "to": "s2", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s1", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s1", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s1", "to": "s2", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s2", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s2", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s2", "to": "s3", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s3", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s3", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s3", "to": "s3", "label": "esc_p_rx & !esc_n_rx"}], "count": 4, "registers": ["resp_p_rx", "resp_n_rx", "esc_req_o", "on_q"]}}, "badge": {"text": "model implements contract", "status": "valid"}, "inputs": ["esc_n_rx", "esc_p_rx"], "outputs": ["esc_req_o", "resp_n_rx", "resp_p_rx"], "id": "n3", "children": [], "edges": [], "layout": "row"}], "edges": [{"from": [null, "in", "esc_req"], "to": ["n1", "in", "esc_req"], "var": "esc_req"}, {"from": [null, "in", "ping_req"], "to": ["n1", "in", "ping_req"], "var": "ping_req"}, {"from": ["n2", "out", "resp_n_tx"], "to": ["n1", "in", "resp_n_tx"], "var": "resp_n_tx"}, {"from": ["n2", "out", "resp_p_tx"], "to": ["n1", "in", "resp_p_tx"], "var": "resp_p_tx"}, {"from": [null, "in", "err_en"], "to": ["n2", "in", "err_en"], "var": "err_en"}, {"from": [null, "in", "err_ep"], "to": ["n2", "in", "err_ep"], "var": "err_ep"}, {"from": [null, "in", "err_rn"], "to": ["n2", "in", "err_rn"], "var": "err_rn"}, {"from": [null, "in", "err_rp"], "to": ["n2", "in", "err_rp"], "var": "err_rp"}, {"from": ["n1", "out", "esc_n_tx"], "to": ["n2", "in", "esc_n_tx"], "var": "esc_n_tx"}, {"from": ["n1", "out", "esc_p_tx"], "to": ["n2", "in", "esc_p_tx"], "var": "esc_p_tx"}, {"from": ["n3", "out", "resp_n_rx"], "to": ["n2", "in", "resp_n_rx"], "var": "resp_n_rx"}, {"from": ["n3", "out", "resp_p_rx"], "to": ["n2", "in", "resp_p_rx"], "var": "resp_p_rx"}, {"from": ["n2", "out", "esc_n_rx"], "to": ["n3", "in", "esc_n_rx"], "var": "esc_n_rx"}, {"from": ["n2", "out", "esc_p_rx"], "to": ["n3", "in", "esc_p_rx"], "var": "esc_p_rx"}], "id": "n4", "layout": "row", "badge": {"text": "the decomposition refines it", "status": "valid"}}]};
+const LINE = 17, PAD = 10, PORT = 8, HEAD = 26;
+const ctx = document.createElement("canvas").getContext("2d");
+function textWidth(s, font) { ctx.font = font; return ctx.measureText(s).width; }
+const FONT_F = "11.5px Menlo, Monaco, monospace", FONT_H = "600 13px Helvetica, Arial, sans-serif",
+      FONT_S = "11.5px Helvetica, Arial, sans-serif", FONT_W = "10.5px Menlo, Monaco, monospace";
+const fontOf = c => c === "f" ? FONT_F : c === "h" ? FONT_H : FONT_S;
+const count = (k, word) => k + " " + word + (k === 1 ? "" : "s");
+
+// What is open: the contract of a box ("c:" + id) and the model of a
+// component ("m:" + id). At first, only the boxes and their names show.
+const open = new Set();
+const widen = {};       // the room added to a box narrower than its text
+const toggle = key => () => { open.has(key) ? open.delete(key) : open.add(key); render(); };
+
+// A long formula on several lines, cut before an operator.
+const WIDTH = 64;
+function wrap(f) {
+  const out = []; let rest = f;
+  while (rest.length > WIDTH) {
+    let cut = -1;
+    for (const op of [" & ", " | ", " -> ", " <-> ", " "]) {
+      const i = rest.lastIndexOf(op, WIDTH); if (i > WIDTH / 3) { cut = i; break; } }
+    if (cut < 0) cut = WIDTH;
+    out.push(rest.slice(0, cut)); rest = "    " + rest.slice(cut).trimStart();
+  }
+  out.push(rest); return out;
+}
+
+// The lines under the name of a box: [class, text, key to toggle]
+function lines(n) {
+  const out = [];
+  if (n.note) out.push(["s", n.note]);
+  if (n.contract) {
+    const c = n.contract, key = "c:" + n.id;
+    if (!open.has(key)) out.push(["l", "▸ contract " + c.name + ": " + count(c.A.length, "assumption")
+                                  + ", " + count(c.G.length, "guarantee"), key]);
+    else {
+      out.push(["l", "▾ contract " + c.name, key]);
+      if (c.A.length) { out.push(["k", "ASSUMES"]); c.A.forEach(a => wrap(a).forEach(l => out.push(["f", l]))); }
+      out.push(["k", "GUARANTEES"]);
+      if (c.G.length) c.G.forEach(g => wrap(g).forEach(l => out.push(["f", l]))); else out.push(["f", "true"]);
+    }
+  }
+  if (n.model) {
+    const m = n.model, key = "m:" + n.id, f = m.fsm;
+    if (!f) out.push(["s", "model " + m.name]);
+    else if (f.too_many) out.push(["s", "model " + m.name + ": more than 24 states"]);
+    else out.push(["l", (open.has(key) ? "▾ " : "▸ ") + "model " + m.name + ": " + count(f.count, "state"), key]);
+  }
+  return out;
+}
+
+function ports(n) {
+  const ps = [], lab = v => [{ text: v, width: textWidth(v, FONT_W), height: 12 }];
+  (n.inputs || []).forEach((v, i) => ps.push({ id: n.id + ":in:" + v, width: PORT, height: PORT, labels: lab(v),
+    layoutOptions: { "elk.port.side": "WEST", "elk.port.index": String(n.inputs.length - i) } }));
+  (n.outputs || []).forEach((v, i) => ps.push({ id: n.id + ":out:" + v, width: PORT, height: PORT, labels: lab(v),
+    layoutOptions: { "elk.port.side": "EAST", "elk.port.index": String(i) } }));
+  return ps;
+}
+
+const byId = {};
+(function index(ns) { ns.forEach(n => { byId[n.id] = n; index(n.children || []); }); })(DATA.nodes);
+
+function header(n) {     // width and height of the name and the lines under it
+  const ls = lines(n);
+  let w = textWidth(n.title, FONT_H) + 2 * PAD + (n.badge ? textWidth(n.badge.text, FONT_S) + 40 : 0);
+  ls.forEach(([c, t]) => { w = Math.max(w, textWidth(t, fontOf(c)) + 2 * PAD); });
+  return { ls, w: Math.max(w, 150), h: HEAD + ls.length * LINE + (ls.length ? 6 : 0) };
+}
+
+function toElk(n) {
+  const hd = header(n);
+  const base = { id: n.id, ports: ports(n),
+    layoutOptions: { "elk.portConstraints": "FIXED_ORDER", "elk.nodeSize.constraints": "MINIMUM_SIZE",
+      "elk.portLabels.placement": "OUTSIDE", "elk.spacing.portPort": "14",
+      "elk.nodeSize.minimum": "(" + hd.w + "," + Math.max(hd.h, ((Math.max((n.inputs || []).length, (n.outputs || []).length)) + 1) * 18) + ")" } };
+  let inner = null;
+  if (n.children && n.children.length) {
+    inner = { children: n.children.map(toElk),
+      edges: (n.edges || []).filter(w => !w.open).map((w, i) => ({ id: n.id + ":e" + i,
+        sources: [(w.from[0] || n.id) + ":" + w.from[1] + ":" + w.from[2]],
+        targets: [(w.to[0] || n.id) + ":" + w.to[1] + ":" + w.to[2]] })),
+      dir: n.layout === "stack" ? "DOWN" : "RIGHT" };
+  } else if (n.model && n.model.fsm && n.model.fsm.states && open.has("m:" + n.id)) {
+    const f = n.model.fsm;
+    inner = { children: f.states.map(st => { const id = n.id + ":" + st.id;
+        byId[id] = { kind: "state", id, label: st.label, init: st.init };
+        return { id, width: textWidth(st.label, FONT_W) + 26, height: 26 }; }),
+      edges: f.edges.map((t, i) => ({ id: n.id + ":t" + i, sources: [n.id + ":" + t.from],
+        targets: [n.id + ":" + t.to],
+        labels: t.label ? [{ text: t.label, width: textWidth(t.label, FONT_W), height: 12 }] : [] })),
+      dir: "RIGHT" };
+  }
+  if (!inner) { base.width = hd.w; base.height = hd.h; return base; }
+  base.children = inner.children; base.edges = inner.edges;
+  Object.assign(base.layoutOptions, { "elk.direction": inner.dir,
+    "elk.padding": "[top=" + (hd.h + 8) + ",left=24,bottom=16,right=" + (24 + (widen[n.id] || 0)) + "]",
+    "elk.spacing.nodeNode": "30", "elk.layered.spacing.nodeNodeBetweenLayers": "80",
+    "elk.layered.cycleBreaking.strategy": "MODEL_ORDER", "elk.spacing.edgeLabel": "4" });
+  return base;
+}
+
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function text(parent, x, y, cls, s) { const t = el("text", { x, y, class: cls }, parent); t.textContent = s; return t; }
+function mark(status) { return status === "valid" ? ["✓", "var(--ok)"] : status === "invalid" ? ["✗", "var(--bad)"]
+                         : status ? ["?", "var(--soft)"] : ["○", "var(--soft)"]; }
+const STYLE = {
+  contract:  { rx: 10, fill: "#fff", stroke: "var(--teal)", width: 1.4, dash: "none" },
+  component: { rx: 0, fill: "#fff", stroke: "var(--ink)", width: 2, dash: "none" },
+  group:     { rx: 8, fill: "var(--fill)", stroke: "var(--line)", width: 1, dash: "none" },
+  hole:      { rx: 10, fill: "var(--hole)", stroke: "#b8962e", width: 1.4, dash: "6 4" } };
+
+function drawNode(g, e, ox, oy) {
+  const n = byId[e.id], x = ox + e.x, y = oy + e.y;
+  if (n.kind === "state") {
+    el("rect", { x, y, width: e.width, height: e.height, rx: 13, fill: "#fff", stroke: "var(--teal)",
+                 "stroke-width": n.init ? 2.4 : 1.1 }, g);
+    const t = text(g, x + e.width / 2, y + 17, "w", n.label); t.setAttribute("text-anchor", "middle");
+    if (n.init) el("polyline", { points: (x - 16) + "," + (y + 13) + " " + (x - 2) + "," + (y + 13),
+      stroke: "var(--teal)", "stroke-width": 1.6, fill: "none", "marker-end": "url(#arrow)" }, g);
+    return;
+  }
+  const st = STYLE[n.kind] || STYLE.contract;
+  // a group that holds a decomposition refining a contract looks like the contract
+  const s2 = n.kind === "group" && n.contract ? Object.assign({}, STYLE.contract, { fill: "var(--fill)" }) : st;
+  el("rect", { x, y, width: e.width, height: e.height, rx: s2.rx, fill: s2.fill, stroke: s2.stroke,
+               "stroke-width": s2.width, "stroke-dasharray": s2.dash }, g);
+  if (n.kind === "component") el("line", { x1: x, y1: y + HEAD, x2: x + e.width, y2: y + HEAD,
+                                           stroke: "var(--ink)", "stroke-width": 1 }, g);
+  text(g, x + PAD, y + 18, "h", n.title);
+  if (n.badge) { const [m, col] = mark(n.badge.status);
+    const b = text(g, x + e.width - PAD, y + 18, "s", n.badge.text + " " + m);
+    b.setAttribute("text-anchor", "end"); b.setAttribute("fill", col); }
+  header(n).ls.forEach(([c, s, key], i) => { const t = text(g, x + PAD, y + HEAD + 12 + i * LINE, c, s);
+    if (key) t.onclick = toggle(key); });
+  (e.ports || []).forEach(p => {
+    el("rect", { x: x + p.x, y: y + p.y, width: p.width, height: p.height, fill: "var(--teal)" }, g);
+    (p.labels || []).forEach(l => text(g, x + p.x + l.x, y + p.y + l.y + 10, "w", l.text)); });
+  (e.children || []).forEach(c => drawNode(g, c, x, y));
+  (e.edges || []).forEach(ed => drawEdge(g, ed, x, y));
+  (n.edges || []).filter(w => w.open).forEach(w => {
+    const c = (e.children || []).find(c => c.id === w.open[0]); if (!c) return;
+    const p = (c.ports || []).find(p => p.id === w.open[0] + ":in:" + w.var); if (!p) return;
+    const px = x + c.x + p.x, py = y + c.y + p.y + PORT / 2;
+    el("line", { x1: px - 22, y1: py, x2: px, y2: py, stroke: "var(--bad)", "stroke-width": 2 }, g);
+    const t = text(g, px - 24, py - 4, "w", "open"); t.setAttribute("text-anchor", "end"); t.setAttribute("fill", "var(--bad)"); });
+}
+
+function drawEdge(g, ed, ox, oy) {
+  (ed.sections || []).forEach(s => {
+    const pts = [s.startPoint, ...(s.bendPoints || []), s.endPoint].map(p => (ox + p.x) + "," + (oy + p.y));
+    el("polyline", { points: pts.join(" "), fill: "none", stroke: "var(--soft)", "stroke-width": 1.2,
+                     "marker-end": "url(#arrow)" }, g); });
+  (ed.labels || []).forEach(l => text(g, ox + l.x, oy + l.y + 10, "w", l.text));
+}
+
+// ELK does not keep the minimum width of a box with boxes inside: a second
+// layout adds the room that its text needs.
+function narrow(e, todo) {
+  const n = byId[e.id];
+  if (n && n.kind !== "state" && e.children && e.children.length) {
+    const need = header(n).w - e.width;
+    if (need > 1) { widen[n.id] = (widen[n.id] || 0) + need; todo.push(n.id); }
+  }
+  (e.children || []).forEach(c => narrow(c, todo));
+}
+async function layout() {
+  return new ELK().layout({ id: "root", children: DATA.nodes.map(toElk), edges: [],
+    layoutOptions: { "elk.algorithm": "layered", "elk.direction": "DOWN",
+      "elk.hierarchyHandling": "INCLUDE_CHILDREN", "elk.spacing.nodeNode": "40" } });
+}
+async function render() {
+  let out = await layout();
+  for (let pass = 0; pass < 3; pass++) {
+    const todo = []; (out.children || []).forEach(c => narrow(c, todo));
+    if (!todo.length) break;
+    out = await layout();
+  }
+  const view = document.getElementById("view"); view.innerHTML = "";
+  const svg = el("svg", { width: out.width + 40, height: out.height + 40 }, view);
+  const m = el("marker", { id: "arrow", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7,
+                           markerHeight: 7, orient: "auto" }, el("defs", {}, svg));
+  el("path", { d: "M0,0 L10,5 L0,10 z", fill: "var(--soft)" }, m);
+  const g = el("g", { transform: "translate(20,20)" }, svg);
+  (out.children || []).forEach(c => drawNode(g, c, 0, 0));
+}
+render().catch(e => { document.getElementById("view").textContent = "Cannot draw the diagram: " + e; });
+</script>
+<script>
+(function () {
+  if (!location.protocol.startsWith("http")) return;
+  let seen = null;
+  setInterval(async () => {
+    try { const v = await (await fetch("/version", { cache: "no-store" })).text();
+          if (seen === null) seen = v; else if (v !== seen) location.reload(); } catch (e) {}
+  }, 1000);
+})();
+</script>
+</body></html>
