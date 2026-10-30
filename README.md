@@ -1,68 +1,58 @@
 # CHASE demos
 
-This repository contains the demonstrations of [CHASE][WEB]:
+This repository contains the demonstrations of [CHASE][WEB]. Each one
+follows a design problem from its requirements to a result; its page on the
+website and its README show each step with its diagram.
 
-- **DATE18**: specification files used to produce the experimental results
-    presented in the DATE 2018 paper. `eps.py` checks them with the Python
-    package (`load_dsl`): the requirements as written are unrealizable, with
-    the core, and the relaxed ones are realizable.
-- [**DATE21**][DATE21]: specification files used during the hands-on tutorial
-    presented at the DATE 2021 University Booth.
-- **CPSWeek22**: demonstration presented at CPS-IoT Week 2022, about the
-    verification and synthesis of the controller of a robotic arm, using both
-    a single model and a compositional model.
-- **RoboticJoints**: extended version of the robotic arm demonstration.
-    `scaling.py` builds the same contracts for N joints with the CHASE Python
-    package and measures the time of the refinement check.
-- **FDL2024**: DSL specification of a small factory.
-- [**Charger**][CHARGER]: two robots sharing a charging station through an
-    arbiter. One design iteration of the arbiter: the unrealizable core of a
-    first arbiter, the synthesis of a second one, the well-separation check,
-    the removal of vacuous guarantees, and the composition with discharge of
-    the arbiter and the robots, which feed each other.
-- [**LiftPlusCruise**][LPC]: requirements of the Lift-Plus-Cruise case study
-    of [FRET][FRET], with real variables. The consistency of two subsets of
-    the requirements, a behavior of the consistent one, and the requirements
-    in conflict in the other one; then the quotient of the deadline by the
-    mode logic, which says what the pilot must do to hover in time.
-- [**BufferSwap**][BUFFERSWAP]: the replacement of a buffer of a circuit
-    (BaseJump STL), with contracts in SystemVerilog Assertions. The new
-    buffer does not refine the old one, but it refines the quotient of the
-    system by its neighbours, so it can replace it; the quotient is written
-    as SVA and checked on the RTL with Yosys and nuXmv, and with Jasper.
-- [**LMFSM**][LMFSM]: the finite state machine of the Ten Lockheed Martin
-    Cyber-Physical Challenges, an autopilot and a sensor. The unrealizable
-    cores of the requirements as first written, fixed one by one; the
-    composition of the corrected autopilot and sensor, which does not give
-    the pullup at once, and the time it takes.
-- [**AHB**][AHB]: the arbiter of the AMBA AHB bus (Bloem et al., COCV 2007),
-    simplified, as two viewpoints in SystemVerilog Assertions. Their merge is
-    unrealizable without the assumption that a master releases a locked bus,
-    with the requirements in conflict as its core; with it, it is
-    synthesized and written as SVA.
-- [**WarehouseRobot**][WAREHOUSE]: the local controller of a warehouse robot is
-    delegated (Damera, Matheu, Baras, 2026). The quotient of the system by
-    perception and localization is its contract, with the bound on the yaw
-    rate that perception assumes; the requirements written for the mission
-    alone do not refine it.
-- [**Escalation**][ESCALATION]: the escalation link of a security chip (a
-    toy version of the one of OpenTitan), checked module by module: the RTL
-    of each module implements its contract in SVA, and the composition of
-    the contracts refines the requirements, with no check on the whole
-    design. A faster sender breaks its contract, and the link with it.
-- [**PaymentAssistant**][PAYMENT]: a task in natural language (AppWorld) becomes the
-    contract of an AI agent, over its tool calls, decomposed among three
-    sub-agents. The decomposition misses a deliverable; the quotient says
-    which sub-agent must do it; an unsat core finds a clause that
-    contradicts the rules of the user.
+- [**PaymentAssistant**][PAYMENT] (payment assistant agent): a task in
+    natural language (AppWorld) becomes the contract of an agent over its
+    tool calls, split among sub-agents. The plan misses a deliverable, the
+    quotient says what sub-agent 3 must do, and an unsat core finds a clause
+    against the request of the user.
+- [**LiftPlusCruise**][LPC] (aircraft): the requirements of the
+    Lift-Plus-Cruise case study of [FRET][FRET], with real variables. They
+    are consistent with a hover within 12 steps, not within 6, and the
+    quotient by the mode logic says what the pilot must do.
+- [**AHB**][AHB] (bus arbiter): the arbiter of the AMBA AHB bus as two
+    viewpoints in SystemVerilog Assertions. Their merge is unrealizable
+    until the masters release a locked bus, and is then synthesized.
+- [**BufferSwap**][BUFFERSWAP] (circuit buffer swap): a buffer of BaseJump
+    STL is replaced by a smaller one. The new buffer does not refine the old
+    one, but it refines the quotient, the contract of its place; the RTL is
+    checked with Yosys and nuXmv, and with Jasper.
+- [**Escalation**][ESCALATION] (security chip): the escalation link of a
+    toy OpenTitan, checked module by module: the RTL of each module
+    implements its contract, and the contracts together refine the
+    requirements, with no check on the whole design.
+- [**WarehouseRobot**][WAREHOUSE] (warehouse robot): the controller of a
+    robot is delegated; the quotient by perception and localization is its
+    contract, and requirements written for the mission alone fail it.
+- [**Charger**][CHARGER] (charging station): one design iteration of an
+    arbiter for two robots: an unrealizable arbiter, a realizable one, one
+    that is not well separated, one that is vacuous, and the composition
+    with the robots.
+- [**LMFSM**][LMFSM] (autopilot): the state machine of the Lockheed Martin
+    challenge; the unrealizable cores find the requirements in conflict, and
+    the corrected autopilot and sensor refine the timed requirement.
+- **RoboticJoints** and **CPSWeek22** (robotic joints): three joints
+    refine the contract of a robotic arm and are synthesized; `scaling.py`
+    measures the refinement for N joints. CPSWeek22 is the version shown at
+    CPS-IoT Week 2022.
+- **DATE18** and **FDL2024** (power systems and factories): requirements
+    written in the domain-specific language of CHASE. `DATE18/eps.py` checks
+    the power system of the DATE 2018 paper with the Python package: the
+    requirements as written are unrealizable, with the core, and the relaxed
+    ones are realizable.
+- [**DATE21**][DATE21]: the hands-on tutorial of the DATE 2021 University
+    Booth, with the console tools of CHASE.
 
-The scripts expect `dsl_tool`, `logics_tool`, `slugs` (with its compiler,
-`$SLUGS/tools/StructuredSlugsParser/compiler.py`), and `nuXmv` to be in the
-`PATH`. All of them are available in the Docker image of CHASE,
-described in the [core-library][CORE] repository. The Python scripts use the
-CHASE Python package, version 0.5.0 or later, which draws the diagrams
+The Python scripts use the CHASE Python package, version 0.5.0 or later
 (`pip install chase-cps`; BufferSwap and Escalation with
-`pip install chase-cps[rtl]`).
+`pip install "chase-cps[rtl]"`), and nuXmv and slugs, which `chase-cps
+install` installs. The console scripts expect `dsl_tool`, `logics_tool`,
+`slugs` (with its compiler, `$SLUGS/tools/StructuredSlugsParser/compiler.py`),
+and `nuXmv` in the `PATH`. All of them are in the Docker image of CHASE,
+described in the [core-library][CORE] repository.
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md
