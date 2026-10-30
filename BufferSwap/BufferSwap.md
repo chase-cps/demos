@@ -4,8 +4,11 @@
 contract does not refine the old one. Can it take its place, and what must
 any buffer in that place satisfy?
 
-![The system: a producer, the buffer, and a consumer, with a ready/valid handshake](diagram-system.png)
-_The system: a producer, the buffer, and a consumer, with a ready/valid handshake._
+<p align="center">
+  <img src="diagram-system.png" alt="The system: a producer, the buffer, and a consumer, with a ready/valid handshake">
+  <br>
+  <em>The system: a producer, the buffer, and a consumer, with a ready/valid handshake.</em>
+</p>
 
 A producer sends data to a consumer through a buffer, with a ready/valid
 handshake: the producer offers a value (`v_i`) and the buffer takes it when
@@ -26,8 +29,11 @@ _TwoFifo_ (the diagram at the top).
 _TwoFifo_: with a value in, it takes no other. Its contract alone does not
 say that it can take the place.
 
-![Step 2: OneFifo does not refine TwoFifo](diagram-1.png)
-_Step 2: OneFifo does not refine TwoFifo._
+<p align="center">
+  <img src="diagram-1.png" alt="Step 2: OneFifo does not refine TwoFifo">
+  <br>
+  <em>Step 2: OneFifo does not refine TwoFifo.</em>
+</p>
 
 **Step 3. What the place of the buffer needs.** The quotient Slot = System /
 (Producer ∥ Consumer), drawn as a dashed box, is the weakest contract with
@@ -36,8 +42,11 @@ take the place, and _OneFifo_ does: _Slot_ may assume what the consumer
 guarantees, that an offer is taken sooner or later, so a buffer of one
 entry is enough.
 
-![Step 3: OneFifo refines Slot, the contract of the place](diagram-2.png)
-_Step 3: OneFifo refines Slot, the contract of the place._
+<p align="center">
+  <img src="diagram-2.png" alt="Step 3: OneFifo refines Slot, the contract of the place">
+  <br>
+  <em>Step 3: OneFifo refines Slot, the contract of the place.</em>
+</p>
 
 **Step 4. On the RTL.** The RTL of `bsg_one_fifo` implements _Slot_: Yosys
 reads the RTL and nuXmv checks it. (M ⊨ C in the diagrams is the check of

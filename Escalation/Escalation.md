@@ -4,8 +4,11 @@
 sender, the wires, and a receiver. Does it meet its requirements, and can we
 show it by checking each module on its own?
 
-![The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements](diagram-system.png)
-_The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements._
+<p align="center">
+  <img src="diagram-system.png" alt="The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements">
+  <br>
+  <em>The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements.</em>
+</p>
 
 The link is a toy version of the escalation link of OpenTitan. The sender
 raises a differential pair to make the receiver escalate, and pings the
@@ -27,8 +30,11 @@ receiver implements its contract.
 _Functional_ and _Integrity_. So the three modules together meet the
 requirements, with no check on the whole design.
 
-![Steps 1 and 2: each RTL implements its contract, and the composition refines Functional; the receiver with its four states](diagram-1.png)
-_Steps 1 and 2: each RTL implements its contract, and the composition refines Functional; the receiver with its four states._
+<p align="center">
+  <img src="diagram-1.png" alt="Steps 1 and 2: each RTL implements its contract, and the composition refines Functional; the receiver with its four states">
+  <br>
+  <em>Steps 1 and 2: each RTL implements its contract, and the composition refines Functional; the receiver with its four states.</em>
+</p>
 
 **Step 3. A cross-check.** The whole RTL, checked directly, meets
 _Functional_ and _Integrity_ too.

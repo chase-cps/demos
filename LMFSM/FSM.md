@@ -4,8 +4,11 @@
 contradict each other? Once they are corrected, does the system command
 the pullup when its requirement says?
 
-![The system: the autopilot and the sensor, which feed each other](diagram-system.png)
-_The system: the autopilot and the sensor, which feed each other._
+<p align="center">
+  <img src="diagram-system.png" alt="The system: the autopilot and the sensor, which feed each other">
+  <br>
+  <em>The system: the autopilot and the sensor, which feed each other.</em>
+</p>
 
 An autopilot commands a safety maneuver (pullup) when a sensor reports a
 hazard. The requirements are those of the finite state machine of the Ten
@@ -27,16 +30,22 @@ next step: the autopilot reads the inputs of the step it moves to.) The
 script replaces the requirement by its corrected version and checks again:
 four conflicts in the autopilot, one in the sensor, the same fixes as FRET.
 
-![Step 1: the first requirements are unrealizable; the cores highlighted in red](diagram-1.png)
-_Step 1: the first requirements are unrealizable; the cores highlighted in red._
+<p align="center">
+  <img src="diagram-1.png" alt="Step 1: the first requirements are unrealizable; the cores highlighted in red">
+  <br>
+  <em>Step 1: the first requirements are unrealizable; the cores highlighted in red.</em>
+</p>
 
 **Step 2. The system.** The corrected _Autopilot_ and _Sensor_ are
 realizable, but together they do not refine _System_ (FSM-001): the
 counterexample the limits are exceeded and the pullup does not come at
 once.
 
-![Step 2: Autopilot ∥ Sensor does not refine System](diagram-2.png)
-_Step 2: Autopilot ∥ Sensor does not refine System._
+<p align="center">
+  <img src="diagram-2.png" alt="Step 2: Autopilot ∥ Sensor does not refine System">
+  <br>
+  <em>Step 2: Autopilot ∥ Sensor does not refine System.</em>
+</p>
 
 **Step 3. The system, with time.** The sensor and the autopilot each take a
 step to react, and the autopilot must first reach NOMINAL from the start.
@@ -44,8 +53,11 @@ _SystemTimed_ (FSM-001t) gives the pullup that time: with the limits not
 exceeded for three steps and then exceeded, the pilot not in control and no
 failure, the pullup comes at the fifth step. The composition refines it.
 
-![Step 3: Autopilot ∥ Sensor refines SystemTimed](diagram-3.png)
-_Step 3: Autopilot ∥ Sensor refines SystemTimed._
+<p align="center">
+  <img src="diagram-3.png" alt="Step 3: Autopilot ∥ Sensor refines SystemTimed">
+  <br>
+  <em>Step 3: Autopilot ∥ Sensor refines SystemTimed.</em>
+</p>
 
 ### Content of the directory
 The directory of the demo contains:

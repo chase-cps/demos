@@ -5,8 +5,11 @@ with a contract over its tool calls. Do the contracts of the sub-agents,
 together, refine the contract of the parent agent? If not, what is missing,
 and which sub-agent must do it?
 
-![The plan: the sub-agents inside the contract of the parent](diagram-system.png)
-_The plan: the sub-agents inside the contract of the parent._
+<p align="center">
+  <img src="diagram-system.png" alt="The plan: the sub-agents inside the contract of the parent">
+  <br>
+  <em>The plan: the sub-agents inside the contract of the parent.</em>
+</p>
 
 The task comes from [AppWorld](https://arxiv.org/abs/2407.18901) (task
 530b157_1): pay Kristin back on Venmo the amount in her text messages, with
@@ -30,8 +33,11 @@ right words, and no voice message. Together the sub-agents do not refine
 the parent: the counterexample pays and never sends the text. No sub-agent
 promises `F text3`.
 
-![Step 1: the plan does not refine the parent; Text does not promise F text3](diagram-1.png)
-_Step 1: the plan does not refine the parent; Text does not promise F text3._
+<p align="center">
+  <img src="diagram-1.png" alt="Step 1: the plan does not refine the parent; Text does not promise F text3">
+  <br>
+  <em>Step 1: the plan does not refine the parent; Text does not promise F text3.</em>
+</p>
 
 **Step 2. What sub-agent 3 must do.** Only sub-agent 3 can send the text
 (`text3`), so the quotient by the others, Q3 = Parent / (Messages ∥ Payment
@@ -44,16 +50,22 @@ the plan refines the parent. It may assume that the payment is done sooner
 or later (`F paid`): Q3 assumes it from what the other sub-agents
 guarantee.
 
-![Steps 2 and 3: Q3 asks for F text3; Text refines it](diagram-2.png)
-_Steps 2 and 3: Q3 asks for F text3; Text refines it._
+<p align="center">
+  <img src="diagram-2.png" alt="Steps 2 and 3: Q3 asks for F text3; Text refines it">
+  <br>
+  <em>Steps 2 and 3: Q3 asks for F text3; Text refines it.</em>
+</p>
 
 **Step 4. A clause against the request.** If the parent also says "never
 pay" (`G !tx2`, _ParentWithSlip_ in the picture), its contract is
 inconsistent, and the unsat core is the two clauses in conflict: `F tx2`
 and `G !tx2`.
 
-![Step 4: the inconsistent parent, with the core highlighted in red](diagram-3.png)
-_Step 4: the inconsistent parent, with the core highlighted in red._
+<p align="center">
+  <img src="diagram-3.png" alt="Step 4: the inconsistent parent, with the core highlighted in red">
+  <br>
+  <em>Step 4: the inconsistent parent, with the core highlighted in red.</em>
+</p>
 
 ### Content of the directory
 The directory of the demo contains:

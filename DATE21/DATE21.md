@@ -176,14 +176,23 @@ _Move_ ∥ _Turn_ ∥ _Pick_ ∥ _Place_, with the compatibility (A), the
 consistency (G), and the realizability (R) of each contract. It needs
 `chase-cps` and nuXmv.
 
-![Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees](diagram-1.png)
-_Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees._
+<p align="center">
+  <img src="diagram-1.png" alt="Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees">
+  <br>
+  <em>Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees.</em>
+</p>
 
-![Target does not refine Mission: it does not set the target position or the angle](diagram-2.png)
-_Target does not refine Mission: it does not set the target position or the angle._
+<p align="center">
+  <img src="diagram-2.png" alt="Target does not refine Mission: it does not set the target position or the angle">
+  <br>
+  <em>Target does not refine Mission: it does not set the target position or the angle.</em>
+</p>
 
-![The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables](diagram-3.png)
-_The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables._
+<p align="center">
+  <img src="diagram-3.png" alt="The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables">
+  <br>
+  <em>The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables.</em>
+</p>
 
 ### References
 [1] Nuzzo, Pierluigi, et al. _CHASE: Contract-based requirement engineering for 

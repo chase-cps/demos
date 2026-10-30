@@ -3,8 +3,11 @@
 **The question.** Some flights of an aircraft meet its requirements and
 hover within 12 steps. What must the pilot do so that every flight does?
 
-![The vehicle: the mode logic and the pilot](diagram-system.png)
-_The vehicle: the mode logic and the pilot._
+<p align="center">
+  <img src="diagram-system.png" alt="The vehicle: the mode logic and the pilot">
+  <br>
+  <em>The vehicle: the mode logic and the pilot.</em>
+</p>
 
 Lift-Plus-Cruise is an aircraft studied at NASA, with lift rotors for the
 hover and a wing for the cruise. The requirements are those of the LPC_mini
@@ -25,8 +28,11 @@ are not. The unsat core gives the reason: the vehicle stays wing borne while
 `kias` is above 90, then semi wing borne while it is above 30, and `kias`
 cannot fall from 120 to 30 by step 6. No pilot can hover within 6 steps.
 
-![Step 1: consistent with 12 steps, not with 6; the core highlighted in red](diagram-1.png)
-_Step 1: consistent with 12 steps, not with 6; the core highlighted in red._
+<p align="center">
+  <img src="diagram-1.png" alt="Step 1: consistent with 12 steps, not with 6; the core highlighted in red">
+  <br>
+  <em>Step 1: consistent with 12 steps, not with 6; the core highlighted in red.</em>
+</p>
 
 **Step 2. The split.** The vehicle is split into the mode logic and the
 pilot, as in the diagram at the top, and _ModeLogic_ ∥ _Pilot_ refines
@@ -37,26 +43,38 @@ drawn as a dashed box, is the weakest contract of the pilot with which
 every flight hovers within 12 steps. _Pilot_, which has only the
 requirements on the speeds, does not refine it: `kias` may stay at 120.
 
-![Step 3: Q12, what the pilot must do; Pilot does not refine it](diagram-2.png)
-_Step 3: Q12, what the pilot must do; Pilot does not refine it._
+<p align="center">
+  <img src="diagram-2.png" alt="Step 3: Q12, what the pilot must do; Pilot does not refine it">
+  <br>
+  <em>Step 3: Q12, what the pilot must do; Pilot does not refine it.</em>
+</p>
 
 **Step 4. A pilot that slows down.** _Slow_ also lowers `kias` by 10 at each
 step. It does not refine Q12: the hover control mode is never turned on, so
 the vehicle never reaches the hover.
 
-![Step 4: Slow does not refine Q12](diagram-3.png)
-_Step 4: Slow does not refine Q12._
+<p align="center">
+  <img src="diagram-3.png" alt="Step 4: Slow does not refine Q12">
+  <br>
+  <em>Step 4: Slow does not refine Q12.</em>
+</p>
 
 **Step 5. A pilot that slows down and turns on the hover control.**
 _Decel_ also turns the hover control mode on when `kgs` is below 20. It
 refines Q12, so every flight hovers within 12 steps. As step 1 says, it
 does not refine Q06 = Reach06 / ModeLogic.
 
-![Step 5: Decel refines Q12](diagram-4.png)
-_Step 5: Decel refines Q12._
+<p align="center">
+  <img src="diagram-4.png" alt="Step 5: Decel refines Q12">
+  <br>
+  <em>Step 5: Decel refines Q12.</em>
+</p>
 
-![Step 5: Decel does not refine Q06](diagram-5.png)
-_Step 5: Decel does not refine Q06._
+<p align="center">
+  <img src="diagram-5.png" alt="Step 5: Decel does not refine Q06">
+  <br>
+  <em>Step 5: Decel does not refine Q06.</em>
+</p>
 
 The checks are on real variables, with the SMT engine of nuXmv.
 

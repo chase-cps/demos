@@ -4,8 +4,11 @@
 designer while perception and localization stay as they are. What must the
 controller satisfy for the robot to meet the requirements of the system?
 
-![The place of the controller: the hole Q next to perception and localization](diagram-system.png)
-_The place of the controller: the hole Q next to perception and localization._
+<p align="center">
+  <img src="diagram-system.png" alt="The place of the controller: the hole Q next to perception and localization">
+  <br>
+  <em>The place of the controller: the hole Q next to perception and localization.</em>
+</p>
 
 The example is simplified from Damera, Matheu, and Baras, "Contract-Based
 Agentic Systems Engineering: Delegation as Quotient for Assured System
@@ -32,22 +35,31 @@ requirements written on what the controller sees, does not refine Q: in the
 counterexample the reported clearance is 0.40 while the true one is
 lower, and the robot turns faster than perception allows.
 
-![Step 2: MissionOnly does not refine Q](diagram-1.png)
-_Step 2: MissionOnly does not refine Q._
+<p align="center">
+  <img src="diagram-1.png" alt="Step 2: MissionOnly does not refine Q">
+  <br>
+  <em>Step 2: MissionOnly does not refine Q.</em>
+</p>
 
 **Step 3. With margins for the errors.** _Margins_ adds the errors of
 perception and localization to the bounds, and does not refine Q either: it
 turns faster than perception allows, and the robot reaches the worker.
 
-![Step 3: Margins does not refine Q](diagram-2.png)
-_Step 3: Margins does not refine Q._
+<p align="center">
+  <img src="diagram-2.png" alt="Step 3: Margins does not refine Q">
+  <br>
+  <em>Step 3: Margins does not refine Q.</em>
+</p>
 
 **Step 4. With the yaw rate.** _Dispatched_, the contract given to the
 designer, is _Margins_ with `|w| <= 0.8`. It refines Q, so the robot with
 it meets the requirements of the system.
 
-![Step 4: Dispatched refines Q](diagram-3.png)
-_Step 4: Dispatched refines Q._
+<p align="center">
+  <img src="diagram-3.png" alt="Step 4: Dispatched refines Q">
+  <br>
+  <em>Step 4: Dispatched refines Q.</em>
+</p>
 
 The paper finds the same two failures in simulation.
 

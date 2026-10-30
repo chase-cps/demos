@@ -5,8 +5,11 @@ AMBA AHB bus: one on how the bus is given to the masters, one on how a
 master locks it. Is there an arbiter that meets both, and what must it
 assume of the masters?
 
-![The arbiter: the merge of the two viewpoints, Grant and Lock](diagram-system.png)
-_The arbiter: the merge of the two viewpoints, Grant and Lock._
+<p align="center">
+  <img src="diagram-system.png" alt="The arbiter: the merge of the two viewpoints, Grant and Lock">
+  <br>
+  <em>The arbiter: the merge of the two viewpoints, Grant and Lock.</em>
+</p>
 
 The arbiter gives the bus to one of two masters. A master asks for the bus
 (`hbusreq`), and can ask for a locked access (`hlock`); the arbiter grants
@@ -30,8 +33,11 @@ bus and keeps asking for it, _Lock_ says that master 1 keeps the bus
 core is these two, with GR1, GR2, and LK1, which make the conflict
 possible.
 
-![Step 2: the merge is unrealizable; the core highlighted in red](diagram-1.png)
-_Step 2: the merge is unrealizable; the core highlighted in red._
+<p align="center">
+  <img src="diagram-1.png" alt="Step 2: the merge is unrealizable; the core highlighted in red">
+  <br>
+  <em>Step 2: the merge is unrealizable; the core highlighted in red.</em>
+</p>
 
 **Step 3. What the arbiter must assume.** The core points to the missing
 assumption: a master that has locked the bus stops asking for it sooner or
@@ -42,8 +48,11 @@ _Arbiter_ is also written as SVA (`out/arbiter.sv`).
 **Step 4. The controller.** The synthesized controller, read as a state
 machine, implements _Arbiter_ (M ⊨ C).
 
-![Step 4: the controller implements Arbiter](diagram-2.png)
-_Step 4: the controller implements Arbiter._
+<p align="center">
+  <img src="diagram-2.png" alt="Step 4: the controller implements Arbiter">
+  <br>
+  <em>Step 4: the controller implements Arbiter.</em>
+</p>
 
 ### Content of the directory
 The directory of the demo contains:
