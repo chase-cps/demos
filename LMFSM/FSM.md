@@ -5,7 +5,7 @@ contradict each other? Once they are corrected, does the system command
 the pullup when its requirement says?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The system: the autopilot and the sensor, which feed each other">
+  <img src="images/autopilot-and-sensor.png" alt="The system: the autopilot and the sensor, which feed each other">
   <br>
   <em>The system: the autopilot and the sensor, which feed each other.</em>
 </p>
@@ -36,7 +36,7 @@ and checks again. It finds four conflicts in the autopilot and one in the
 sensor, with the same fixes as FRET.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Step 1: the first requirements are unrealizable; the cores highlighted in red">
+  <img src="images/first-requirements-unrealizable-cores.png" alt="Step 1: the first requirements are unrealizable; the cores highlighted in red">
   <br>
   <em>Step 1: the first requirements are unrealizable; the cores highlighted in red.</em>
 </p>
@@ -47,7 +47,7 @@ counterexample the limits are exceeded and the pullup does not come at
 once.
 
 <p align="center">
-  <img src="diagram-2.png" alt="Step 2: Autopilot ∥ Sensor does not refine System">
+  <img src="images/composition-does-not-refine-system.png" alt="Step 2: Autopilot ∥ Sensor does not refine System">
   <br>
   <em>Step 2: Autopilot ∥ Sensor does not refine System.</em>
 </p>
@@ -59,7 +59,7 @@ exceeded for three steps and then exceeded, the pilot not in control and no
 failure, the pullup comes at the fifth step. The composition refines it.
 
 <p align="center">
-  <img src="diagram-3.png" alt="Step 3: Autopilot ∥ Sensor refines SystemTimed">
+  <img src="images/composition-refines-systemtimed.png" alt="Step 3: Autopilot ∥ Sensor refines SystemTimed">
   <br>
   <em>Step 3: Autopilot ∥ Sensor refines SystemTimed.</em>
 </p>

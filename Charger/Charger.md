@@ -5,7 +5,7 @@ Which checks catch the problems of the first contracts of the arbiter, and
 which contract works with the robots?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The system: an arbiter and two robots, which feed each other with requests and grants">
+  <img src="images/arbiter-and-two-robots.png" alt="The system: an arbiter and two robots, which feed each other with requests and grants">
   <br>
   <em>The system: an arbiter and two robots, which feed each other with requests and grants.</em>
 </p>
@@ -30,7 +30,7 @@ at the next step after its request (R6.1, R6.2). When both robots ask at
 once, it cannot serve both: the unrealizable core is R5, R6.1, and R6.2.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Step 1: Greedy is unrealizable; the core highlighted in red">
+  <img src="images/greedy-unrealizable-core.png" alt="Step 1: Greedy is unrealizable; the core highlighted in red">
   <br>
   <em>Step 1: Greedy is unrealizable; the core highlighted in red.</em>
 </p>
@@ -41,7 +41,7 @@ nothing. It is realizable, and slugs synthesizes a controller of 18 states.
 Its guarantee R8 is implied by R7.1 and is removed.
 
 <p align="center">
-  <img src="diagram-2.png" alt="Step 2: Fair is realizable">
+  <img src="images/fair-realizable.png" alt="Step 2: Fair is realizable">
   <br>
   <em>Step 2: Fair is realizable.</em>
 </p>
@@ -57,7 +57,7 @@ _Polite_ assumes A4 instead of A3 (after a grant it asked for, robot 1 does
 not ask at the next step), and is well separated.
 
 <p align="center">
-  <img src="diagram-3.png" alt="Step 3: Pushy is not well separated (the core: A2, A3); Polite is">
+  <img src="images/pushy-not-well-separated.png" alt="Step 3: Pushy is not well separated (the core: A2, A3); Polite is">
   <br>
   <em>Step 3: Pushy is not well separated (the core: A2, A3); Polite is.</em>
 </p>
@@ -69,7 +69,7 @@ setting its outputs. The core is the two assumptions and the three
 guarantees they make true. _Fair_ is not vacuous.
 
 <p align="center">
-  <img src="diagram-4.png" alt="Step 4: Trusting is vacuous; the core highlighted in red">
+  <img src="images/trusting-vacuous-core.png" alt="Step 4: Trusting is vacuous; the core highlighted in red">
   <br>
   <em>Step 4: Trusting is vacuous; the core highlighted in red.</em>
 </p>

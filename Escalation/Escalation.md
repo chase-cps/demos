@@ -5,7 +5,7 @@ sender, the wires, and a receiver. Does it meet its requirements, and can we
 show it by checking each module on its own?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements">
+  <img src="images/sender-channel-receiver.png" alt="The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements">
   <br>
   <em>The link: the sender, the channel, and the receiver, each with its RTL, inside the requirements.</em>
 </p>
@@ -39,7 +39,7 @@ _Functional_ and _Integrity_. So the three modules together meet the
 requirements, with no check on the whole design.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Steps 1 and 2: each RTL implements its contract, and the composition refines Functional; the receiver with its four states">
+  <img src="images/rtl-implements-contracts.png" alt="Steps 1 and 2: each RTL implements its contract, and the composition refines Functional; the receiver with its four states">
   <br>
   <em>Steps 1 and 2: each RTL implements its contract, and the composition refines Functional; the receiver with its four states.</em>
 </p>

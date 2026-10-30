@@ -177,19 +177,19 @@ consistency (G), and the realizability (R) of each contract. It needs
 `chase-cps` and nuXmv.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees">
+  <img src="images/mission-refines-target.png" alt="Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees">
   <br>
   <em>Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees.</em>
 </p>
 
 <p align="center">
-  <img src="diagram-2.png" alt="Target does not refine Mission: it does not set the target position or the angle">
+  <img src="images/target-does-not-refine-mission.png" alt="Target does not refine Mission: it does not set the target position or the angle">
   <br>
   <em>Target does not refine Mission: it does not set the target position or the angle.</em>
 </p>
 
 <p align="center">
-  <img src="diagram-3.png" alt="The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables">
+  <img src="images/whole-system-wired.png" alt="The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables">
   <br>
   <em>The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables.</em>
 </p>

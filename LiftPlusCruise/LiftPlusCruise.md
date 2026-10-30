@@ -4,7 +4,7 @@
 hover within 12 steps. What must the pilot do so that every flight does?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The vehicle: the mode logic and the pilot">
+  <img src="images/mode-logic-and-pilot.png" alt="The vehicle: the mode logic and the pilot">
   <br>
   <em>The vehicle: the mode logic and the pilot.</em>
 </p>
@@ -35,7 +35,7 @@ are not. The unsat core gives the reason: the vehicle stays wing borne while
 cannot fall from 120 to 30 by step 6. No pilot can hover within 6 steps.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Step 1: consistent with 12 steps, not with 6; the core highlighted in red">
+  <img src="images/reach06-inconsistent-core.png" alt="Step 1: consistent with 12 steps, not with 6; the core highlighted in red">
   <br>
   <em>Step 1: consistent with 12 steps, not with 6; the core highlighted in red.</em>
 </p>
@@ -50,7 +50,7 @@ every flight hovers within 12 steps. _Pilot_, which has only the
 requirements on the speeds, does not refine it: `kias` may stay at 120.
 
 <p align="center">
-  <img src="diagram-2.png" alt="Step 3: Q12, what the pilot must do; Pilot does not refine it">
+  <img src="images/q12-pilot-does-not-refine.png" alt="Step 3: Q12, what the pilot must do; Pilot does not refine it">
   <br>
   <em>Step 3: Q12, what the pilot must do; Pilot does not refine it.</em>
 </p>
@@ -60,7 +60,7 @@ step. It does not refine Q12: the hover control mode is never turned on, so
 the vehicle never reaches the hover.
 
 <p align="center">
-  <img src="diagram-3.png" alt="Step 4: Slow does not refine Q12">
+  <img src="images/slow-does-not-refine-q12.png" alt="Step 4: Slow does not refine Q12">
   <br>
   <em>Step 4: Slow does not refine Q12.</em>
 </p>
@@ -71,13 +71,13 @@ refines Q12, so every flight hovers within 12 steps. As step 1 says, it
 does not refine Q06 = Reach06 / ModeLogic.
 
 <p align="center">
-  <img src="diagram-4.png" alt="Step 5: Decel refines Q12">
+  <img src="images/decel-refines-q12.png" alt="Step 5: Decel refines Q12">
   <br>
   <em>Step 5: Decel refines Q12.</em>
 </p>
 
 <p align="center">
-  <img src="diagram-5.png" alt="Step 5: Decel does not refine Q06">
+  <img src="images/decel-does-not-refine-q06.png" alt="Step 5: Decel does not refine Q06">
   <br>
   <em>Step 5: Decel does not refine Q06.</em>
 </p>

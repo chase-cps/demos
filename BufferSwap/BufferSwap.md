@@ -5,7 +5,7 @@ contract does not refine the old one. Can it take its place, and what must
 any buffer in that place satisfy?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The system: a producer, the buffer, and a consumer, with a ready/valid handshake">
+  <img src="images/producer-buffer-consumer.png" alt="The system: a producer, the buffer, and a consumer, with a ready/valid handshake">
   <br>
   <em>The system: a producer, the buffer, and a consumer, with a ready/valid handshake.</em>
 </p>
@@ -34,7 +34,7 @@ _TwoFifo_: with a value in, it takes no other. Its contract alone does not
 say that it can take the place.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Step 2: OneFifo does not refine TwoFifo">
+  <img src="images/onefifo-does-not-refine-twofifo.png" alt="Step 2: OneFifo does not refine TwoFifo">
   <br>
   <em>Step 2: OneFifo does not refine TwoFifo.</em>
 </p>
@@ -47,7 +47,7 @@ guarantees, that an offer is taken sooner or later, so a buffer of one
 entry is enough.
 
 <p align="center">
-  <img src="diagram-2.png" alt="Step 3: OneFifo refines Slot, the contract of the place">
+  <img src="images/onefifo-refines-slot.png" alt="Step 3: OneFifo refines Slot, the contract of the place">
   <br>
   <em>Step 3: OneFifo refines Slot, the contract of the place.</em>
 </p>

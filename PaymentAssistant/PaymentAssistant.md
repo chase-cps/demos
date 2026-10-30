@@ -6,7 +6,7 @@ together, refine the contract of the parent agent? If not, what is missing,
 and which sub-agent must do it?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The plan: the sub-agents inside the contract of the parent">
+  <img src="images/plan-of-sub-agents.png" alt="The plan: the sub-agents inside the contract of the parent">
   <br>
   <em>The plan: the sub-agents inside the contract of the parent.</em>
 </p>
@@ -48,7 +48,7 @@ the parent: the counterexample pays and never sends the text. No sub-agent
 promises `F text3`.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Step 1: the plan does not refine the parent; Text does not promise F text3">
+  <img src="images/plan-does-not-refine-parent.png" alt="Step 1: the plan does not refine the parent; Text does not promise F text3">
   <br>
   <em>Step 1: the plan does not refine the parent; Text does not promise F text3.</em>
 </p>
@@ -65,7 +65,7 @@ or later (`F paid`): Q3 assumes it from what the other sub-agents
 guarantee.
 
 <p align="center">
-  <img src="diagram-2.png" alt="Steps 2 and 3: Q3 asks for F text3; Text refines it">
+  <img src="images/quotient-q3-text-refines.png" alt="Steps 2 and 3: Q3 asks for F text3; Text refines it">
   <br>
   <em>Steps 2 and 3: Q3 asks for F text3; Text refines it.</em>
 </p>
@@ -76,7 +76,7 @@ inconsistent, and the unsat core is the two clauses in conflict: `F tx2`
 and `G !tx2`.
 
 <p align="center">
-  <img src="diagram-3.png" alt="Step 4: the inconsistent parent, with the core highlighted in red">
+  <img src="images/parent-inconsistent-core.png" alt="Step 4: the inconsistent parent, with the core highlighted in red">
   <br>
   <em>Step 4: the inconsistent parent, with the core highlighted in red.</em>
 </p>

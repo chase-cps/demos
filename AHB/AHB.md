@@ -6,7 +6,7 @@ master locks it. Is there an arbiter that meets both, and what must it
 assume of the masters?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The arbiter: the merge of the two viewpoints, Grant and Lock">
+  <img src="images/merge-of-grant-and-lock.png" alt="The arbiter: the merge of the two viewpoints, Grant and Lock">
   <br>
   <em>The arbiter: the merge of the two viewpoints, Grant and Lock.</em>
 </p>
@@ -45,7 +45,7 @@ core is these two, with GR1, GR2, and LK1, which make the conflict
 possible.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Step 2: the merge is unrealizable; the core highlighted in red">
+  <img src="images/merge-unrealizable-core.png" alt="Step 2: the merge is unrealizable; the core highlighted in red">
   <br>
   <em>Step 2: the merge is unrealizable; the core highlighted in red.</em>
 </p>
@@ -60,7 +60,7 @@ _Arbiter_ is also written as SVA (`out/arbiter.sv`).
 machine, implements _Arbiter_ (M ⊨ C).
 
 <p align="center">
-  <img src="diagram-2.png" alt="Step 4: the controller implements Arbiter">
+  <img src="images/controller-implements-arbiter.png" alt="Step 4: the controller implements Arbiter">
   <br>
   <em>Step 4: the controller implements Arbiter.</em>
 </p>

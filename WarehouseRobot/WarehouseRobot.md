@@ -5,7 +5,7 @@ designer while perception and localization stay as they are. What must the
 controller satisfy for the robot to meet the requirements of the system?
 
 <p align="center">
-  <img src="diagram-system.png" alt="The place of the controller: the hole Q next to perception and localization">
+  <img src="images/hole-q-for-controller.png" alt="The place of the controller: the hole Q next to perception and localization">
   <br>
   <em>The place of the controller: the hole Q next to perception and localization.</em>
 </p>
@@ -41,7 +41,7 @@ counterexample the reported clearance is 0.40 while the true one is
 lower, and the robot turns faster than perception allows.
 
 <p align="center">
-  <img src="diagram-1.png" alt="Step 2: MissionOnly does not refine Q">
+  <img src="images/missiononly-does-not-refine-q.png" alt="Step 2: MissionOnly does not refine Q">
   <br>
   <em>Step 2: MissionOnly does not refine Q.</em>
 </p>
@@ -51,7 +51,7 @@ perception and localization to the bounds, and does not refine Q either: it
 turns faster than perception allows, and the robot reaches the worker.
 
 <p align="center">
-  <img src="diagram-2.png" alt="Step 3: Margins does not refine Q">
+  <img src="images/margins-does-not-refine-q.png" alt="Step 3: Margins does not refine Q">
   <br>
   <em>Step 3: Margins does not refine Q.</em>
 </p>
@@ -61,7 +61,7 @@ designer, is _Margins_ with `|w| <= 0.8`. It refines Q, so the robot with
 it meets the requirements of the system.
 
 <p align="center">
-  <img src="diagram-3.png" alt="Step 4: Dispatched refines Q">
+  <img src="images/dispatched-refines-q.png" alt="Step 4: Dispatched refines Q">
   <br>
   <em>Step 4: Dispatched refines Q.</em>
 </p>
