@@ -1,13 +1,62 @@
-## Charger: diagnosis of an arbiter
+## Charging station: designing an arbiter
 
-Two robots share a charging station, and an arbiter gives the station to
-the robots. The demo follows one design iteration of the arbiter: the
-requirements of a first arbiter cannot be realized, a second one can be
-realized but for a bad reason, and a third one is composed with the robots
-and checked against the requirements of the whole system.
+**The question.** Two robots share a charging station through an arbiter.
+Which checks catch the problems of the first contracts of the arbiter, and
+which contract works with the robots?
 
 ![The system: an arbiter and two robots, which feed each other with requests and grants](diagram-system.png)
 _The system: an arbiter and two robots, which feed each other with requests and grants._
+
+A robot asks for the station (`req`) when its battery is low (`low`), and
+the arbiter gives it (`grant`). The requests of the robots are the inputs of
+the arbiter, and its grants are the inputs of the robots. A robot asks
+when its battery is low, and assumes that it is given the station, or stops
+asking, infinitely often. Each candidate arbiter guarantees that the
+station is never given to both robots (R5). The requirements are numbered
+as in `requirements.txt`.
+
+### The steps
+
+**Step 1. Greedy: unrealizable.** _Greedy_ gives the station to each robot
+at the next step after its request (R6.1, R6.2). When both robots ask at
+once, it cannot serve both: the unrealizable core is R5, R6.1, and R6.2.
+
+![Step 1: Greedy is unrealizable; the core highlighted in red](diagram-1.png)
+_Step 1: Greedy is unrealizable; the core highlighted in red._
+
+**Step 2. Fair: realizable.** _Fair_ gives the station to each robot, or
+the robot stops asking, infinitely often (R7.1, R7.2), and assumes
+nothing. It is realizable, and slugs synthesizes a controller of 18 states.
+Its guarantee R8 is implied by R7.1 and is removed.
+
+![Step 2: Fair is realizable](diagram-2.png)
+_Step 2: Fair is realizable._
+
+**Step 3. Realizable for a bad reason.** _Pushy_ assumes that robot 1 asks
+infinitely often (A2), and does not ask at the step after it is given the
+station (A3). The arbiter can then give the station to robot 1 at every
+step, even when it does not ask: by A3 robot 1 never asks again, A2 is
+broken, and the contract holds because an assumption fails. A contract
+is well separated when the arbiter cannot win by making the environment
+break its assumptions; _Pushy_ is not, with A2 and A3 as the core.
+_Polite_ assumes A4 instead of A3 (after a grant it asked for, robot 1 does
+not ask at the next step), and is well separated.
+
+![Step 3: Pushy is not well separated (the core: A2, A3); Polite is](diagram-3.png)
+_Step 3: Pushy is not well separated (the core: A2, A3); Polite is._
+
+**Step 4. An arbiter that never grants.** _Trusting_ assumes that each robot
+stops asking infinitely often (`G F !req1`, `G F !req2`). Its guarantees
+then hold without any grant: it is vacuous, since it can win without
+setting its outputs. The core is the two assumptions and the three
+guarantees they make true. _Fair_ is not vacuous.
+
+![Step 4: Trusting is vacuous; the core highlighted in red](diagram-4.png)
+_Step 4: Trusting is vacuous; the core highlighted in red._
+
+**Step 5. The arbiter with the robots.** _Fair_ and the robots are composed
+with discharge (the guarantees of the arbiter discharge the assumptions of
+the robots), and the composition refines _System_, the diagram at the top.
 
 ### Content of the directory
 The directory of the demo contains:
@@ -56,51 +105,21 @@ refinement check of the composition against _System_ in
 Both formulas are true: the composition refines _System_.
 
 ### Python Flow
+The script needs the CHASE Python package, version 0.5.0, nuXmv, and
+slugs. From the directory of the demo:
 
-The checks that find why a contract fails are in the CHASE Python package
-(`pip install chase-cps`, version 0.5.0):
+```
+$> pip install chase-cps
+$> chase-cps install nuxmv --accept-license
+$> chase-cps install slugs
+$> python3 charger.py
+```
 
-`$> python3 charger.py`
-
-The script prints the result of each step:
-1. _Greedy_ is unrealizable. The unrealizable core is R6.1, R6.2, and R5:
-   the three guarantees in conflict. The composition of _Greedy_ with the
-   robots refines _System_ all the same: the refinement check does not see
-   the conflict.
-2. _Fair_ is realizable, and a controller is synthesized.
-3. The _Pushy_ arbiter assumes that robot 1 asks for the station infinitely
-   often (A2), and that it does not ask for it after it is given the station
-   (A3). The arbiter can give the station to robot 1 forever: then robot 1
-   never asks again, A2 is violated, and the arbiter satisfies its contract
-   without serving anybody. The well-separation check finds it, and its core
-   is A2 and A3. The _Polite_ arbiter assumes A4 instead of A3, and is well
-   separated.
-4. _Fair_ is not vacuous: it cannot win without granting each robot
-   (`is_vacuous`). An arbiter that trusts the robots to stop asking on
-   their own (it assumes G F !req1 and G F !req2) is vacuous: R7.1 and R7.2
-   then hold without any grant, and `is_vacuous` gives the strategy that
-   never grants and the assumptions that allow it. R8 is redundant: R7.1
-   implies it. `remove_redundant` with `synth=True` removes it, and the
-   contract stays realizable.
-5. The arbiter and the robots feed each other (`req` and `grant`). Composed
-   with discharge, the assumptions of the robots (A1.1, A1.2) are discharged
-   by the guarantees of the arbiter (R7.1, R7.2): no assumption is left, and
-   the composition refines _System_.
+The script prints the result of each step and writes the diagrams above in
+`out/charger.html`, a page to open in a browser: a click on a name opens
+or closes the contract, and a click on a red tag shows its core. Steps 1,
+2, and 5 with the console of logics_tool are in `charger.chase` (the
+Logic-based Flow above).
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
-
-`out/charger.html` draws the arbiters with the results of their checks (R,
-WS, ¬V), the three that fail drawn open on their cores, and the composition
-of _Fair_ with the robots inside _System_. The page opens in a browser; a
-click on a name opens its contract, and a click on a red tag shows its
-core.
-
-![The arbiters: Greedy is unrealizable (its core: R5, R6.1, R6.2), Fair is realizable and not vacuous, Pushy is not well separated (it can win by making the robots break A2 and A3), and Polite is](diagram-1.png)
-_The arbiters: Greedy is unrealizable (its core: R5, R6.1, R6.2), Fair is realizable and not vacuous, Pushy is not well separated (it can win by making the robots break A2 and A3), and Polite is._
-
-![Trusting assumes that the robots stop asking on their own, G F !req1 and G F !req2, so it wins without any grant: it is vacuous, and these two assumptions are the core](diagram-2.png)
-_Trusting assumes that the robots stop asking on their own, G F !req1 and G F !req2, so it wins without any grant: it is vacuous, and these two assumptions are the core._
-
-![Fair composed with the two robots, with discharge, refines System](diagram-3.png)
-_Fair composed with the two robots, with discharge, refines System._

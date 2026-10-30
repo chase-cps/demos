@@ -1,20 +1,51 @@
-## LMFSM: conflicting requirements
+## Autopilot: conflicting requirements
 
-The question: which requirements of a state machine, as first written,
-contradict each other, and does the pullup of the corrected system come
-when the requirement of the system says?
-
-An autopilot commands a safety maneuver (pullup) when a sensor reports a
-hazard. The requirements are those of the finite state machine of the Ten
-Lockheed Martin Cyber-Physical Challenges (A. Mavridou et al., "The Ten
-Lockheed Martin Cyber-Physical Challenges: Formalized, Analyzed, and
-Explained", RE 2020), as in the FRET case study LMCPS. The demo finds the
-requirements in conflict, checks that the corrected ones can be realized,
-and checks the requirement of the whole system on the composition of the
-autopilot and the sensor.
+**The question.** Which requirements of a state machine, as first written,
+contradict each other? Once they are corrected, does the system command
+the pullup when its requirement says?
 
 ![The system: the autopilot and the sensor, which feed each other](diagram-system.png)
 _The system: the autopilot and the sensor, which feed each other._
+
+An autopilot commands a safety maneuver (pullup) when a sensor reports a
+hazard. The requirements are those of the finite state machine of the Ten
+Lockheed Martin Cyber-Physical Challenges (Mavridou et al., RE 2020), as in
+the FRET case study, which gives a first version of each requirement and
+the corrected one (FSM-001 to FSM-011). Each requirement is a transition
+of the autopilot (`STATE` 0 to 3: TRANSITION, NOMINAL, MANEUVER, STANDBY) or
+of the sensor (NOMINAL, TRANSITION, FAULT).
+
+### The steps
+
+**Step 1. The first requirements.** _AutopilotFirst_ and _SensorFirst_ are
+unrealizable. Each unrealizable core is the requirements that send the
+machine to two different states for the same inputs, with the initial
+state; for instance, in TRANSITION with the pilot in control (`standby`),
+the system supported (`supported`), and good sensor data (`good`), FSM-002
+says STANDBY and FSM-003 says NOMINAL. (A primed input is its value at the
+next step: the autopilot reads the inputs of the step it moves to.) The
+script replaces the requirement by its corrected version and checks again:
+four conflicts in the autopilot, one in the sensor, the same fixes as FRET.
+
+![Step 1: the first requirements are unrealizable; the cores highlighted in red](diagram-1.png)
+_Step 1: the first requirements are unrealizable; the cores highlighted in red._
+
+**Step 2. The system.** The corrected _Autopilot_ and _Sensor_ are
+realizable, but together they do not refine _System_ (FSM-001): the
+counterexample the limits are exceeded and the pullup does not come at
+once.
+
+![Step 2: Autopilot ∥ Sensor does not refine System](diagram-2.png)
+_Step 2: Autopilot ∥ Sensor does not refine System._
+
+**Step 3. The system, with time.** The sensor and the autopilot each take a
+step to react, and the autopilot must first reach NOMINAL from the start.
+_SystemTimed_ (FSM-001t) gives the pullup that time: with the limits not
+exceeded for three steps and then exceeded, the pilot not in control and no
+failure, the pullup comes at the fifth step. The composition refines it.
+
+![Step 3: Autopilot ∥ Sensor refines SystemTimed](diagram-3.png)
+_Step 3: Autopilot ∥ Sensor refines SystemTimed._
 
 ### Content of the directory
 The directory of the demo contains:
@@ -26,65 +57,22 @@ The directory of the demo contains:
   requirement;
 - `fsm.py`: the analysis with the CHASE Python package.
 
-### The contracts
-The autopilot has four states (TRANSITION, NOMINAL, MANEUVER, STANDBY), and
-the sensor three (NOMINAL, TRANSITION, FAULT). Each requirement is a
-transition, written one step early: "from S to S' when c" is
-`G((STATE = S & c) -> STATE' = S')`, where the inputs of the new step are
-primed. The autopilot reads the sensor (`good`) of the previous step, and
-the sensor reads the autopilot (`MODE`, `REQUEST`) of the same step.
-
-_Autopilot_ and _Sensor_ have the corrected requirements (v2), and what the
-Simulink model of the challenge does in the other cases: the machine stays
-in its state (AP-S, SEN-S), and the outputs are given by the state (AP-O,
-SEN-O).
-
 ### Python Flow
-The script needs the CHASE Python package (`pip install chase-cps`), slugs,
-and nuXmv or NuSMV:
+The script needs the CHASE Python package, version 0.5.0, nuXmv, and
+slugs. From the directory of the demo:
 
-`$> python3 fsm.py`
+```
+$> pip install chase-cps
+$> chase-cps install nuxmv --accept-license
+$> chase-cps install slugs
+$> python3 fsm.py
+```
 
-It prints the result of each step:
-1. _AutopilotFirst_ is unrealizable. The unrealizable core gives the
-   requirements in conflict: FSM-002 and FSM-003 both apply in TRANSITION
-   when the pilot is in control and the sensor data is good, and lead to
-   two states. The script replaces the requirement with a corrected version
-   (FSM-003v2) and checks again. Four conflicts are found in a row (FSM-003,
-   FSM-004, FSM-008, FSM-007), and the contract is realizable after the
-   fourth fix. _SensorFirst_ has one conflict (FSM-010 and FSM-011).
-2. _Autopilot_ and _Sensor_ are realizable.
-3. _Autopilot_ and _Sensor_, composed with discharge, do not refine
-   _System_ (FSM-001: a pullup when the limits are exceeded). The
-   counterexample: the limits are exceeded at step 1 and the sensor goes
-   to FAULT, but the autopilot reads the sensor of the previous step, and
-   is not in MANEUVER at step 1.
-4. They refine _SystemTimed_ (FSM-001t), which gives the pullup the steps it
-   takes: the limits not exceeded for three steps, then exceeded, with the
-   pilot not in control and no failure from the second step to the fifth,
-   give a pullup at the fifth step. This is FSM-001v3 of FRET, with the
-   limits not exceeded for one step less.
+The script prints the result of each step, with the five conflicts and
+their fixes, and writes the diagrams above in `out/fsm.html`, a page to
+open in a browser: a click on a name opens or closes the contract, and a
+click on a red tag shows its core. The requirements are in
+`requirements.txt`, and the contracts in `fsm.ltl`.
 
 With `--expect` the script exits with code 1 when a result is not the
 expected one.
-
-The limits not exceeded at the start are needed: when the sensor is in
-FAULT while the autopilot is in TRANSITION, and the limits stay exceeded,
-the sensor stays in FAULT (the autopilot requests support) and the
-autopilot stays in TRANSITION (the sensor data is not good), so there is
-never a pullup.
-
-`out/fsm.html`, written by `fsm.py`, draws _AutopilotFirst_ and
-_SensorFirst_ open on their unrealizable cores, and _Autopilot_ ∥ _Sensor_
-inside _System_ (⪯, red) and inside _SystemTimed_ (⪯, green), with the
-contract of each drawn open. It opens in a browser; a click on a name opens
-or closes the contract, and a click on a red tag shows its core.
-
-![The contracts as first written are unrealizable; the cores, on a red ground, are the requirements in conflict, in the autopilot and in the sensor](diagram-1.png)
-_The contracts as first written are unrealizable; the cores, on a red ground, are the requirements in conflict, in the autopilot and in the sensor._
-
-![Autopilot ∥ Sensor does not refine System (FSM-001): the pullup does not come at the step the limits are exceeded](diagram-2.png)
-_Autopilot ∥ Sensor does not refine System (FSM-001): the pullup does not come at the step the limits are exceeded._
-
-![Autopilot ∥ Sensor refines SystemTimed (FSM-001t), which gives the pullup the steps it takes](diagram-3.png)
-_Autopilot ∥ Sensor refines SystemTimed (FSM-001t), which gives the pullup the steps it takes._
