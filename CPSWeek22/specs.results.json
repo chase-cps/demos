@@ -8,7 +8,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:45"
+        "at": "2026-10-30T00:33:23"
       }
     },
     "Joint2": {
@@ -17,7 +17,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:45"
+        "at": "2026-10-30T00:33:23"
       }
     },
     "Joint3": {
@@ -25,8 +25,8 @@
         "key": "5d19f2acefc5f160",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:04:45"
+        "seconds": 0.03,
+        "at": "2026-10-30T00:33:23"
       }
     },
     "Joints": {
@@ -34,8 +34,8 @@
         "key": "13d352f2dd859f8d",
         "result": "sat",
         "tool": "nuxmv/ic3",
-        "seconds": 0.16,
-        "at": "2026-10-30T00:04:45"
+        "seconds": 0.19,
+        "at": "2026-10-30T00:33:23"
       }
     }
   },
@@ -46,9 +46,9 @@
       "refined": "Joint1+Joint2+Joint3",
       "abstract": "Joints",
       "result": "valid",
-      "tool": "",
-      "seconds": 0.0,
-      "at": "2026-10-30T00:04:50"
+      "tool": "nuxmv/ic3",
+      "seconds": 4.67,
+      "at": "2026-10-30T00:33:28"
     }
   ]
 }

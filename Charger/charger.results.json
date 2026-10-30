@@ -7,8 +7,8 @@
         "key": "e87a69d97343ca69",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.05,
-        "at": "2026-10-29T23:57:24"
+        "seconds": 0.01,
+        "at": "2026-10-30T00:33:28"
       }
     },
     "Greedy": {
@@ -17,7 +17,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-29T23:57:24"
+        "at": "2026-10-30T00:33:28"
       }
     },
     "Polite": {
@@ -26,7 +26,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-29T23:57:24"
+        "at": "2026-10-30T00:33:28"
       }
     },
     "Pushy": {
@@ -35,7 +35,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-29T23:57:24"
+        "at": "2026-10-30T00:33:28"
       }
     },
     "Robot1": {
@@ -44,7 +44,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-29T23:57:24"
+        "at": "2026-10-30T00:33:28"
       }
     },
     "Robot2": {
@@ -52,8 +52,8 @@
         "key": "a5f35a68b3bc78ff",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-29T23:57:24"
+        "seconds": 0.02,
+        "at": "2026-10-30T00:33:28"
       }
     },
     "System": {
@@ -61,8 +61,8 @@
         "key": "fa25e6abdbb7fa2a",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-29T23:57:24"
+        "seconds": 0.01,
+        "at": "2026-10-30T00:33:28"
       }
     }
   },
@@ -73,9 +73,9 @@
       "refined": "Robot1+Robot2+Greedy",
       "abstract": "System",
       "result": "valid",
-      "tool": "",
-      "seconds": 0.0,
-      "at": "2026-10-29T23:57:24"
+      "tool": "nuxmv/bdd",
+      "seconds": 0.03,
+      "at": "2026-10-30T00:33:28"
     }
   ]
 }
