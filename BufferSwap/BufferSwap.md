@@ -11,13 +11,17 @@ any buffer in that place satisfy?
 </p>
 
 A producer sends data to a consumer through a buffer, with a ready/valid
-handshake: the producer offers a value (`v_i`) and the buffer takes it when
-it is ready (`ready_o`); the buffer offers a value (`v_o`) and the consumer
-takes it (`yumi_i`). The buffer is `bsg_two_fifo` of BaseJump STL, a FIFO
-of two entries; the demo replaces it with `bsg_one_fifo`, a FIFO of one
-entry. The contracts are written in SystemVerilog Assertions: every offer
-is taken sooner or later, and what the buffer offers stays until it is
-taken. The RTL is that of BaseJump STL.
+handshake:
+
+- the producer offers a value (`v_i`), and the buffer takes it when it is
+  ready (`ready_o`);
+- the buffer offers a value (`v_o`), and the consumer takes it (`yumi_i`).
+
+The buffer is `bsg_two_fifo` of BaseJump STL, a FIFO of two entries. The
+demo replaces it with `bsg_one_fifo`, a FIFO of one entry. The contracts are
+written in SystemVerilog Assertions: every
+offer is taken sooner or later, and what the buffer offers stays until it
+is taken. The RTL is that of BaseJump STL.
 
 ### The steps
 

@@ -13,22 +13,27 @@ the pullup when its requirement says?
 An autopilot commands a safety maneuver (pullup) when a sensor reports a
 hazard. The requirements are those of the finite state machine of the Ten
 Lockheed Martin Cyber-Physical Challenges (Mavridou et al., RE 2020), as in
-the FRET case study, which gives a first version of each requirement and
-the corrected one (FSM-001 to FSM-011). Each requirement is a transition
-of the autopilot (`STATE` 0 to 3: TRANSITION, NOMINAL, MANEUVER, STANDBY) or
-of the sensor (NOMINAL, TRANSITION, FAULT).
+the FRET case study. The case study gives a first version of each
+requirement and the corrected one (FSM-001 to FSM-011). Each requirement is
+a transition:
+
+- of the autopilot: `STATE` 0 to 3, that is TRANSITION, NOMINAL, MANEUVER,
+  and STANDBY;
+- or of the sensor: NOMINAL, TRANSITION, and FAULT.
 
 ### The steps
 
 **Step 1. The first requirements.** _AutopilotFirst_ and _SensorFirst_ are
-unrealizable. Each unrealizable core is the requirements that send the
-machine to two different states for the same inputs, with the initial
-state; for instance, in TRANSITION with the pilot in control (`standby`),
+unrealizable. Each unrealizable core is made of the requirements that send
+the machine to two different states for the same inputs, with the initial
+state. For instance, in TRANSITION, with the pilot in control (`standby`),
 the system supported (`supported`), and good sensor data (`good`), FSM-002
-says STANDBY and FSM-003 says NOMINAL. (A primed input is its value at the
-next step: the autopilot reads the inputs of the step it moves to.) The
-script replaces the requirement by its corrected version and checks again:
-four conflicts in the autopilot, one in the sensor, the same fixes as FRET.
+says STANDBY and FSM-003 says NOMINAL. A primed input is its value at the
+next step: the autopilot reads the inputs of the step it moves to.
+
+The script replaces each requirement of a core by its corrected version,
+and checks again. It finds four conflicts in the autopilot and one in the
+sensor, with the same fixes as FRET.
 
 <p align="center">
   <img src="diagram-1.png" alt="Step 1: the first requirements are unrealizable; the cores highlighted in red">

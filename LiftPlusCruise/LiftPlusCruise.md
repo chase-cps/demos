@@ -12,13 +12,19 @@ hover within 12 steps. What must the pilot do so that every flight does?
 Lift-Plus-Cruise is an aircraft studied at NASA, with lift rotors for the
 hover and a wing for the cruise. The requirements are those of the LPC_mini
 project of [FRET](https://github.com/NASA-SW-VnV/fret) (Pressburger et al.,
-REFSQ 2023). The mode logic gives the lift mode `lift_mode` (0 thrust borne,
-i.e. hover; 1 semi thrust borne; 2 semi wing borne; 3 wing borne) from the
-airspeed `kias` and the ground speed `kgs`, both real numbers. The pilot
-sets the speeds and the hover control mode `hover_control_mode`. The
-airspeed is 120 at the start and changes by at most 10 at each step.
-_Vehicle_ has all the requirements but the deadline of the hover;
-_Reach12_ and _Reach06_ add a hover within 12 or 6 steps.
+REFSQ 2023). The variables are:
+
+- `lift_mode`: the lift mode, given by the mode logic: 0 thrust borne
+  (the hover), 1 semi thrust borne, 2 semi wing borne, 3 wing borne;
+- `kias` and `kgs`: the airspeed and the ground speed, real numbers set by
+  the pilot;
+- `hover_control_mode`: the hover control mode, set by the pilot.
+
+The airspeed is 120 at the start, and changes by at most 10 at each step.
+The contracts are:
+
+- _Vehicle_: all the requirements but the deadline of the hover;
+- _Reach12_ and _Reach06_: the same, with a hover within 12 or 6 steps.
 
 ### The steps
 

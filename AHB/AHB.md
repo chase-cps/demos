@@ -11,17 +11,28 @@ assume of the masters?
   <em>The arbiter: the merge of the two viewpoints, Grant and Lock.</em>
 </p>
 
-The arbiter gives the bus to one of two masters. A master asks for the bus
-(`hbusreq`), and can ask for a locked access (`hlock`); the arbiter grants
-the bus (`hgrant`) and says whether it is locked (`hmastlock`). The
-requirements are simplified from Bloem et al., "Specify, Compile, Run:
-Hardware from PSL" (COCV 2007), and written in SystemVerilog Assertions.
-_Grant_ gives the bus to master 1 at the start (GR1) and to exactly one
-master (GR2), and no master waits forever (GR3.1, GR3.2). _Lock_ locks the
-bus for a master that asks for a locked access (LK1), and keeps it while
-that master asks (LK2.1, LK2.2); it assumes that a master that asks for a
-locked access also asks for the bus (LA1.1, LA1.2). The two are put
-together by merging (•), the operation for viewpoints of one component.
+The arbiter gives the bus to one of two masters. The requirements are
+simplified from Bloem et al., "Specify, Compile, Run: Hardware from PSL"
+(COCV 2007), and written in
+SystemVerilog Assertions. The variables are:
+
+- `hbusreq`: a master asks for the bus;
+- `hlock`: a master asks for a locked access;
+- `hgrant`: the arbiter grants the bus;
+- `hmastlock`: the bus is locked.
+
+The requirements are written as two viewpoints:
+
+- _Grant_ gives the bus to master 1 at the start (GR1) and to exactly one
+  master (GR2), and no master waits forever (GR3.1, GR3.2).
+- _Lock_ locks the bus for a master that asks for a locked access (LK1),
+  and keeps it while that master asks (LK2.1, LK2.2). It assumes that a
+  master that asks for a locked access also asks for the bus (LA1.1,
+  LA1.2).
+
+The two viewpoints are put together by
+merging (•), the operation
+for viewpoints of one component.
 
 ### The steps
 

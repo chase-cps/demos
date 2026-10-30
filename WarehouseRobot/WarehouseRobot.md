@@ -12,15 +12,20 @@ controller satisfy for the robot to meet the requirements of the system?
 
 The example is simplified from Damera, Matheu, and Baras, "Contract-Based
 Agentic Systems Engineering: Delegation as Quotient for Assured System
-Design" (arXiv 2610.33349, 2026). The robot keeps 0.40 m from a worker and
-rests (`rest`) at a dock. The controller commands the yaw rate `w`. It sees
-the clearance to the worker (`c_true`) only as perception reports it
-(`c_rep`, at most 0.3 too high), and the distance to the dock (`e_true`)
-only as localization reports it (`e_est`, at most 0.05 too low); it rests
-when `e_true <= 0.1`. Perception bounds its error only if the robot turns
-slowly, `|w| <= 0.8`, and localization only if `|w| <= 1.0`. The variables
-are real numbers, and the composition of perception and localization is
-called _Fixed_ in the diagrams.
+Design" (arXiv 2610.33349, 2026). The robot keeps 0.40 m from a worker, and
+rests (`rest`) at a dock. The variables are real numbers:
+
+- `w`: the yaw rate, commanded by the controller;
+- `c_true` and `c_rep`: the clearance to the worker, and the clearance that
+  perception reports (at most 0.3 too high);
+- `e_true` and `e_est`: the distance to the dock, and the distance that
+  localization reports (at most 0.05 too low). The robot rests when
+  `e_true <= 0.1`.
+
+The controller sees only the reported values. Perception bounds its error
+only if the robot turns slowly (`|w| <= 0.8`), and localization only if
+`|w| <= 1.0`. The composition of perception and localization is called
+_Fixed_ in the diagrams.
 
 ### The steps
 

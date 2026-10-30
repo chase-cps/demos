@@ -10,13 +10,18 @@ which contract works with the robots?
   <em>The system: an arbiter and two robots, which feed each other with requests and grants.</em>
 </p>
 
-A robot asks for the station (`req`) when its battery is low (`low`), and
-the arbiter gives it (`grant`). The requests of the robots are the inputs of
-the arbiter, and its grants are the inputs of the robots. A robot asks
-when its battery is low, and assumes that it is given the station, or stops
-asking, infinitely often. Each candidate arbiter guarantees that the
-station is never given to both robots (R5). The requirements are numbered
-as in `requirements.txt`.
+The variables of each robot are:
+
+- `low`: its battery is low;
+- `req`: it asks for the station;
+- `grant`: the arbiter gives it the station.
+
+The requests of the robots are the inputs of the arbiter, and its grants
+are the inputs of the robots. A robot asks when its battery is low, and
+assumes that it is given the station, or stops asking, infinitely often.
+Each candidate arbiter guarantees that the station is never given to both
+robots (R5). The requirements are numbered as in
+`Charger/requirements.txt`.
 
 ### The steps
 

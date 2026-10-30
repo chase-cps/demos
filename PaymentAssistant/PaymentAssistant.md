@@ -14,16 +14,30 @@ and which sub-agent must do it?
 The task comes from [AppWorld](https://arxiv.org/abs/2407.18901) (task
 530b157_1): pay Kristin back on Venmo the amount in her text messages, with
 the note "Groceries", then text her "It is done.", and send no voice
-message. The parent gives the task to three sub-agents: _Messages_ (1)
-finds the amount, _Payment_ (2) pays, and _Text_ (3) sends the text. The
-parent marks the task complete itself (_Keep_). The variables are the tool
-calls and their arguments: `voice1` and `voice3` (a voice message of
-sub-agent 1 or 3), `tx2` (a Venmo payment), `desc_ok` (the note is right),
-`paid` (written by the Venmo tool once the payment is done), `text3` (a
-text), `msg_ok` (its words are right), and `complete`. The contract of the
-parent guarantees H1 to H8: the text after the payment (H1), one payment
-(H2), the right note (H3) and words (H4), no voice message (H5), and
-`F tx2`, `F text3`, `F complete` (H6 to H8).
+message. The parent gives the task to three sub-agents, and marks the task
+complete itself (_Keep_):
+
+- _Messages_ (1) finds the amount;
+- _Payment_ (2) pays;
+- _Text_ (3) sends the text.
+
+The variables are the tool calls and their arguments:
+
+- `voice1`, `voice3`: a voice message of sub-agent 1 or 3;
+- `tx2`: a Venmo payment;
+- `desc_ok`: the note of the payment is right;
+- `paid`: written by the Venmo tool once the payment is done;
+- `text3`: a text;
+- `msg_ok`: the words of the text are right;
+- `complete`: the task is marked complete.
+
+The contract of the parent guarantees:
+
+- H1: the text is sent after the payment;
+- H2: one payment;
+- H3 and H4: the right note and the right words;
+- H5: no voice message;
+- H6 to H8: `F tx2`, `F text3`, and `F complete`.
 
 ### The steps
 
