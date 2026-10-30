@@ -23,6 +23,16 @@
   #help div { display:flex; gap:10px; align-items:center; margin:6px 0; white-space:nowrap; }
   #help svg { flex:none; }
   #context { display:none; gap:8px; flex-wrap:wrap; padding-top:4px; }
+  #stale { display:none; position:fixed; left:12px; bottom:12px; max-width:min(720px, 70%); z-index:6;
+           background:#fff6f4; border:1px solid var(--bad); border-radius:6px; padding:7px 10px;
+           font:12px/1.45 Helvetica, Arial, sans-serif; color:#7a2a20; white-space:pre-wrap; }
+  #stale b { display:block; margin-bottom:2px; }
+  #tip { display:none; position:fixed; z-index:20; max-width:420px; pointer-events:none;
+         background:#1d2526; color:#fff; border-radius:4px; padding:5px 8px;
+         font:12px/1.4 Helvetica, Arial, sans-serif; white-space:pre-wrap; }
+  #busy { display:none; position:fixed; right:14px; bottom:12px; z-index:6; padding:5px 12px;
+          border-radius:12px; background:var(--teal); color:#fff; font:600 12px Helvetica, Arial, sans-serif;
+          box-shadow:0 1px 4px rgba(0,0,0,.2); }
   #context span { display:inline-flex; align-items:center; gap:7px; border:1px solid #d5dddd; border-radius:6px;
                   padding:2px 9px 2px 2px; font:11.5px Menlo, Monaco, monospace; color:var(--ink);
                   white-space:nowrap; background:#fff; }
@@ -59,24 +69,27 @@
     <span class="sep"></span>
     <button title="Fit the diagram to the window (0); the wheel zooms where it points, a drag moves" onclick="fit()"><svg viewBox="0 0 16 16"><path d="M2 5.5V2h3.5M10.5 2H14v3.5M14 10.5V14h-3.5M5.5 14H2v-3.5"/></svg></button>
     <span class="sep"></span>
-    <button class="on" title="Ports and their names" onclick="flip(this, 'ports')"><svg viewBox="0 0 16 16"><rect x="4.5" y="3" width="7" height="10" rx="1.5"/><path d="M1.5 6h3M1.5 10h3M11.5 8h3"/></svg></button>
-    <button class="on" title="Types of the ports (bit vectors, ranges, reals)" onclick="flip(this, 'types')"><svg viewBox="0 0 16 16"><path d="M1.5 8h13" stroke-width="2.4"/><path d="M6.5 11.5l3-7"/></svg></button>
+    <button class="on" title="Names of the ports" onclick="flip(this, 'names')"><svg viewBox="0 0 16 16"><rect x="4.5" y="3" width="7" height="10" rx="1.5"/><path d="M1.5 6h3M1.5 10h3M11.5 8h3"/></svg></button>
+    <button class="on" title="Types of the ports (ranges, reals, bit vectors)" onclick="flip(this, 'types')"><svg viewBox="0 0 16 16"><path d="M1.5 8h13" stroke-width="2.4"/><path d="M6.5 11.5l3-7"/></svg></button>
     <button class="on" title="Transition labels of the models: the inputs that take each transition" onclick="flip(this, 'conditions')"><svg viewBox="0 0 16 16"><circle cx="3" cy="11" r="1.8"/><circle cx="13" cy="11" r="1.8"/><path d="M4.8 11h6.4"/><rect x="5" y="3" width="6" height="4" rx="1"/></svg></button>
     <button class="on" title="Results of the checks (A, G, R, ⪯, M ⊨ C, E ⊨ A) and their cores" onclick="flip(this, 'checks')"><svg viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="3"/><path d="M5.5 8l1.8 1.8L10.5 6.3"/></svg></button>
     <span class="sep"></span>
     <button title="What the shapes mean" onclick="help()"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.4"/><circle cx="8" cy="11.6" r=".4"/></svg></button>
   </span><div id="help"></div></div>
 <div id="view"></div>
+<div id="stale"></div>
+<div id="busy">checking…</div>
+<div id="tip"></div>
 <div id="pop"><header><b id="poptitle"></b><button onclick="closePop()">close</button></header><div id="popview"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
 <script>
-const DATA = {"title": "Charging station", "nodes": [{"kind": "contract", "title": "Greedy", "note": null, "contract": {"name": "Greedy", "A": [], "G": ["!grant1", "!grant2", "G (req1 -> X grant1)", "G (req2 -> X grant2)", "G !(grant1 & grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n1", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "invalid", "reason": "", "core": {"A": [], "G": [2, 3, 4], "part": "contract"}}], "open": true}, {"kind": "contract", "title": "Fair", "note": null, "contract": {"name": "Fair", "A": [], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)", "G F (grant1 | !req1 | grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n2", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "valid", "reason": ""}, {"name": "\u00acV", "status": "valid", "reason": ""}]}, {"kind": "contract", "title": "Pushy", "note": null, "contract": {"name": "Pushy", "A": ["G F req1", "G (grant1 -> X !req1)"], "G": ["G !(grant1 & grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n3", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "WS", "status": "invalid", "reason": "", "core": {"A": [0, 1], "G": [], "part": "contract"}}], "open": true}, {"kind": "contract", "title": "Polite", "note": null, "contract": {"name": "Polite", "A": ["G F req1", "G (req1 & grant1 -> X !req1)"], "G": ["G !(grant1 & grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n4", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "WS", "status": "valid", "reason": ""}]}, {"kind": "contract", "title": "Trusting", "note": null, "contract": {"name": "Trusting", "A": ["G F !req1", "G F !req2"], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)", "G F (grant1 | !req1 | grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n5", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "\u00acV", "status": "invalid", "reason": "", "core": {"A": [0, 1], "G": [3, 4, 5], "part": "contract"}}], "open": true}, {"kind": "group", "op": "composition", "title": "System", "note": "Fair \u2297 Robot1 \u2297 Robot2", "layout": "row", "contract": {"name": "System", "A": [], "G": ["G F (grant1 | !req1)", "G F (grant2 | !req2)", "G !(grant1 & grant2)"]}, "inputs": ["low1", "low2"], "outputs": ["grant1", "grant2", "req1", "req2"], "children": [{"kind": "contract", "title": "Fair", "note": null, "contract": {"name": "Fair", "A": [], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n6", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Robot1", "note": null, "contract": {"name": "Robot1", "A": ["G F (grant1 | !req1)"], "G": ["!req1", "G (low1 -> X req1)", "G (!low1 -> X !req1)"]}, "inputs": ["grant1", "low1"], "outputs": ["req1"], "id": "n7", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Robot2", "note": null, "contract": {"name": "Robot2", "A": ["G F (grant2 | !req2)"], "G": ["!req2", "G (low2 -> X req2)", "G (!low2 -> X !req2)"]}, "inputs": ["grant2", "low2"], "outputs": ["req2"], "id": "n9", "types": {}, "children": [], "edges": [], "layout": "row"}], "edges": [{"from": ["n7", "out", "req1"], "to": ["n6", "in", "req1"], "var": "req1"}, {"from": ["n9", "out", "req2"], "to": ["n6", "in", "req2"], "var": "req2"}, {"from": ["n6", "out", "grant1"], "to": ["n7", "in", "grant1"], "var": "grant1"}, {"from": [null, "in", "low1"], "to": ["n7", "in", "low1"], "var": "low1"}, {"from": ["n6", "out", "grant2"], "to": ["n9", "in", "grant2"], "var": "grant2"}, {"from": [null, "in", "low2"], "to": ["n9", "in", "low2"], "var": "low2"}, {"from": ["n6", "out", "grant1"], "to": [null, "out", "grant1"], "var": "grant1"}, {"from": ["n6", "out", "grant2"], "to": [null, "out", "grant2"], "var": "grant2"}, {"from": ["n7", "out", "req1"], "to": [null, "out", "req1"], "var": "req1"}, {"from": ["n9", "out", "req2"], "to": [null, "out", "req2"], "var": "req2"}], "id": "n10", "types": {}, "composed": {"name": "Charging", "A": [], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)", "!req1", "G (low1 -> X req1)", "G (!low1 -> X !req1)", "!req2", "G (low2 -> X req2)", "G (!low2 -> X !req2)"]}, "badge": {"text": "\u2aaf", "status": "valid"}}], "edges": [], "context": []};
+let DATA = {"title": "Charging station", "nodes": [{"kind": "contract", "title": "Greedy", "note": null, "contract": {"name": "Greedy", "A": [], "G": ["!grant1", "!grant2", "G (req1 -> X grant1)", "G (req2 -> X grant2)", "G !(grant1 & grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n1", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "invalid", "reason": "", "core": {"A": [], "G": [2, 3, 4], "part": "contract"}}], "open": true}, {"kind": "contract", "title": "Fair", "note": null, "contract": {"name": "Fair", "A": [], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)", "G F (grant1 | !req1 | grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n2", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "valid", "reason": ""}, {"name": "\u00acV", "status": "valid", "reason": ""}]}, {"kind": "contract", "title": "Pushy", "note": null, "contract": {"name": "Pushy", "A": ["G F req1", "G (grant1 -> X !req1)"], "G": ["G !(grant1 & grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n3", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "WS", "status": "invalid", "reason": "", "core": {"A": [0, 1], "G": [], "part": "contract"}}], "open": true}, {"kind": "contract", "title": "Polite", "note": null, "contract": {"name": "Polite", "A": ["G F req1", "G (req1 & grant1 -> X !req1)"], "G": ["G !(grant1 & grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n4", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "WS", "status": "valid", "reason": ""}]}, {"kind": "contract", "title": "Trusting", "note": null, "contract": {"name": "Trusting", "A": ["G F !req1", "G F !req2"], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)", "G F (grant1 | !req1 | grant2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n5", "types": {}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "\u00acV", "status": "invalid", "reason": "", "core": {"A": [0, 1], "G": [3, 4, 5], "part": "contract"}}], "open": true}, {"kind": "group", "op": "composition", "title": "System", "note": "Fair \u2297 Robot1 \u2297 Robot2", "layout": "row", "contract": {"name": "System", "A": [], "G": ["G F (grant1 | !req1)", "G F (grant2 | !req2)", "G !(grant1 & grant2)"]}, "inputs": ["low1", "low2"], "outputs": ["grant1", "grant2", "req1", "req2"], "children": [{"kind": "contract", "title": "Fair", "note": null, "contract": {"name": "Fair", "A": [], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)"]}, "inputs": ["req1", "req2"], "outputs": ["grant1", "grant2"], "id": "n6", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Robot1", "note": null, "contract": {"name": "Robot1", "A": ["G F (grant1 | !req1)"], "G": ["!req1", "G (low1 -> X req1)", "G (!low1 -> X !req1)"]}, "inputs": ["grant1", "low1"], "outputs": ["req1"], "id": "n7", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Robot2", "note": null, "contract": {"name": "Robot2", "A": ["G F (grant2 | !req2)"], "G": ["!req2", "G (low2 -> X req2)", "G (!low2 -> X !req2)"]}, "inputs": ["grant2", "low2"], "outputs": ["req2"], "id": "n9", "types": {}, "children": [], "edges": [], "layout": "row"}], "edges": [{"from": ["n7", "out", "req1"], "to": ["n6", "in", "req1"], "var": "req1"}, {"from": ["n9", "out", "req2"], "to": ["n6", "in", "req2"], "var": "req2"}, {"from": ["n6", "out", "grant1"], "to": ["n7", "in", "grant1"], "var": "grant1"}, {"from": [null, "in", "low1"], "to": ["n7", "in", "low1"], "var": "low1"}, {"from": ["n6", "out", "grant2"], "to": ["n9", "in", "grant2"], "var": "grant2"}, {"from": [null, "in", "low2"], "to": ["n9", "in", "low2"], "var": "low2"}, {"from": ["n6", "out", "grant1"], "to": [null, "out", "grant1"], "var": "grant1"}, {"from": ["n6", "out", "grant2"], "to": [null, "out", "grant2"], "var": "grant2"}, {"from": ["n7", "out", "req1"], "to": [null, "out", "req1"], "var": "req1"}, {"from": ["n9", "out", "req2"], "to": [null, "out", "req2"], "var": "req2"}], "id": "n10", "types": {}, "composed": {"name": "Charging", "A": [], "G": ["!grant1", "!grant2", "G !(grant1 & grant2)", "G F (grant1 | !req1)", "G F (grant2 | !req2)", "!req1", "G (low1 -> X req1)", "G (!low1 -> X !req1)", "!req2", "G (low2 -> X req2)", "G (!low2 -> X !req2)"]}, "badge": {"text": "\u2aaf", "status": "valid"}}], "edges": [], "context": []};
 const LINE = 17, PAD = 10, PORT = 6, HEAD = 28, ICON = 16, INLINE_STATES = 8;
 const ctx = document.createElement("canvas").getContext("2d");
 function textWidth(s, font) { ctx.font = font; return ctx.measureText(s).width; }
 const FONT_F = "11.5px Menlo, Monaco, monospace", FONT_H = "600 12.5px Helvetica, Arial, sans-serif",
       FONT_S = "11px 'Arial Unicode MS', Helvetica, Arial, sans-serif", FONT_W = "10px Menlo, Monaco, monospace";
-const show = { ports: true, types: true, conditions: true, checks: true };
+const show = { names: true, types: true, conditions: true, checks: true };
 
 // What is open: the contract ("c:"), the computed composition ("k:"), and
 // the model ("m:") of each box. At first, only the names show.
@@ -97,7 +110,7 @@ const fold = id => () => { folded.has(id) ? folded.delete(id) : folded.add(id); 
 
 const byId = {};
 (function index(ns) { ns.forEach(n => { byId[n.id] = n; index(n.children || []); }); })(DATA.nodes);
-const boxes = Object.values(byId);
+let boxes = Object.values(byId);
 const states = n => n.model && n.model.fsm && n.model.fsm.states;
 const inlineModel = n => states(n) && n.model.fsm.count <= INLINE_STATES;
 let allOpen = false;
@@ -117,7 +130,7 @@ function openAll(on) {
   if (on) folded.clear();
   allOpen = on; refit = true;
   const b = document.getElementById("all");
-  b.title = on ? "Close all" : "Open all";
+  b.setAttribute("data-tip", on ? "Close all" : "Open all");
   b.querySelector("path").setAttribute("d", on ? "M4.5 3 8 6.5 11.5 3M4.5 13 8 9.5l3.5 3.5" : "M4.5 6.5 8 3l3.5 3.5M4.5 9.5 8 13l3.5-3.5");
   render();
 }
@@ -227,12 +240,12 @@ function tag(g, x, y, s, status) {
   return tagWidth(s);
 }
 const SAYS = { valid: "holds", invalid: "does not hold", unknown: "not decided" };
-const WHAT = { "A": "A is satisfiable: the contract is compatible",
-               "G": "A → G is satisfiable: the contract is consistent",
+const WHAT = { "A": "compatible: the assumptions A are satisfiable",
+               "G": "consistent: A → G is satisfiable",
                "A∧G": "feasible: A ∧ G is satisfiable",
-               "R": "the contract is realizable (GR(1))",
+               "R": "realizable (GR(1))",
                "WS": "well-separated: the component cannot win by making the environment break A",
-               "¬V": "no vacuous output: each liveness guarantee asks something of the component",
+               "¬V": "not vacuous: each liveness guarantee asks something of the component",
                "M ⊨ C": "the model implements the contract",
                "E ⊨ A": "the environment satisfies the assumptions",
                "⪯": "what is inside refines this contract" };
@@ -252,10 +265,12 @@ function size(n) {
   return { ls, w: Math.max(w, 110), h, m };
 }
 
-const portText = (n, v) => { const t = show.types && n.types && n.types[v]; return t ? v + " " + t.label : v; };
+// The label of a port: its name, its type, both, or nothing, as the two buttons say.
+const portText = (n, v) => { const t = show.types && n.types && n.types[v];
+  return [show.names ? v : null, t ? t.label : null].filter(x => x).join(" "); };
 function ports(n) {
   if (n.bare) return [];
-  const ps = [], lab = v => show.ports ? [{ text: portText(n, v), width: textWidth(portText(n, v), FONT_W), height: 11 }] : [];
+  const ps = [], lab = v => portText(n, v) ? [{ text: portText(n, v), width: textWidth(portText(n, v), FONT_W), height: 11 }] : [];
   (n.inputs || []).forEach((v, i) => ps.push({ id: n.id + ":in:" + v, width: PORT, height: PORT, labels: lab(v),
     layoutOptions: { "elk.port.side": "WEST", "elk.port.index": String(n.inputs.length - i) } }));
   (n.outputs || []).forEach((v, i) => ps.push({ id: n.id + ":out:" + v, width: PORT, height: PORT, labels: lab(v),
@@ -344,7 +359,8 @@ const NS = "http://www.w3.org/2000/svg";
 function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
 function text(parent, x, y, cls, s) { const t = el("text", { x, y, class: cls }, parent); t.textContent = s; return t; }
-function tip(parent, s) { el("title", {}, parent).textContent = s; }
+// The explanation of a part, shown when the pointer rests on it (see #tip).
+function tip(parent, s) { parent.setAttribute("data-tip", s); }
 
 // The icons: a card for a contract, ⊗ for a computed composition, two
 // states and a move for a model, with a spark when it was synthesized.
@@ -393,7 +409,7 @@ function drawNode(g, e, ox, oy) {
   if (n.kind === "component" || n.kind === "environment") el("line", { x1: x, y1: y + HEAD - 2, x2: x + e.width, y2: y + HEAD - 2,
                                            stroke: "#e3e8e8", "stroke-width": 1 }, box);
   const name = text(box, x + PAD, y + 18, "h", n.title);
-  if (n.contract) name.onclick = toggle("c:" + n.id);
+  if (n.contract) { name.onclick = toggle("c:" + n.id); tip(name, "Click: open or close the contract"); }
   let ix = x + PAD + textWidth(n.title, FONT_H) + 10;
   icons(n).forEach(([kind, key, title]) => {
     const on = key && open.has(key), c = icon(box, kind, ix, y + 6, on, title, !key);
@@ -403,7 +419,7 @@ function drawNode(g, e, ox, oy) {
   checks(n).forEach((c, i) => {      // a click on a check that has a core shows the core
     const t = el("g", {}, box), on = focus[n.id] === i;
     ix += tag(t, ix, y + 6, c.name, c.status) + 4;
-    tip(t, (WHAT[c.name] || c.name) + ": " + (SAYS[c.status] || "not checked") + (c.reason ? " (" + c.reason + ")" : "")
+    tip(t, (WHAT[c.name] || c.name) + " — " + (SAYS[c.status] || "not checked") + (c.reason ? " (" + c.reason + ")" : "")
            + (c.core ? (on ? ". Click: hide the core" : ". Click: show the core") : ""));
     if (on) el("rect", { x: ix - 4 - tagWidth(c.name) - 2, y: y + 4, width: tagWidth(c.name) + 4, height: 20, rx: 5,
                          fill: "none", stroke: COLOR[c.status], "stroke-width": 1 }, t);
@@ -425,7 +441,7 @@ function drawNode(g, e, ox, oy) {
   }
   if (n.badge && show.checks) { const b = el("g", {}, box), w = tagWidth(n.badge.text);
     tag(b, rx - w, y + 6, n.badge.text, n.badge.status);
-    tip(b, (WHAT[n.badge.text.split(" of ")[0]] || n.badge.text) + ": " + (SAYS[n.badge.status] || "not checked")
+    tip(b, (WHAT[n.badge.text.split(" of ")[0]] || n.badge.text) + " — " + (SAYS[n.badge.status] || "not checked")
            + (inside(n) ? ". Click: hide or show the boxes inside" : ""));
     if (inside(n)) { b.setAttribute("class", "icon"); b.onclick = fold(n.id); } }
   sz.ls.forEach(([k, label, s, core], i) => {
@@ -478,7 +494,7 @@ function drawEdge(g, ed, ox, oy) {
         if (Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y) > Math.hypot(b.x - a.x, b.y - a.y)) { a = pts[i]; b = pts[i + 1]; }
       const mx = ox + (a.x + b.x) / 2, my = oy + (a.y + b.y) / 2;
       el("line", { x1: mx - 4, y1: my + 5, x2: mx + 4, y2: my - 5, stroke: "var(--wire)", "stroke-width": 1.3 }, g);
-      if (!show.types || !show.ports) text(g, mx + 4, my - 6, "w", String(k.bus));
+      if (!show.types) text(g, mx + 4, my - 6, "w", String(k.bus));
     } });
 }
 
@@ -627,6 +643,25 @@ function rootEdges() {      // from an environment to the box it drives
 // The items of the diagram in rows, when one row would be much wider than
 // the window: null for one row, else the ids of the items of each row.
 let rootRows = null;
+// The rows of the first drawing stay: a box keeps its row and its place in
+// it when another one opens, closes, or changes; a new box goes at the end.
+let rowPlan;                     // the keys of the items of each row, or null for one row
+function planOf(rows) {
+  if (!rows) return null;
+  const keys = keysOf(DATA.nodes);
+  return rows.map(ids => ids.map(id => keys[id]));
+}
+function rowsFromPlan() {
+  if (!rowPlan) return null;
+  const keys = keysOf(DATA.nodes), idOf = {}, placed = new Set();
+  for (const id in keys) idOf[keys[id]] = id;
+  const rows = rowPlan.map(r => r.map(k => idOf[k]).filter(id => id && DATA.nodes.some(n => n.id === id)));
+  rows.forEach(r => r.forEach(id => placed.add(id)));
+  const extra = DATA.nodes.filter(n => !placed.has(n.id)).map(n => n.id);
+  if (extra.length) rows[rows.length - 1].push(...extra);
+  const kept = rows.filter(r => r.length);
+  return kept.length > 1 ? kept : null;
+}
 function rowsOf(out) {
   const up = {}, root = id => up[id] === id ? id : (up[id] = root(up[id]));
   DATA.nodes.forEach(n => { up[n.id] = n.id; });
@@ -663,10 +698,9 @@ async function render() {
   for (const n of boxes)
     if (open.has("m:" + n.id) && inlineModel(n) && !MODELS[n.id]) MODELS[n.id] = await layoutModel(n);
   widen = {};
-  rootRows = null;
+  if (rowPlan === undefined) { rootRows = null; rowPlan = planOf(rowsOf(await layout())); }
+  rootRows = rowsFromPlan();
   let out = await layout();
-  rootRows = rowsOf(out);
-  if (rootRows) out = await layout();
   for (let pass = 0; pass < 3; pass++) {
     const todo = []; (out.children || []).forEach(c => narrow(c, todo));
     if (!todo.length) break;
@@ -766,11 +800,129 @@ function svgDefsHatch(s) {
   el("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: "#dfe6e6", "stroke-width": 2 }, p);
 }
 
-if (DATA.context && DATA.context.length) {
+function drawContext() {
   const c = document.getElementById("context"), esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  c.innerHTML = DATA.context.map(f => "<span title='context: holds in every check'><i>context</i>" + esc(f) + "</span>").join("");
-  c.style.display = "flex";
+  const fs = DATA.context || [];
+  c.innerHTML = fs.map(f => "<span data-tip='context: holds in every check'><i>context</i>" + esc(f) + "</span>").join("");
+  c.style.display = fs.length ? "flex" : "none";
 }
+// A new drawing of the same file, sent by an editor or by chase-cps view
+// --serve as the file changes: the view, and what is open or folded, stay.
+// A box is known from one drawing to the next by the names from the top
+// down to it (with its rank among the boxes of the same name), not by its
+// number, which moves when a contract is added. What it says, without the
+// results, tells whether the results of a check still hold for it.
+function keysOf(nodes) {
+  const keys = {};
+  (function walk(ns, prefix) {
+    const seen = {};
+    ns.forEach(n => { seen[n.title] = (seen[n.title] || 0) + 1;
+                      keys[n.id] = prefix + "/" + n.title + "#" + seen[n.title];
+                      walk(n.children || [], keys[n.id]); });
+  })(nodes, "");
+  return keys;
+}
+function says(n) {
+  return JSON.stringify([n.kind, n.title, n.note, n.contract, n.composed, n.inputs, n.outputs,
+                         n.model && n.model.name, (n.children || []).map(says)]);
+}
+// The results of the boxes of results that say the same, by key.
+function resultsOf(nodes) {
+  const keys = keysOf(nodes), out = {};
+  (function walk(ns) { ns.forEach(n => { out[keys[n.id]] = n; walk(n.children || []); }); })(nodes);
+  return out;
+}
+function carry(n, old) {               // the results of old, when n says the same
+  if (!old || says(old) !== says(n)) return;
+  if (!(n.checks && n.checks.length) && old.checks) n.checks = old.checks;
+  if (n.badge && !n.badge.status && old.badge && old.badge.text === n.badge.text) n.badge.status = old.badge.status;
+}
+let drawing = Promise.resolve(), told = 0, staleAt = 0;   // one drawing at a time, in order
+function setData(data) {
+  const token = ++told;
+  drawing = drawing.catch(() => {}).then(() => load(data, token));
+  return drawing;
+}
+// The results of the checks of the saved file, for the boxes that say the same now.
+function setChecks(data) {
+  drawing = drawing.catch(() => {}).then(() => {
+    const was = resultsOf(data.nodes), keys = keysOf(DATA.nodes);
+    for (const id in byId) {
+      const n = byId[id], c = was[keys[id]];
+      if (c && says(c) === says(n)) { n.checks = c.checks; if (n.badge && c.badge) n.badge.status = c.badge.status; }
+    }
+    return render();
+  });
+  return drawing;
+}
+function load(data, token) {
+  const keys = keysOf(DATA.nodes), was = resultsOf(DATA.nodes);
+  const openKeys = [...open].map(k => [k.slice(0, 2), keys[k.slice(2)]]);
+  const foldedKeys = [...folded].map(id => keys[id]);
+  const focusKeys = Object.entries(focus).map(([id, i]) => [keys[id], byId[id] && byId[id].checks && byId[id].checks[i]]);
+  DATA = data;
+  for (const k in byId) delete byId[k];
+  (function index(ns) { ns.forEach(n => { byId[n.id] = n; index(n.children || []); }); })(DATA.nodes);
+  boxes = Object.values(byId);
+  ROOT.children = DATA.nodes;
+  for (const k in MODELS) delete MODELS[k];
+  const now = keysOf(DATA.nodes), idOf = {};
+  for (const id in now) { idOf[now[id]] = id; carry(byId[id], was[now[id]]); }
+  open.clear(); openKeys.forEach(([p, k]) => { if (idOf[k]) open.add(p + idOf[k]); });
+  folded.clear(); foldedKeys.forEach(k => { if (idOf[k]) folded.add(idOf[k]); });
+  for (const k in focus) delete focus[k];
+  focusKeys.forEach(([k, c]) => { const n = byId[idOf[k]];
+    const i = n && c ? (n.checks || []).findIndex(x => x.name === c.name && x.core) : -1;
+    if (i >= 0) focus[n.id] = i; });
+  document.title = DATA.title;
+  drawContext();
+  if (token > staleAt) stale(null);    // a newer reason stays
+  return render();
+}
+// The file cannot be drawn as it is now: the diagram of the last version
+// that could be drawn stays, with the reason.
+function stale(reason) {
+  if (reason) staleAt = told;
+  const b = document.getElementById("stale");
+  if (!reason) { b.style.display = "none"; return; }
+  b.innerHTML = "<b>The diagram is of the last version that could be drawn.</b>";
+  b.appendChild(document.createTextNode(reason));
+  b.style.display = "block";
+}
+window.addEventListener("message", e => {
+  const m = e.data || {};
+  if (m.type === "chase-data") setData(m.data).catch(err => stale("Cannot draw the diagram: " + err));
+  else if (m.type === "chase-checks") setChecks(m.data).catch(err => stale("Cannot draw the checks: " + err));
+  else if (m.type === "chase-stale") stale(m.reason);
+  else if (m.type === "chase-busy") document.getElementById("busy").style.display = m.on ? "block" : "none";
+});
+// The explanations: shown by the page itself, since the tooltips of the
+// browser do not show in the webview of an editor.
+(function () {
+  const box = document.getElementById("tip");
+  document.querySelectorAll("[title]").forEach(b => {
+    b.setAttribute("data-tip", b.title); b.setAttribute("aria-label", b.title); b.removeAttribute("title"); });
+  let timer = null, x = 0, y = 0, over = null;
+  const hide = () => { clearTimeout(timer); box.style.display = "none"; };
+  const place = () => {
+    box.style.left = "0px"; box.style.top = "0px";          // measured at its full width
+    const w = box.offsetWidth, h = box.offsetHeight;
+    box.style.left = Math.max(4, Math.min(x + 12, innerWidth - w - 8)) + "px";
+    box.style.top = (y + 18 + h > innerHeight ? y - h - 10 : y + 18) + "px";
+  };
+  document.addEventListener("mouseover", e => {
+    const t = e.target.closest && e.target.closest("[data-tip]");
+    if (t === over) return;                                  // still on the same part
+    over = t;
+    hide();
+    if (t) timer = setTimeout(() => { box.textContent = t.getAttribute("data-tip"); box.style.display = "block"; place(); }, 400);
+  });
+  document.addEventListener("mousemove", e => { x = e.clientX; y = e.clientY; if (box.style.display === "block") place(); });
+  document.addEventListener("mousedown", () => { hide(); over = null; });
+  document.addEventListener("wheel", hide, { passive: true });
+  document.addEventListener("mouseleave", hide);
+})();
+drawContext();
 openAsked();
 render().catch(e => { document.getElementById("view").textContent = "Cannot draw the diagram: " + e; });
 </script>
@@ -779,8 +931,15 @@ render().catch(e => { document.getElementById("view").textContent = "Cannot draw
   if (!location.protocol.startsWith("http")) return;
   let seen = null;
   setInterval(async () => {
-    try { const v = await (await fetch("/version", { cache: "no-store" })).text();
-          if (seen === null) seen = v; else if (v !== seen) location.reload(); } catch (e) {}
+    try {
+      const v = await (await fetch("/version", { cache: "no-store" })).text();
+      if (seen === null) { seen = v; return; }
+      if (v === seen) return;
+      seen = v;
+      if (typeof setData !== "function") { location.reload(); return; }
+      const r = await (await fetch("/data", { cache: "no-store" })).json();
+      if (r.data) await setData(r.data); else stale(r.error);
+    } catch (e) {}
   }, 1000);
 })();
 </script>
