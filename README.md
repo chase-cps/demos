@@ -51,12 +51,14 @@ The Python scripts use the CHASE Python package, version 0.5.0 or later
 `pip install "chase-cps[rtl]"`), and nuXmv and slugs, which `chase-cps
 install` installs. The console scripts expect `dsl_tool`, `logics_tool`,
 `slugs` (with its compiler, `$SLUGS/tools/StructuredSlugsParser/compiler.py`),
-and `nuXmv` in the `PATH`. All of them are in the Docker image of CHASE,
-described in the [core-library][CORE] repository.
+and `nuXmv` in the `PATH`. The Docker image of CHASE
+(`ghcr.io/chase-cps/chase`, built from the [chase][CHASE] repository) has
+all of them but nuXmv, whose license does not allow redistribution:
+`chase-cps install nuxmv --accept-license` adds it in a container.
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md
-[CORE]: https://github.com/chase-cps/core-library
+[CHASE]: https://github.com/chase-cps/chase
 [FRET]: https://github.com/NASA-SW-VnV/fret
 [CHARGER]: Charger/Charger.md
 [LPC]: LiftPlusCruise/LiftPlusCruise.md
