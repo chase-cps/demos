@@ -17,6 +17,15 @@
   .tools button svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.4;
                stroke-linecap:round; stroke-linejoin:round; }
   .tools .sep { width:1px; height:18px; background:#e3e8e8; margin:0 6px; }
+  [data-box].sel > rect:first-of-type { stroke:var(--teal); stroke-width:3px; }
+  .trow > .hl { display:none; } .trow.sel > .hl { display:inline; }
+  #export { display:none; position:absolute; right:12px; top:46px; background:#fff; border:1px solid #d5dddd;
+            border-radius:8px; padding:4px; gap:4px; box-shadow:0 4px 14px rgba(0,0,0,.08); z-index:7; }
+  #export button { font:600 12px Helvetica, Arial, sans-serif; border:1px solid #d5dddd; background:#fff;
+                   border-radius:6px; padding:4px 10px; cursor:pointer; color:var(--teal); }
+  #export button:hover { background:var(--fill); }
+  @media print { body > *:not(#print) { display:none !important; } #print { display:block !important; }
+                 #print svg { width:100%; height:auto; } @page { margin:12mm; } }
   #help { position:absolute; right:12px; top:46px; background:#fff; border:1px solid #d5dddd; border-radius:8px;
           box-shadow:0 6px 24px rgba(0,0,0,.12); padding:12px 14px; font:12px 'Arial Unicode MS', Helvetica, Arial, sans-serif;
           color:var(--soft); display:none; z-index:11; }
@@ -38,7 +47,7 @@
                   white-space:nowrap; background:#fff; }
   #context i { font:600 9.5px -apple-system, Helvetica, Arial, sans-serif; font-style:normal; color:#fff;
                background:#6f7f80; border-radius:4px; padding:2px 5px; }
-  #view { position:fixed; inset:0; overflow:hidden; cursor:grab; touch-action:none; }
+  #view { position:fixed; inset:0; overflow:hidden; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
   #view.moving { cursor:grabbing; }
   #view > svg { display:block; width:100%; height:100%; }
   svg text { font-family:-apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
@@ -74,8 +83,9 @@
     <button class="on" title="Transition labels of the models: the inputs that take each transition" onclick="flip(this, 'conditions')"><svg viewBox="0 0 16 16"><circle cx="3" cy="11" r="1.8"/><circle cx="13" cy="11" r="1.8"/><path d="M4.8 11h6.4"/><rect x="5" y="3" width="6" height="4" rx="1"/></svg></button>
     <button class="on" title="Results of the checks (A, G, R, ⪯, M ⊨ C, E ⊨ A) and their cores" onclick="flip(this, 'checks')"><svg viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="3"/><path d="M5.5 8l1.8 1.8L10.5 6.3"/></svg></button>
     <span class="sep"></span>
+    <button title="Export the whole diagram (SVG, PNG, PDF)" onclick="exportMenu()"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.8 6.8 8 10l3.2-3.2M2.5 11.5v2h11v-2"/></svg></button>
     <button title="What the shapes mean" onclick="help()"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.4"/><circle cx="8" cy="11.6" r=".4"/></svg></button>
-  </span><div id="help"></div></div>
+  </span><div id="help"></div><div id="export"><button onclick="exportAs('svg')">SVG</button><button onclick="exportAs('png')">PNG</button><button onclick="exportAs('pdf')">PDF</button></div></div>
 <div id="view"></div>
 <div id="stale"></div>
 <div id="busy">checking…</div>
@@ -83,7 +93,7 @@
 <div id="pop"><header><b id="poptitle"></b><button onclick="closePop()">close</button></header><div id="popview"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
 <script>
-let DATA = {"title": "Power systems: requirements from patterns", "nodes": [{"kind": "contract", "title": "EPS_15ms", "note": null, "contract": {"name": "EPS_15ms", "A": ["G (contactor_1_state & contactor_1_command -> X (contactor_1_on_counter = 0 & contactor_1_state))", "contactor_1_on_counter = 0", "G (contactor_1_on_counter = 1 & !contactor_1_state & contactor_1_command -> X (contactor_1_state & contactor_1_on_counter = 0))", "G (contactor_1_command & !contactor_1_state & contactor_1_on_counter = 0 -> X (contactor_1_on_counter = 1 & !contactor_1_state | contactor_1_on_counter = 0 & contactor_1_state))", "G (!contactor_1_state & !contactor_1_command -> X (contactor_1_off_counter = 0 & !contactor_1_state))", "contactor_1_off_counter = 0", "G (contactor_1_off_counter = 1 & contactor_1_state & !contactor_1_command -> X (!contactor_1_state & contactor_1_off_counter = 0))", "G (!contactor_1_command & contactor_1_state & contactor_1_off_counter = 0 -> X (contactor_1_off_counter = 1 & contactor_1_state | contactor_1_off_counter = 0 & !contactor_1_state))", "G (contactor_2_state & contactor_2_command -> X (contactor_2_on_counter = 0 & contactor_2_state))", "contactor_2_on_counter = 0", "G (contactor_2_on_counter = 1 & !contactor_2_state & contactor_2_command -> X (contactor_2_state & contactor_2_on_counter = 0))", "G (contactor_2_command & !contactor_2_state & contactor_2_on_counter = 0 -> X (contactor_2_on_counter = 1 & !contactor_2_state | contactor_2_on_counter = 0 & contactor_2_state))", "G (!contactor_2_state & !contactor_2_command -> X (contactor_2_off_counter = 0 & !contactor_2_state))", "contactor_2_off_counter = 0", "G (contactor_2_off_counter = 1 & contactor_2_state & !contactor_2_command -> X (!contactor_2_state & contactor_2_off_counter = 0))", "G (!contactor_2_command & contactor_2_state & contactor_2_off_counter = 0 -> X (contactor_2_off_counter = 1 & contactor_2_state | contactor_2_off_counter = 0 & !contactor_2_state))", "G (contactor_3_state & contactor_3_command -> X (contactor_3_on_counter = 0 & contactor_3_state))", "contactor_3_on_counter = 0", "G (contactor_3_on_counter = 1 & !contactor_3_state & contactor_3_command -> X (contactor_3_state & contactor_3_on_counter = 0))", "G (contactor_3_command & !contactor_3_state & contactor_3_on_counter = 0 -> X (contactor_3_on_counter = 1 & !contactor_3_state | contactor_3_on_counter = 0 & contactor_3_state))", "G (!contactor_3_state & !contactor_3_command -> X (contactor_3_off_counter = 0 & !contactor_3_state))", "contactor_3_off_counter = 0", "G (contactor_3_off_counter = 1 & contactor_3_state & !contactor_3_command -> X (!contactor_3_state & contactor_3_off_counter = 0))", "G (!contactor_3_command & contactor_3_state & contactor_3_off_counter = 0 -> X (contactor_3_off_counter = 1 & contactor_3_state | contactor_3_off_counter = 0 & !contactor_3_state))", "G (!left_generator_1_state -> X !left_generator_1_state)", "G (!right_generator_1_state -> X !right_generator_1_state)", "G (left_generator_1_state | right_generator_1_state)", "!contactor_3_state", "contactor_1_state", "contactor_2_state"], "G": ["G (!contactor_2_state | !contactor_3_state | !contactor_1_state)", "G (!contactor_1_state | !contactor_3_state | !contactor_2_state)", "G (!contactor_1_state -> left_generator_1_disconnect_counter = 0)", "G (left_generator_1_state -> left_generator_1_disconnect_counter = 0)", "left_generator_1_disconnect_counter = 0", "G (left_generator_1_disconnect_counter = 0 & !left_generator_1_state -> X (left_generator_1_disconnect_counter = 1 & contactor_1_state | !contactor_1_state & left_generator_1_disconnect_counter = 0))", "G (left_generator_1_disconnect_counter = 1 & !left_generator_1_state -> X (left_generator_1_disconnect_counter = 2 & contactor_1_state | !contactor_1_state & left_generator_1_disconnect_counter = 0))", "G (left_generator_1_disconnect_counter = 2 & !left_generator_1_state -> X (!contactor_1_state & left_generator_1_disconnect_counter = 0))", "right_generator_1_disconnect_counter = 0", "G (right_generator_1_state -> right_generator_1_disconnect_counter = 0)", "G (!contactor_2_state -> right_generator_1_disconnect_counter = 0)", "G (right_generator_1_disconnect_counter = 0 & !right_generator_1_state -> X (right_generator_1_disconnect_counter = 1 & contactor_2_state | !contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (right_generator_1_disconnect_counter = 1 & !right_generator_1_state -> X (right_generator_1_disconnect_counter = 2 & contactor_2_state | !contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (right_generator_1_disconnect_counter = 2 & !right_generator_1_state -> X (!contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (left_generator_1_state -> left_generator_1_state & contactor_1_state)", "G (right_generator_1_state -> right_generator_1_state & contactor_2_state)", "G (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state -> left_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state -> right_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (left_generator_1_state & contactor_1_state -> contactor_1_command)", "G (right_generator_1_state & contactor_2_state & contactor_3_state -> contactor_2_command & contactor_3_command)", "G (left_generator_1_state & contactor_1_state & contactor_3_state -> contactor_1_command & contactor_3_command)", "G (right_generator_1_state & contactor_2_state -> contactor_2_command)"]}, "inputs": ["contactor_1_off_counter", "contactor_1_on_counter", "contactor_1_state", "contactor_2_off_counter", "contactor_2_on_counter", "contactor_2_state", "contactor_3_off_counter", "contactor_3_on_counter", "contactor_3_state", "left_generator_1_state", "right_generator_1_state"], "outputs": ["contactor_1_command", "contactor_2_command", "contactor_3_command", "left_DC_bus_1_disconnected_from_generator", "left_generator_1_disconnect_counter", "right_DC_bus_1_disconnected_from_generator", "right_generator_1_disconnect_counter"], "id": "n1", "types": {"contactor_1_on_counter": {"label": "0..1"}, "contactor_1_off_counter": {"label": "0..1"}, "contactor_2_on_counter": {"label": "0..1"}, "contactor_2_off_counter": {"label": "0..1"}, "contactor_3_on_counter": {"label": "0..1"}, "contactor_3_off_counter": {"label": "0..1"}, "left_generator_1_disconnect_counter": {"label": "0..2"}, "right_generator_1_disconnect_counter": {"label": "0..2"}, "left_DC_bus_1_disconnected_from_generator": {"label": "0..2"}, "right_DC_bus_1_disconnected_from_generator": {"label": "0..2"}}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "invalid", "reason": "", "core": {"A": [], "G": [1, 17, 18, 19], "part": "contract"}}], "open": true}, {"kind": "contract", "title": "EPS_30ms", "note": null, "contract": {"name": "EPS_30ms", "A": ["G (!left_generator_1_state -> X !left_generator_1_state)", "G (!right_generator_1_state -> X !right_generator_1_state)", "G (!contactor_3_state & !contactor_3_command -> X (contactor_3_off_counter = 0 & !contactor_3_state))", "contactor_3_off_counter = 0", "G (contactor_3_off_counter = 0 & contactor_3_state & !contactor_3_command -> X (!contactor_3_state & contactor_3_off_counter = 0))", "G (contactor_3_state & contactor_3_command -> X (contactor_3_on_counter = 0 & contactor_3_state))", "contactor_3_on_counter = 0", "G (contactor_3_on_counter = 0 & !contactor_3_state & contactor_3_command -> X (contactor_3_state & contactor_3_on_counter = 0))", "G (!contactor_2_state & !contactor_2_command -> X (contactor_2_off_counter = 0 & !contactor_2_state))", "contactor_2_off_counter = 0", "G (contactor_2_off_counter = 0 & contactor_2_state & !contactor_2_command -> X (!contactor_2_state & contactor_2_off_counter = 0))", "G (contactor_2_state & contactor_2_command -> X (contactor_2_on_counter = 0 & contactor_2_state))", "contactor_2_on_counter = 0", "G (contactor_2_on_counter = 0 & !contactor_2_state & contactor_2_command -> X (contactor_2_state & contactor_2_on_counter = 0))", "G (!contactor_1_state & !contactor_1_command -> X (contactor_1_off_counter = 0 & !contactor_1_state))", "contactor_1_off_counter = 0", "G (contactor_1_off_counter = 0 & contactor_1_state & !contactor_1_command -> X (!contactor_1_state & contactor_1_off_counter = 0))", "G (contactor_1_state & contactor_1_command -> X (contactor_1_on_counter = 0 & contactor_1_state))", "contactor_1_on_counter = 0", "G (contactor_1_on_counter = 0 & !contactor_1_state & contactor_1_command -> X (contactor_1_state & contactor_1_on_counter = 0))", "!contactor_3_state", "contactor_1_state", "contactor_2_state", "G (left_generator_1_state | right_generator_1_state)"], "G": ["G (left_generator_1_state & contactor_1_state -> contactor_1_command)", "G (right_generator_1_state & contactor_2_state & contactor_3_state -> contactor_2_command & contactor_3_command)", "G (left_generator_1_state & contactor_1_state & contactor_3_state -> contactor_1_command & contactor_3_command)", "G (right_generator_1_state & contactor_2_state -> contactor_2_command)", "G (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state -> left_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state -> right_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (right_generator_1_state -> right_generator_1_state & contactor_2_state)", "G (left_generator_1_state -> left_generator_1_state & contactor_1_state)", "left_generator_1_disconnect_counter = 0", "G (left_generator_1_state -> left_generator_1_disconnect_counter = 0)", "G (!contactor_1_state -> left_generator_1_disconnect_counter = 0)", "G (left_generator_1_disconnect_counter = 0 & !left_generator_1_state -> X (left_generator_1_disconnect_counter = 1 & contactor_1_state | !contactor_1_state & left_generator_1_disconnect_counter = 0))", "G (left_generator_1_disconnect_counter = 1 & !left_generator_1_state -> X (!contactor_1_state & left_generator_1_disconnect_counter = 0))", "right_generator_1_disconnect_counter = 0", "G (right_generator_1_state -> right_generator_1_disconnect_counter = 0)", "G (!contactor_2_state -> right_generator_1_disconnect_counter = 0)", "G (right_generator_1_disconnect_counter = 0 & !right_generator_1_state -> X (right_generator_1_disconnect_counter = 1 & contactor_2_state | !contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (right_generator_1_disconnect_counter = 1 & !right_generator_1_state -> X (!contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (!contactor_2_state | !contactor_3_state | !contactor_1_state)", "G (!contactor_1_state | !contactor_3_state | !contactor_2_state)"]}, "inputs": ["contactor_1_off_counter", "contactor_1_on_counter", "contactor_1_state", "contactor_2_off_counter", "contactor_2_on_counter", "contactor_2_state", "contactor_3_off_counter", "contactor_3_on_counter", "contactor_3_state", "left_generator_1_state", "right_generator_1_state"], "outputs": ["contactor_1_command", "contactor_2_command", "contactor_3_command", "left_DC_bus_1_disconnected_from_generator", "left_generator_1_disconnect_counter", "right_DC_bus_1_disconnected_from_generator", "right_generator_1_disconnect_counter"], "id": "n2", "types": {"contactor_3_off_counter": {"label": "0..0"}, "contactor_3_on_counter": {"label": "0..0"}, "contactor_2_off_counter": {"label": "0..0"}, "contactor_2_on_counter": {"label": "0..0"}, "contactor_1_off_counter": {"label": "0..0"}, "contactor_1_on_counter": {"label": "0..0"}, "left_DC_bus_1_disconnected_from_generator": {"label": "0..2"}, "right_DC_bus_1_disconnected_from_generator": {"label": "0..2"}, "left_generator_1_disconnect_counter": {"label": "0..1"}, "right_generator_1_disconnect_counter": {"label": "0..1"}}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "valid", "reason": ""}]}, {"kind": "contract", "title": "Factory", "note": null, "contract": {"name": "Factory", "A": ["G (gate_1_state & gate_1_command -> X (gate_1_on_counter = 0 & gate_1_state))", "gate_1_on_counter = 0", "G (gate_1_on_counter = 0 & !gate_1_state & gate_1_command -> X (gate_1_state & gate_1_on_counter = 0))", "G (gate_10_state & gate_10_command -> X (gate_10_on_counter = 0 & gate_10_state))", "gate_10_on_counter = 0", "G (gate_10_on_counter = 0 & !gate_10_state & gate_10_command -> X (gate_10_state & gate_10_on_counter = 0))", "G (gate_2_state & gate_2_command -> X (gate_2_on_counter = 0 & gate_2_state))", "gate_2_on_counter = 0", "G (gate_2_on_counter = 0 & !gate_2_state & gate_2_command -> X (gate_2_state & gate_2_on_counter = 0))", "G (gate_3_state & gate_3_command -> X (gate_3_on_counter = 0 & gate_3_state))", "gate_3_on_counter = 0", "G (gate_3_on_counter = 0 & !gate_3_state & gate_3_command -> X (gate_3_state & gate_3_on_counter = 0))", "G (gate_4_state & gate_4_command -> X (gate_4_on_counter = 0 & gate_4_state))", "gate_4_on_counter = 0", "G (gate_4_on_counter = 0 & !gate_4_state & gate_4_command -> X (gate_4_state & gate_4_on_counter = 0))", "G (gate_5_state & gate_5_command -> X (gate_5_on_counter = 0 & gate_5_state))", "gate_5_on_counter = 0", "G (gate_5_on_counter = 0 & !gate_5_state & gate_5_command -> X (gate_5_state & gate_5_on_counter = 0))", "G (gate_6_state & gate_6_command -> X (gate_6_on_counter = 0 & gate_6_state))", "gate_6_on_counter = 0", "G (gate_6_on_counter = 0 & !gate_6_state & gate_6_command -> X (gate_6_state & gate_6_on_counter = 0))", "G (gate_7_state & gate_7_command -> X (gate_7_on_counter = 0 & gate_7_state))", "gate_7_on_counter = 0", "G (gate_7_on_counter = 0 & !gate_7_state & gate_7_command -> X (gate_7_state & gate_7_on_counter = 0))", "G (gate_8_state & gate_8_command -> X (gate_8_on_counter = 0 & gate_8_state))", "gate_8_on_counter = 0", "G (gate_8_on_counter = 0 & !gate_8_state & gate_8_command -> X (gate_8_state & gate_8_on_counter = 0))", "G (gate_9_state & gate_9_command -> X (gate_9_on_counter = 0 & gate_9_state))", "gate_9_on_counter = 0", "G (gate_9_on_counter = 0 & !gate_9_state & gate_9_command -> X (gate_9_state & gate_9_on_counter = 0))", "G (!gate_1_state & !gate_1_command -> X (gate_1_off_counter = 0 & !gate_1_state))", "gate_1_off_counter = 0", "G (gate_1_off_counter = 0 & gate_1_state & !gate_1_command -> X (!gate_1_state & gate_1_off_counter = 0))", "G (!gate_10_state & !gate_10_command -> X (gate_10_off_counter = 0 & !gate_10_state))", "gate_10_off_counter = 0", "G (gate_10_off_counter = 0 & gate_10_state & !gate_10_command -> X (!gate_10_state & gate_10_off_counter = 0))", "G (!gate_2_state & !gate_2_command -> X (gate_2_off_counter = 0 & !gate_2_state))", "gate_2_off_counter = 0", "G (gate_2_off_counter = 0 & gate_2_state & !gate_2_command -> X (!gate_2_state & gate_2_off_counter = 0))", "G (!gate_3_state & !gate_3_command -> X (gate_3_off_counter = 0 & !gate_3_state))", "gate_3_off_counter = 0", "G (gate_3_off_counter = 0 & gate_3_state & !gate_3_command -> X (!gate_3_state & gate_3_off_counter = 0))", "G (!gate_4_state & !gate_4_command -> X (gate_4_off_counter = 0 & !gate_4_state))", "gate_4_off_counter = 0", "G (gate_4_off_counter = 0 & gate_4_state & !gate_4_command -> X (!gate_4_state & gate_4_off_counter = 0))", "G (!gate_5_state & !gate_5_command -> X (gate_5_off_counter = 0 & !gate_5_state))", "gate_5_off_counter = 0", "G (gate_5_off_counter = 0 & gate_5_state & !gate_5_command -> X (!gate_5_state & gate_5_off_counter = 0))", "G (!gate_6_state & !gate_6_command -> X (gate_6_off_counter = 0 & !gate_6_state))", "gate_6_off_counter = 0", "G (gate_6_off_counter = 0 & gate_6_state & !gate_6_command -> X (!gate_6_state & gate_6_off_counter = 0))", "G (!gate_7_state & !gate_7_command -> X (gate_7_off_counter = 0 & !gate_7_state))", "gate_7_off_counter = 0", "G (gate_7_off_counter = 0 & gate_7_state & !gate_7_command -> X (!gate_7_state & gate_7_off_counter = 0))", "G (!gate_8_state & !gate_8_command -> X (gate_8_off_counter = 0 & !gate_8_state))", "gate_8_off_counter = 0", "G (gate_8_off_counter = 0 & gate_8_state & !gate_8_command -> X (!gate_8_state & gate_8_off_counter = 0))", "G (!gate_9_state & !gate_9_command -> X (gate_9_off_counter = 0 & !gate_9_state))", "gate_9_off_counter = 0", "G (gate_9_off_counter = 0 & gate_9_state & !gate_9_command -> X (!gate_9_state & gate_9_off_counter = 0))"], "G": ["main_conveyor_1_disconnect_counter = 0", "G (main_conveyor_1_state -> main_conveyor_1_disconnect_counter = 0)", "G (!gate_5_state -> main_conveyor_1_disconnect_counter = 0)", "G (main_conveyor_1_disconnect_counter = 0 & !main_conveyor_1_state -> X (main_conveyor_1_disconnect_counter = 1 & gate_5_state | !gate_5_state & main_conveyor_1_disconnect_counter = 0))", "G (main_conveyor_1_disconnect_counter = 1 & !main_conveyor_1_state -> X (!gate_5_state & main_conveyor_1_disconnect_counter = 0))", "main_conveyor_2_disconnect_counter = 0", "G (main_conveyor_2_state -> main_conveyor_2_disconnect_counter = 0)", "G (!gate_6_state -> main_conveyor_2_disconnect_counter = 0)", "G (main_conveyor_2_disconnect_counter = 0 & !main_conveyor_2_state -> X (main_conveyor_2_disconnect_counter = 1 & gate_6_state | !gate_6_state & main_conveyor_2_disconnect_counter = 0))", "G (main_conveyor_2_disconnect_counter = 1 & !main_conveyor_2_state -> X (!gate_6_state & main_conveyor_2_disconnect_counter = 0))", "G (gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state -> output_bay_1_disconnected_from_warehouse = 0)", "G (!(gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 0 -> X (!(gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 1 | (gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 0))", "G (!(gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 1 -> X (!(gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 2 | (gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 0))", "G (!(gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 2 -> X ((gate_1_state & main_conveyor_1_state & gate_5_state & gate_9_state | gate_3_state & gate_7_state & gate_9_state) & output_bay_1_disconnected_from_warehouse = 0))", "G (gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state -> output_bay_2_disconnected_from_warehouse = 0)", "G (!(gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 0 -> X (!(gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 1 | (gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 0))", "G (!(gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 1 -> X (!(gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 2 | (gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 0))", "G (!(gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 2 -> X ((gate_2_state & main_conveyor_2_state & gate_6_state & gate_10_state | gate_4_state & gate_8_state & gate_10_state) & output_bay_2_disconnected_from_warehouse = 0))"]}, "inputs": ["gate_10_off_counter", "gate_10_on_counter", "gate_10_state", "gate_1_off_counter", "gate_1_on_counter", "gate_1_state", "gate_2_off_counter", "gate_2_on_counter", "gate_2_state", "gate_3_off_counter", "gate_3_on_counter", "gate_3_state", "gate_4_off_counter", "gate_4_on_counter", "gate_4_state", "gate_5_off_counter", "gate_5_on_counter", "gate_5_state", "gate_6_off_counter", "gate_6_on_counter", "gate_6_state", "gate_7_off_counter", "gate_7_on_counter", "gate_7_state", "gate_8_off_counter", "gate_8_on_counter", "gate_8_state", "gate_9_off_counter", "gate_9_on_counter", "gate_9_state", "main_conveyor_1_state", "main_conveyor_2_state"], "outputs": ["gate_10_command", "gate_1_command", "gate_2_command", "gate_3_command", "gate_4_command", "gate_5_command", "gate_6_command", "gate_7_command", "gate_8_command", "gate_9_command", "main_conveyor_1_disconnect_counter", "main_conveyor_2_disconnect_counter", "output_bay_1_disconnected_from_warehouse", "output_bay_2_disconnected_from_warehouse"], "id": "n3", "types": {"gate_1_on_counter": {"label": "0..0"}, "gate_10_on_counter": {"label": "0..0"}, "gate_2_on_counter": {"label": "0..0"}, "gate_3_on_counter": {"label": "0..0"}, "gate_4_on_counter": {"label": "0..0"}, "gate_5_on_counter": {"label": "0..0"}, "gate_6_on_counter": {"label": "0..0"}, "gate_7_on_counter": {"label": "0..0"}, "gate_8_on_counter": {"label": "0..0"}, "gate_9_on_counter": {"label": "0..0"}, "gate_1_off_counter": {"label": "0..0"}, "gate_10_off_counter": {"label": "0..0"}, "gate_2_off_counter": {"label": "0..0"}, "gate_3_off_counter": {"label": "0..0"}, "gate_4_off_counter": {"label": "0..0"}, "gate_5_off_counter": {"label": "0..0"}, "gate_6_off_counter": {"label": "0..0"}, "gate_7_off_counter": {"label": "0..0"}, "gate_8_off_counter": {"label": "0..0"}, "gate_9_off_counter": {"label": "0..0"}, "main_conveyor_1_disconnect_counter": {"label": "0..1"}, "main_conveyor_2_disconnect_counter": {"label": "0..1"}, "output_bay_1_disconnected_from_warehouse": {"label": "0..2"}, "output_bay_2_disconnected_from_warehouse": {"label": "0..2"}}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "valid", "reason": ""}]}], "edges": [], "context": []};
+let DATA = {"title": "Power systems: requirements from patterns", "nodes": [{"kind": "contract", "title": "EPS_15ms", "note": null, "contract": {"name": "EPS_15ms", "A": ["G (contactor_1_state & contactor_1_command -> X (contactor_1_on_counter = 0 & contactor_1_state))", "contactor_1_on_counter = 0", "G (contactor_1_on_counter = 1 & !contactor_1_state & contactor_1_command -> X (contactor_1_state & contactor_1_on_counter = 0))", "G (contactor_1_command & !contactor_1_state & contactor_1_on_counter = 0 -> X (contactor_1_on_counter = 1 & !contactor_1_state | contactor_1_on_counter = 0 & contactor_1_state))", "G (!contactor_1_state & !contactor_1_command -> X (contactor_1_off_counter = 0 & !contactor_1_state))", "contactor_1_off_counter = 0", "G (contactor_1_off_counter = 1 & contactor_1_state & !contactor_1_command -> X (!contactor_1_state & contactor_1_off_counter = 0))", "G (!contactor_1_command & contactor_1_state & contactor_1_off_counter = 0 -> X (contactor_1_off_counter = 1 & contactor_1_state | contactor_1_off_counter = 0 & !contactor_1_state))", "G (contactor_2_state & contactor_2_command -> X (contactor_2_on_counter = 0 & contactor_2_state))", "contactor_2_on_counter = 0", "G (contactor_2_on_counter = 1 & !contactor_2_state & contactor_2_command -> X (contactor_2_state & contactor_2_on_counter = 0))", "G (contactor_2_command & !contactor_2_state & contactor_2_on_counter = 0 -> X (contactor_2_on_counter = 1 & !contactor_2_state | contactor_2_on_counter = 0 & contactor_2_state))", "G (!contactor_2_state & !contactor_2_command -> X (contactor_2_off_counter = 0 & !contactor_2_state))", "contactor_2_off_counter = 0", "G (contactor_2_off_counter = 1 & contactor_2_state & !contactor_2_command -> X (!contactor_2_state & contactor_2_off_counter = 0))", "G (!contactor_2_command & contactor_2_state & contactor_2_off_counter = 0 -> X (contactor_2_off_counter = 1 & contactor_2_state | contactor_2_off_counter = 0 & !contactor_2_state))", "G (contactor_3_state & contactor_3_command -> X (contactor_3_on_counter = 0 & contactor_3_state))", "contactor_3_on_counter = 0", "G (contactor_3_on_counter = 1 & !contactor_3_state & contactor_3_command -> X (contactor_3_state & contactor_3_on_counter = 0))", "G (contactor_3_command & !contactor_3_state & contactor_3_on_counter = 0 -> X (contactor_3_on_counter = 1 & !contactor_3_state | contactor_3_on_counter = 0 & contactor_3_state))", "G (!contactor_3_state & !contactor_3_command -> X (contactor_3_off_counter = 0 & !contactor_3_state))", "contactor_3_off_counter = 0", "G (contactor_3_off_counter = 1 & contactor_3_state & !contactor_3_command -> X (!contactor_3_state & contactor_3_off_counter = 0))", "G (!contactor_3_command & contactor_3_state & contactor_3_off_counter = 0 -> X (contactor_3_off_counter = 1 & contactor_3_state | contactor_3_off_counter = 0 & !contactor_3_state))", "G (!left_generator_1_state -> X !left_generator_1_state)", "G (!right_generator_1_state -> X !right_generator_1_state)", "G (left_generator_1_state | right_generator_1_state)", "contactor_2_state", "contactor_1_state", "!contactor_3_state"], "G": ["G (left_generator_1_state -> left_generator_1_state & contactor_1_state)", "G (right_generator_1_state -> right_generator_1_state & contactor_2_state)", "G (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state -> left_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state -> right_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (left_generator_1_state & contactor_1_state -> contactor_1_command)", "G (right_generator_1_state & contactor_2_state & contactor_3_state -> contactor_2_command & contactor_3_command)", "G (left_generator_1_state & contactor_1_state & contactor_3_state -> contactor_1_command & contactor_3_command)", "G (right_generator_1_state & contactor_2_state -> contactor_2_command)", "G (!contactor_1_state -> left_generator_1_disconnect_counter = 0)", "left_generator_1_disconnect_counter = 0", "G (left_generator_1_state -> left_generator_1_disconnect_counter = 0)", "G (!contactor_1_state | !contactor_3_state | !contactor_2_state)", "G (!contactor_2_state | !contactor_3_state | !contactor_1_state)", "G (left_generator_1_disconnect_counter = 0 & !left_generator_1_state -> X (left_generator_1_disconnect_counter = 1 & contactor_1_state | !contactor_1_state & left_generator_1_disconnect_counter = 0))", "G (left_generator_1_disconnect_counter = 1 & !left_generator_1_state -> X (left_generator_1_disconnect_counter = 2 & contactor_1_state | !contactor_1_state & left_generator_1_disconnect_counter = 0))", "G (left_generator_1_disconnect_counter = 2 & !left_generator_1_state -> X (!contactor_1_state & left_generator_1_disconnect_counter = 0))", "right_generator_1_disconnect_counter = 0", "G (right_generator_1_state -> right_generator_1_disconnect_counter = 0)", "G (!contactor_2_state -> right_generator_1_disconnect_counter = 0)", "G (right_generator_1_disconnect_counter = 0 & !right_generator_1_state -> X (right_generator_1_disconnect_counter = 1 & contactor_2_state | !contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (right_generator_1_disconnect_counter = 1 & !right_generator_1_state -> X (right_generator_1_disconnect_counter = 2 & contactor_2_state | !contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (right_generator_1_disconnect_counter = 2 & !right_generator_1_state -> X (!contactor_2_state & right_generator_1_disconnect_counter = 0))"]}, "inputs": ["contactor_1_off_counter", "contactor_1_on_counter", "contactor_1_state", "contactor_2_off_counter", "contactor_2_on_counter", "contactor_2_state", "contactor_3_off_counter", "contactor_3_on_counter", "contactor_3_state", "left_generator_1_state", "right_generator_1_state"], "outputs": ["contactor_1_command", "contactor_2_command", "contactor_3_command", "left_DC_bus_1_disconnected_from_generator", "left_generator_1_disconnect_counter", "right_DC_bus_1_disconnected_from_generator", "right_generator_1_disconnect_counter"], "id": "n1", "types": {"contactor_1_on_counter": {"label": "0..1"}, "contactor_1_off_counter": {"label": "0..1"}, "contactor_2_on_counter": {"label": "0..1"}, "contactor_2_off_counter": {"label": "0..1"}, "contactor_3_on_counter": {"label": "0..1"}, "contactor_3_off_counter": {"label": "0..1"}, "left_generator_1_disconnect_counter": {"label": "0..2"}, "right_generator_1_disconnect_counter": {"label": "0..2"}, "left_DC_bus_1_disconnected_from_generator": {"label": "0..2"}, "right_DC_bus_1_disconnected_from_generator": {"label": "0..2"}}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "invalid", "reason": "", "core": {"A": [], "G": [7, 8, 9, 18], "part": "contract"}}], "open": true}, {"kind": "contract", "title": "EPS_30ms", "note": null, "contract": {"name": "EPS_30ms", "A": ["G (contactor_1_state & contactor_1_command -> X (contactor_1_on_counter = 0 & contactor_1_state))", "contactor_1_on_counter = 0", "G (contactor_1_on_counter = 0 & !contactor_1_state & contactor_1_command -> X (contactor_1_state & contactor_1_on_counter = 0))", "G (!contactor_1_state & !contactor_1_command -> X (contactor_1_off_counter = 0 & !contactor_1_state))", "contactor_1_off_counter = 0", "G (contactor_1_off_counter = 0 & contactor_1_state & !contactor_1_command -> X (!contactor_1_state & contactor_1_off_counter = 0))", "G (contactor_2_state & contactor_2_command -> X (contactor_2_on_counter = 0 & contactor_2_state))", "contactor_2_on_counter = 0", "G (contactor_2_on_counter = 0 & !contactor_2_state & contactor_2_command -> X (contactor_2_state & contactor_2_on_counter = 0))", "G (!contactor_2_state & !contactor_2_command -> X (contactor_2_off_counter = 0 & !contactor_2_state))", "contactor_2_off_counter = 0", "G (contactor_2_off_counter = 0 & contactor_2_state & !contactor_2_command -> X (!contactor_2_state & contactor_2_off_counter = 0))", "G (contactor_3_state & contactor_3_command -> X (contactor_3_on_counter = 0 & contactor_3_state))", "contactor_3_on_counter = 0", "G (contactor_3_on_counter = 0 & !contactor_3_state & contactor_3_command -> X (contactor_3_state & contactor_3_on_counter = 0))", "G (!contactor_3_state & !contactor_3_command -> X (contactor_3_off_counter = 0 & !contactor_3_state))", "contactor_3_off_counter = 0", "G (contactor_3_off_counter = 0 & contactor_3_state & !contactor_3_command -> X (!contactor_3_state & contactor_3_off_counter = 0))", "G (!left_generator_1_state -> X !left_generator_1_state)", "G (!right_generator_1_state -> X !right_generator_1_state)", "!contactor_3_state", "G (left_generator_1_state | right_generator_1_state)", "contactor_2_state", "contactor_1_state"], "G": ["G (left_generator_1_disconnect_counter = 1 & !left_generator_1_state -> X (!contactor_1_state & left_generator_1_disconnect_counter = 0))", "right_generator_1_disconnect_counter = 0", "G (right_generator_1_state -> right_generator_1_disconnect_counter = 0)", "G (!contactor_2_state -> right_generator_1_disconnect_counter = 0)", "G (right_generator_1_disconnect_counter = 0 & !right_generator_1_state -> X (right_generator_1_disconnect_counter = 1 & contactor_2_state | !contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (right_generator_1_disconnect_counter = 1 & !right_generator_1_state -> X (!contactor_2_state & right_generator_1_disconnect_counter = 0))", "G (left_generator_1_state -> left_generator_1_state & contactor_1_state)", "G (right_generator_1_state -> right_generator_1_state & contactor_2_state)", "G (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state -> left_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state | right_generator_1_state & contactor_2_state & contactor_3_state) & left_DC_bus_1_disconnected_from_generator = 0))", "G (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state -> right_DC_bus_1_disconnected_from_generator = 0)", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 1 -> X (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 | (left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (!(left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 2 -> X ((left_generator_1_state & contactor_1_state & contactor_3_state | right_generator_1_state & contactor_2_state) & right_DC_bus_1_disconnected_from_generator = 0))", "G (left_generator_1_state & contactor_1_state -> contactor_1_command)", "G (right_generator_1_state & contactor_2_state & contactor_3_state -> contactor_2_command & contactor_3_command)", "G (left_generator_1_state & contactor_1_state & contactor_3_state -> contactor_1_command & contactor_3_command)", "G (right_generator_1_state & contactor_2_state -> contactor_2_command)", "left_generator_1_disconnect_counter = 0", "G (left_generator_1_state -> left_generator_1_disconnect_counter = 0)", "G (!contactor_1_state | !contactor_3_state | !contactor_2_state)", "G (!contactor_2_state | !contactor_3_state | !contactor_1_state)", "G (!contactor_1_state -> left_generator_1_disconnect_counter = 0)", "G (left_generator_1_disconnect_counter = 0 & !left_generator_1_state -> X (left_generator_1_disconnect_counter = 1 & contactor_1_state | !contactor_1_state & left_generator_1_disconnect_counter = 0))"]}, "inputs": ["contactor_1_off_counter", "contactor_1_on_counter", "contactor_1_state", "contactor_2_off_counter", "contactor_2_on_counter", "contactor_2_state", "contactor_3_off_counter", "contactor_3_on_counter", "contactor_3_state", "left_generator_1_state", "right_generator_1_state"], "outputs": ["contactor_1_command", "contactor_2_command", "contactor_3_command", "left_DC_bus_1_disconnected_from_generator", "left_generator_1_disconnect_counter", "right_DC_bus_1_disconnected_from_generator", "right_generator_1_disconnect_counter"], "id": "n2", "types": {"contactor_1_on_counter": {"label": "0..0"}, "contactor_1_off_counter": {"label": "0..0"}, "contactor_2_on_counter": {"label": "0..0"}, "contactor_2_off_counter": {"label": "0..0"}, "contactor_3_on_counter": {"label": "0..0"}, "contactor_3_off_counter": {"label": "0..0"}, "left_generator_1_disconnect_counter": {"label": "0..1"}, "right_generator_1_disconnect_counter": {"label": "0..1"}, "left_DC_bus_1_disconnected_from_generator": {"label": "0..2"}, "right_DC_bus_1_disconnected_from_generator": {"label": "0..2"}}, "children": [], "edges": [], "layout": "row", "checks": [{"name": "R", "status": "valid", "reason": ""}]}], "edges": [], "context": []};
 const LINE = 17, PAD = 10, PORT = 6, HEAD = 28, ICON = 16, INLINE_STATES = 8;
 const ctx = document.createElement("canvas").getContext("2d");
 function textWidth(s, font) { ctx.font = font; return ctx.measureText(s).width; }
@@ -150,12 +160,13 @@ function wrap(f) {
 }
 // Each part opens with a tag: A (assumes), G (guarantees), E (an environment).
 // With a core in focus, its terms are on a red ground: [kind, tag, text, in the core].
-function terms(c, out, core) {
-  const part = (tag, fs, hit) => fs.forEach((f, j) => wrap(f).forEach((l, i) =>
-    out.push(["f", i || j ? "" : tag, l, hit.includes(j)])));
-  part("A", c.A, core ? core.A : []);
+// src: the lines of the terms in the file, [first, last], when known.
+function terms(c, out, core, src) {
+  const part = (tag, fs, hit, at) => fs.forEach((f, j) => wrap(f).forEach((l, i) =>
+    out.push(["f", i || j ? "" : tag, l, hit.includes(j), at && at[j]])));
+  part("A", c.A, core ? core.A : [], src && src.A);
   if (c.E) part("E", c.E, []);
-  else part("G", c.G.length ? c.G : ["true"], core ? core.G : []);
+  else part("G", c.G.length ? c.G : ["true"], core ? core.G : [], c.G.length && src && src.G);
 }
 const focused = n => show.checks && n.id in focus ? n.checks[focus[n.id]].core : null;
 
@@ -166,7 +177,7 @@ function lines(n) {
   const out = [], core = focused(n);
   const part = (c, which) => {
     const ts = [];
-    terms(c, ts, core && core.part === which ? core : null);
+    terms(c, ts, core && core.part === which ? core : null, which === "contract" ? n.source : null);
     if (ts.length <= LONG) { out.push(...ts); return; }
     const parts = [];                  // A and G cut apart: the first lines of each
     ts.forEach(t => (t[1] || !parts.length) ? parts.push([t]) : parts[parts.length - 1].push(t));
@@ -176,9 +187,11 @@ function lines(n) {
       const keep = Math.max(1, i === parts.length - 1 ? left : Math.max(Math.floor(SHORT / parts.length), SHORT - rest));
       let room = keep - p.filter(t => t[3]).length;   // the lines of a core in focus are kept first
       const shown = p.filter(t => t[3] || room-- > 0);
-      if (shown[0] !== p[0]) shown[0] = [shown[0][0], p[0][1], shown[0][2], shown[0][3]];
+      if (shown[0] !== p[0]) shown[0] = [shown[0][0], p[0][1], shown[0][2], shown[0][3], shown[0][4]];
       out.push(...shown);
-      if (p.length > shown.length) out.push(["more", "", "⋯ " + (p.length - shown.length) + " more lines", c]);
+      if (p.length > shown.length)   // with the lines of the terms it hides, for the cursor
+        out.push(["more", "", "⋯ " + (p.length - shown.length) + " more lines", c,
+                  p.filter(t => !shown.includes(t) && t[4]).map(t => t[4])]);
       left -= Math.min(keep, shown.length);
     });
   };
@@ -196,10 +209,11 @@ function lines(n) {
 const lineWidth = ([k, tag, t]) => (k === "f" ? 20 : 0) + textWidth(t, k === "f" ? FONT_F : FONT_S);
 function showTerms(n, c) {     // the whole contract, in the panel
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"), ts = [];
-  terms(c, ts, null);
+  terms(c, ts, null, c === n.contract ? n.source : null);
   document.getElementById("poptitle").textContent = n.title + " · contract " + c.name;
-  document.getElementById("popview").innerHTML = "<table class='fsm'>" + ts.map(([k, tag, t]) =>
-    "<tr><td class='st'>" + (tag || "") + "</td><td>" + esc(t) + "</td></tr>").join("") + "</table>";
+  document.getElementById("popview").innerHTML = "<table class='fsm'>" + ts.map(([k, tag, t, , at]) =>
+    "<tr" + (at ? " data-line='" + at[0] + "'" + (inEditor() ? " title='double click: line " + at[0] + "'" : "") : "")
+    + "><td class='st'>" + (tag || "") + "</td><td>" + esc(t) + "</td></tr>").join("") + "</table>";
   document.getElementById("pop").style.display = "flex";
 }
 
@@ -409,7 +423,12 @@ function drawNode(g, e, ox, oy) {
   if (n.kind === "component" || n.kind === "environment") el("line", { x1: x, y1: y + HEAD - 2, x2: x + e.width, y2: y + HEAD - 2,
                                            stroke: "#e3e8e8", "stroke-width": 1 }, box);
   const name = text(box, x + PAD, y + 18, "h", n.title);
-  if (n.contract) { name.onclick = toggle("c:" + n.id); tip(name, "Click: open or close the contract"); }
+  if (n.contract) {
+    const flip = toggle("c:" + n.id);
+    name.onclick = e => { flip(); if (e.detail === 2) reveal(n.source && n.source.line); };   // a double click opens and closes: as it was
+    tip(name, "Click: open or close the contract" + (n.source && typeof acquireVsCodeApi === "function"
+                                                     ? " · double click: its text in the editor" : ""));
+  }
   let ix = x + PAD + textWidth(n.title, FONT_H) + 10;
   icons(n).forEach(([kind, key, title]) => {
     const on = key && open.has(key), c = icon(box, kind, ix, y + 6, on, title, !key);
@@ -444,15 +463,24 @@ function drawNode(g, e, ox, oy) {
     tip(b, (WHAT[n.badge.text.split(" of ")[0]] || n.badge.text) + " — " + (SAYS[n.badge.status] || "not checked")
            + (inside(n) ? ". Click: hide or show the boxes inside" : ""));
     if (inside(n)) { b.setAttribute("class", "icon"); b.onclick = fold(n.id); } }
-  sz.ls.forEach(([k, label, s, core], i) => {
+  sz.ls.forEach(([k, label, s, core, at], i) => {
+    const frame = r => el("rect", { class: "hl", x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, rx: 3,
+                                     fill: "none", stroke: "var(--teal)", "stroke-width": 1.5 }, r);
     const ty = y + HEAD + 12 + i * LINE, row = el("g", {}, box);
     if (k === "f") {
       if (core) el("rect", { x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, rx: 3, fill: "#f6dcd9" }, row);
+      if (at) {             // its lines in the file: the editor goes there, and marks it from there
+        row.setAttribute("class", "trow"); row.setAttribute("data-line", at[0]); row.setAttribute("data-last", at[1]);
+        el("rect", { x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, fill: "transparent" }, row);   // the whole line
+        frame(row);
+        tip(row, (at[0] === at[1] ? "line " + at[0] : "lines " + at[0] + "–" + at[1])
+                 + (inEditor() ? " · double click: there in the editor" : "")); }
       if (label) { el("rect", { x: x + PAD, y: ty - 10, width: 13, height: 13, rx: 3, fill: "var(--teal)" }, row);
                    const t = text(row, x + PAD + 6.5, ty, "s", label); t.setAttribute("text-anchor", "middle");
                    t.setAttribute("style", "font-size:9.5px;font-weight:700;fill:#fff"); }
       text(row, x + PAD + 20, ty, "f", s); }
     else if (k === "more") {
+      if (at && at.length) { row.setAttribute("class", "trow"); row.setAttribute("data-hidden", JSON.stringify(at)); frame(row); }
       const t = text(row, x + PAD + 20, ty, "s", s);
       t.setAttribute("style", "fill:var(--teal);cursor:pointer;text-decoration:underline");
       tip(t, "the whole contract");
@@ -579,16 +607,35 @@ function zoomBy(f) { if (!cam) return; const v = document.getElementById("view")
   const v = document.getElementById("view");
   let drag = null;
   const live = t => { for (let e = t; e && e !== v; e = e.parentNode) if (e.onclick) return true; return false; };
+  // the pointer is held by the view once it moves, not before: a click or a
+  // double click on a box still reaches the box
   v.addEventListener("pointerdown", e => {
     if (!cam || e.button !== 0 || live(e.target)) return;
-    drag = { x: e.clientX, y: e.clientY, cx: cam.x, cy: cam.y };
-    v.setPointerCapture(e.pointerId); v.classList.add("moving");
+    drag = { x: e.clientX, y: e.clientY, cx: cam.x, cy: cam.y, id: e.pointerId, held: false };
   });
   v.addEventListener("pointermove", e => {
     if (!drag) return;
+    if (!drag.held) {
+      if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) < 4) return;
+      drag.held = true; v.setPointerCapture(drag.id); v.classList.add("moving");
+    }
     cam.x = drag.cx + e.clientX - drag.x; cam.y = drag.cy + e.clientY - drag.y; place();
   });
   const stop = () => { drag = null; v.classList.remove("moving"); };
+  // a double click on a box (not on its name, which opens it): its text
+  v.addEventListener("dblclick", e => {
+    for (let t = e.target; t && t !== v; t = t.parentNode) {
+      if (t.onclick) return;
+      const line = t.getAttribute && t.getAttribute("data-line");   // a term: its line
+      if (line) { reveal(+line); return; }
+      const id = t.getAttribute && t.getAttribute("data-box");
+      if (id && byId[id] && byId[id].source) { reveal(byId[id].source.line); return; }
+    }
+  });
+  document.getElementById("popview").addEventListener("dblclick", e => {
+    const tr = e.target.closest && e.target.closest("tr[data-line]");
+    if (tr) reveal(+tr.getAttribute("data-line"));
+  });
   v.addEventListener("pointerup", stop); v.addEventListener("pointercancel", stop);
   v.addEventListener("wheel", e => {
     if (!cam) return;
@@ -682,12 +729,29 @@ function rowsOf(out) {
     rows[rows.length - 1].push(...u.ids); used += (used ? 40 : 0) + u.w; });
   return rows.length > 1 ? rows : null;
 }
+// Boxes wired to each other at the top are laid out by ELK in columns: the
+// column of each box, and its place in it, stay those of the first drawing.
+let colPlan = null;              // key -> [column, place]
+function colsOf(out) {
+  if (!(DATA.edges || []).length) return null;
+  const keys = keysOf(DATA.nodes), cs = out.children || [], xs = [];
+  cs.forEach(c => { if (!xs.some(x => Math.abs(x - c.x) < 20)) xs.push(c.x); });
+  xs.sort((a, b) => a - b);
+  const col = c => xs.findIndex(x => Math.abs(x - c.x) < 20), plan = {};
+  cs.forEach(c => { const same = cs.filter(d => col(d) === col(c)).sort((a, b) => a.y - b.y);
+                    plan[keys[c.id]] = [col(c), same.indexOf(c)]; });
+  return plan;
+}
 function layout() {
+  const keys = colPlan ? keysOf(DATA.nodes) : {};
   const items = rootRows
     ? rootRows.map((ids, r) => ({ id: "root:row" + r, x: 0, y: r * 40, edges: [],
         children: ids.map((id, i) => toElk(byId[id], i, 0)),
         layoutOptions: Object.assign({}, FLOW, { "elk.padding": "[top=0,left=0,bottom=0,right=0]", "elk.alignment": "LEFT" }) }))
-    : DATA.nodes.map((n, i) => toElk(n, i, 0));
+    : DATA.nodes.map((n, i) => { const e = toElk(n, i, 0), at = colPlan && colPlan[keys[n.id]];
+        if (at) Object.assign(e.layoutOptions, { "elk.layered.layering.layerChoiceConstraint": String(at[0]),
+                                                 "elk.layered.crossingMinimization.positionChoiceConstraint": String(at[1]) });
+        return e; });
   return new ELK().layout({ id: "root", children: items, edges: rootEdges(),
     // with INCLUDE_CHILDREN, every level takes the direction of the root
     layoutOptions: Object.assign({ "elk.algorithm": "layered", "elk.direction": "RIGHT",
@@ -698,7 +762,8 @@ async function render() {
   for (const n of boxes)
     if (open.has("m:" + n.id) && inlineModel(n) && !MODELS[n.id]) MODELS[n.id] = await layoutModel(n);
   widen = {};
-  if (rowPlan === undefined) { rootRows = null; rowPlan = planOf(rowsOf(await layout())); }
+  if (rowPlan === undefined) { rootRows = null; colPlan = null; const first = await layout();
+                                rowPlan = planOf(rowsOf(first)); colPlan = rowPlan ? null : colsOf(first); }
   rootRows = rowsFromPlan();
   let out = await layout();
   for (let pass = 0; pass < 3; pass++) {
@@ -730,6 +795,40 @@ async function render() {
   const g = svgIn(document.getElementById("view"), out.width, out.height);
   (out.children || []).forEach(c => drawNode(g, c, 0, 0));
   (out.edges || []).forEach(ed => drawEdge(g, ed, 0, 0));
+  select(selectedLine, false, selectedAt);
+}
+
+// From the diagram to the text, and back: a double click on a box asks the
+// editor to show where it is written; the editor tells the line of the
+// cursor, and the box written there is marked (and brought into view).
+let selectedLine = null, selectedAt = null;
+const inEditor = () => typeof acquireVsCodeApi === "function";
+function reveal(line) {
+  if (!inEditor() || !line) return;
+  vscodeApi = vscodeApi || acquireVsCodeApi();
+  vscodeApi.postMessage({ type: "chase-reveal", line });
+}
+// line: where the contract of the cursor starts; at: the line of the cursor
+function select(line, bring, at) {
+  selectedLine = line; selectedAt = at || null;
+  let hit = null;
+  document.querySelectorAll("[data-box]").forEach(e => {
+    const n = byId[e.getAttribute("data-box")], on = !!(line && n && n.source && n.source.line === line);
+    e.classList.toggle("sel", on);
+    if (on && !hit) hit = e;
+  });
+  document.querySelectorAll(".trow").forEach(r => {
+    const box = r.closest("[data-box]"), hidden = r.getAttribute("data-hidden");
+    const ranges = hidden ? JSON.parse(hidden) : [[+r.getAttribute("data-line"), +r.getAttribute("data-last")]];
+    const on = !!(selectedAt && box && box.classList.contains("sel") && ranges.some(([a, z]) => a <= selectedAt && selectedAt <= z));
+    r.classList.toggle("sel", on);
+  });
+  if (!hit || !bring || !cam) return;
+  const r = hit.getBoundingClientRect(), v = document.getElementById("view").getBoundingClientRect();
+  if (r.left >= v.left && r.right <= v.right && r.top >= v.top + TOP && r.bottom <= v.bottom) return;
+  cam.x += (v.left + v.width / 2) - (r.left + r.width / 2);
+  cam.y += (v.top + TOP + (v.height - TOP) / 2) - (r.top + r.height / 2);
+  place();
 }
 
 // A model with more states is shown in a panel, as a table of moves.
@@ -894,8 +993,73 @@ window.addEventListener("message", e => {
   if (m.type === "chase-data") setData(m.data).catch(err => stale("Cannot draw the diagram: " + err));
   else if (m.type === "chase-checks") setChecks(m.data).catch(err => stale("Cannot draw the checks: " + err));
   else if (m.type === "chase-stale") stale(m.reason);
+  else if (m.type === "chase-select") select(m.line, true, m.at);
   else if (m.type === "chase-busy") document.getElementById("busy").style.display = m.on ? "block" : "none";
 });
+// Export: the whole diagram as it is drawn (what is open stays open), on a
+// white ground, the colors written out, so that the file stands alone.
+function exportMenu() {
+  const m = document.getElementById("export");
+  m.style.display = m.style.display === "flex" ? "none" : "flex";
+}
+function exported() {
+  const src = document.querySelector("#view > svg");
+  if (!src || !camera) return null;
+  const box = camera.getBBox(), pad = 16, w = Math.ceil(box.width + 2 * pad), h = Math.ceil(box.height + 2 * pad);
+  const svg = src.cloneNode(true);
+  svg.setAttribute("xmlns", NS);
+  svg.setAttribute("width", w); svg.setAttribute("height", h); svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  [...svg.children].filter(c => c.tagName === "rect").forEach(c => c.remove());   // the dots
+  svg.querySelectorAll(".sel").forEach(e => e.classList.remove("sel"));            // the box of the cursor
+  const g = [...svg.children].find(c => c.tagName === "g");
+  g.setAttribute("transform", `translate(${pad - box.x},${pad - box.y})`);
+  const ground = document.createElementNS(NS, "rect");
+  ground.setAttribute("width", w); ground.setAttribute("height", h); ground.setAttribute("fill", "#fff");
+  svg.insertBefore(ground, g);
+  const style = document.createElementNS(NS, "style");
+  style.textContent = [...document.querySelectorAll("style")].map(x => x.textContent).join("\n");
+  svg.insertBefore(style, svg.firstChild);
+  svg.querySelectorAll("[data-tip]").forEach(e => e.removeAttribute("data-tip"));
+  const root = getComputedStyle(document.documentElement);
+  const text = new XMLSerializer().serializeToString(svg)
+    .replace(/var\((--[\w-]+)\)/g, (_, v) => root.getPropertyValue(v).trim() || "#000");
+  return { text, w, h };
+}
+let vscodeApi = null;
+function deliver(name, mime, data) {
+  if (typeof acquireVsCodeApi === "function") {      // in an editor: it asks where to save
+    vscodeApi = vscodeApi || acquireVsCodeApi();
+    vscodeApi.postMessage({ type: "chase-export", name, mime, data });
+    return;
+  }
+  const a = document.createElement("a");
+  a.download = name;
+  a.href = data.startsWith("data:") ? data : URL.createObjectURL(new Blob([data], { type: mime }));
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function exportAs(kind) {
+  document.getElementById("export").style.display = "none";
+  const e = exported();
+  if (!e) return;
+  const name = (DATA.title || "diagram").replace(/\.[^.]*$/, "").replace(/[^\w.-]+/g, "_");
+  if (kind === "svg") return deliver(name + ".svg", "image/svg+xml", e.text);
+  const img = new Image();
+  img.onload = () => {
+    const k = 2, c = document.createElement("canvas");
+    c.width = e.w * k; c.height = e.h * k;
+    const x = c.getContext("2d"); x.scale(k, k); x.drawImage(img, 0, 0);
+    if (kind === "png") return deliver(name + ".png", "image/png", c.toDataURL("image/png"));
+    // PDF: the vector page, through the print dialog of the browser ("Save as PDF"); in an
+    // editor, which cannot print, the editor writes it
+    if (typeof acquireVsCodeApi === "function")
+      return deliver(name + ".pdf", "application/pdf", JSON.stringify({ svg: e.text, w: e.w, h: e.h }));
+    let p = document.getElementById("print");
+    if (!p) { p = document.createElement("div"); p.id = "print"; p.style.display = "none"; document.body.appendChild(p); }
+    p.innerHTML = e.text;
+    window.print();
+  };
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(e.text);
+}
 // The explanations: shown by the page itself, since the tooltips of the
 // browser do not show in the webview of an editor.
 (function () {

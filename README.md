@@ -38,11 +38,13 @@ website and its README show each step with its diagram.
     refine the contract of a robotic arm and are synthesized; `scaling.py`
     measures the refinement for N joints. CPSWeek22 is the version shown at
     CPS-IoT Week 2022.
-- **DATE18** and **FDL2024** (power systems and factories): requirements
-    written in the domain-specific language of CHASE. `DATE18/eps.py` checks
-    the power system of the DATE 2018 paper with the Python package: the
-    requirements as written are unrealizable, with the core, and the relaxed
-    ones are realizable.
+- **DATE18** (power system): requirements written in the domain-specific
+    language of CHASE. `DATE18/eps.py` checks the power system of the DATE
+    2018 paper with the Python package: the requirements as written are
+    unrealizable, with the core, and the relaxed ones are realizable.
+- [**FDL2024**][FDL2024] (factory): a small factory of the FDL 2024 paper,
+    in the same language; `FDL2024/factory.py` checks that the controller of
+    its gates is realizable.
 - [**DATE21**][DATE21]: the hands-on tutorial of the DATE 2021 University
     Booth, with the console tools of CHASE.
 
@@ -58,6 +60,7 @@ all of them but nuXmv, whose license does not allow redistribution:
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md
+[FDL2024]: FDL2024/FDL2024.md
 [CHASE]: https://github.com/chase-cps/chase
 [FRET]: https://github.com/NASA-SW-VnV/fret
 [CHARGER]: Charger/Charger.md

@@ -12,8 +12,8 @@ install chase-cps):
      that never leaves the left DC bus unpowered for more than 15 ms.
   2. With 30 ms without power for a DC bus and 20 ms to disconnect a failed
      generator (template_0_realizable.txt), the requirements are realizable.
-  3. The same language describes a small factory (FDL 2024,
-     ../FDL2024/dsl_factory_realizable.txt); its requirements are realizable.
+
+The same language describes a small factory: ../FDL2024/factory.py.
 
     python eps.py
     python eps.py --expect     # exit code 1 when a result is not the expected one
@@ -53,8 +53,6 @@ def main() -> int:
 
     eps15 = load_dsl(os.path.join(HERE, "template_0_unrealizable.txt"), name="EPS_15ms")
     eps30 = load_dsl(os.path.join(HERE, "template_0_realizable.txt"), name="EPS_30ms")
-    factory = load_dsl(os.path.join(HERE, "..", "FDL2024", "dsl_factory_realizable.txt"),
-                       name="Factory")
     print(f"The power system: {len(eps15.inputs)} inputs, {len(eps15.outputs)} outputs, "
           f"{len(eps15.assumptions)} assumptions, {len(eps15.guarantees)} guarantees")
 
@@ -66,14 +64,13 @@ def main() -> int:
             text = ltl.to_str(g)
             print("      " + (text if len(text) <= 100 else text[:97] + "..."))
     second = step("2. With 30 ms for a DC bus, realizable", "realizable", eps30)
-    third = step("3. The factory, realizable", "realizable", factory)
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))
 
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
-    page = viz.save(viz.diagram(eps15, eps30, factory,
-                                checks=[(eps15, first), (eps30, second), (factory, third)],
+    page = viz.save(viz.diagram(eps15, eps30,
+                                checks=[(eps15, first), (eps30, second)],
                                 open=[eps15], title="Power systems: requirements from patterns"),
                     os.path.join(HERE, "out", "eps.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
