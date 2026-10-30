@@ -9,6 +9,10 @@ website and its README show each step with its diagram.
     tool calls, split among sub-agents. The plan misses a deliverable, the
     quotient says what sub-agent 3 must do, and an unsat core finds a clause
     against the request of the user.
+- [**Escalation**][ESCALATION] (security chip): the escalation link of a
+    toy OpenTitan, checked module by module: the RTL of each module
+    implements its contract, and the contracts together refine the
+    requirements, with no check on the whole design.
 - [**LiftPlusCruise**][LPC] (aircraft): the requirements of the
     Lift-Plus-Cruise case study of [FRET][FRET], with real variables. They
     are consistent with a hover within 12 steps, not within 6, and the
@@ -20,10 +24,6 @@ website and its README show each step with its diagram.
     STL is replaced by a smaller one. The new buffer does not refine the old
     one, but it refines the quotient, the contract of its place; the RTL is
     checked with Yosys and nuXmv, and with Jasper.
-- [**Escalation**][ESCALATION] (security chip): the escalation link of a
-    toy OpenTitan, checked module by module: the RTL of each module
-    implements its contract, and the contracts together refine the
-    requirements, with no check on the whole design.
 - [**WarehouseRobot**][WAREHOUSE] (warehouse robot): the controller of a
     robot is delegated; the quotient by perception and localization is its
     contract, and requirements written for the mission alone fail it.
