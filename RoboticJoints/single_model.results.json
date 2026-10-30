@@ -1,0 +1,16 @@
+{
+  "file": "single_model.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Joints": {
+      "feasible": {
+        "key": "13d352f2dd859f8d",
+        "result": "sat",
+        "tool": "nuxmv/ic3",
+        "seconds": 0.16,
+        "at": "2026-10-30T00:04:51"
+      }
+    }
+  },
+  "relations": []
+}

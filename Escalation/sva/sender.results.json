@@ -1,0 +1,16 @@
+{
+  "file": "sender.sv",
+  "chase": "0.5.0",
+  "contracts": {
+    "sender": {
+      "feasible": {
+        "key": "dd47fb09d6ff3bd0",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    }
+  },
+  "relations": []
+}

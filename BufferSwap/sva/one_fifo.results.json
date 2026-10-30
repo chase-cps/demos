@@ -1,0 +1,16 @@
+{
+  "file": "one_fifo.sv",
+  "chase": "0.5.0",
+  "contracts": {
+    "one_fifo": {
+      "feasible": {
+        "key": "3a5a812e138348ab",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:44"
+      }
+    }
+  },
+  "relations": []
+}

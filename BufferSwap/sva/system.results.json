@@ -1,0 +1,16 @@
+{
+  "file": "system.sv",
+  "chase": "0.5.0",
+  "contracts": {
+    "system": {
+      "feasible": {
+        "key": "0fc608f7a2550940",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:44"
+      }
+    }
+  },
+  "relations": []
+}

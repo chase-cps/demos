@@ -1,0 +1,16 @@
+{
+  "file": "grant.sv",
+  "chase": "0.5.0",
+  "contracts": {
+    "grant": {
+      "feasible": {
+        "key": "2ce4db840b4faf8c",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:44"
+      }
+    }
+  },
+  "relations": []
+}

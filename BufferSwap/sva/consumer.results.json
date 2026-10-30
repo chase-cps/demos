@@ -1,0 +1,16 @@
+{
+  "file": "consumer.sv",
+  "chase": "0.5.0",
+  "contracts": {
+    "consumer": {
+      "feasible": {
+        "key": "72a1c575129d9658",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:44"
+      }
+    }
+  },
+  "relations": []
+}

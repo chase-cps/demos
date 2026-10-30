@@ -1,0 +1,70 @@
+{
+  "file": "robotic_arm.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Coordinator": {
+      "feasible": {
+        "key": "354c438aa9f10f50",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:50"
+      }
+    },
+    "Mission": {
+      "feasible": {
+        "key": "1d268af2e249e722",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.01,
+        "at": "2026-10-30T00:04:50"
+      }
+    },
+    "Move": {
+      "feasible": {
+        "key": "5e566add34757e8c",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:50"
+      }
+    },
+    "Pick": {
+      "feasible": {
+        "key": "6dad2ddc60e97170",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:50"
+      }
+    },
+    "Place": {
+      "feasible": {
+        "key": "e8b4a0ff5b5ec97a",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.01,
+        "at": "2026-10-30T00:04:50"
+      }
+    },
+    "Target": {
+      "feasible": {
+        "key": "b88d1952a8f2bda6",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:50"
+      }
+    },
+    "Turn": {
+      "feasible": {
+        "key": "dd3cd7b9ba586880",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:50"
+      }
+    }
+  },
+  "relations": []
+}

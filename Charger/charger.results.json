@@ -1,0 +1,81 @@
+{
+  "file": "charger.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Fair": {
+      "feasible": {
+        "key": "e87a69d97343ca69",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.05,
+        "at": "2026-10-29T23:57:24"
+      }
+    },
+    "Greedy": {
+      "feasible": {
+        "key": "3a13fbeb8c95241e",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-29T23:57:24"
+      }
+    },
+    "Polite": {
+      "feasible": {
+        "key": "e94e64aa4d2d486d",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-29T23:57:24"
+      }
+    },
+    "Pushy": {
+      "feasible": {
+        "key": "d9bcb0223cf424ee",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-29T23:57:24"
+      }
+    },
+    "Robot1": {
+      "feasible": {
+        "key": "74b01c57e60dcf8d",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-29T23:57:24"
+      }
+    },
+    "Robot2": {
+      "feasible": {
+        "key": "a5f35a68b3bc78ff",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.01,
+        "at": "2026-10-29T23:57:24"
+      }
+    },
+    "System": {
+      "feasible": {
+        "key": "fa25e6abdbb7fa2a",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-29T23:57:24"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "158945ce29d59ea6",
+      "check": "refines",
+      "refined": "Robot1+Robot2+Greedy",
+      "abstract": "System",
+      "result": "valid",
+      "tool": "",
+      "seconds": 0.0,
+      "at": "2026-10-29T23:57:24"
+    }
+  ]
+}

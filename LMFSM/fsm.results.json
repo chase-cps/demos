@@ -1,0 +1,72 @@
+{
+  "file": "fsm.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Autopilot": {
+      "feasible": {
+        "key": "2606dc57fd687bf8",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    },
+    "AutopilotFirst": {
+      "feasible": {
+        "key": "904986f6f831dd81",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    },
+    "Sensor": {
+      "feasible": {
+        "key": "d0aca857a85cfa6f",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    },
+    "SensorFirst": {
+      "feasible": {
+        "key": "bf96a3c82a66016d",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    },
+    "System": {
+      "feasible": {
+        "key": "c9eddbbb92960c92",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    },
+    "SystemTimed": {
+      "feasible": {
+        "key": "7ec82b1b933ef844",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "90faa925ff18ccf0",
+      "check": "refines",
+      "refined": "Autopilot+Sensor",
+      "abstract": "System",
+      "result": "invalid",
+      "tool": "",
+      "seconds": 0.0,
+      "at": "2026-10-30T00:04:51"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "file": "integrity.sv",
+  "chase": "0.5.0",
+  "contracts": {
+    "integrity": {
+      "feasible": {
+        "key": "f4824c65290e1076",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:51"
+      }
+    }
+  },
+  "relations": []
+}

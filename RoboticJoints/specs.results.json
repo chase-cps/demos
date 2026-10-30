@@ -1,0 +1,54 @@
+{
+  "file": "specs.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Joint1": {
+      "feasible": {
+        "key": "b5f9000c661db20e",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:52"
+      }
+    },
+    "Joint2": {
+      "feasible": {
+        "key": "563fc0bc7a834a41",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T00:04:52"
+      }
+    },
+    "Joint3": {
+      "feasible": {
+        "key": "5d19f2acefc5f160",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.03,
+        "at": "2026-10-30T00:04:52"
+      }
+    },
+    "Joints": {
+      "feasible": {
+        "key": "13d352f2dd859f8d",
+        "result": "sat",
+        "tool": "nuxmv/ic3",
+        "seconds": 0.16,
+        "at": "2026-10-30T00:04:52"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "2197471be27adb6d",
+      "check": "refines",
+      "refined": "Joint1+Joint2+Joint3",
+      "abstract": "Joints",
+      "result": "valid",
+      "tool": "",
+      "seconds": 0.0,
+      "at": "2026-10-30T00:04:56"
+    }
+  ]
+}
