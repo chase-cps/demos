@@ -1,4 +1,4 @@
-## Payment assistant: decomposing a task
+## Payment assistant agent: decomposing a task
 
 A user gives an AI agent a task in natural language, with rules: pay a
 friend back on Venmo the amount in her text messages, with the note

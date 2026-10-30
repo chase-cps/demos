@@ -3,7 +3,9 @@
 This repository contains the demonstrations of [CHASE][WEB]:
 
 - **DATE18**: specification files used to produce the experimental results
-    presented in the DATE 2018 paper.
+    presented in the DATE 2018 paper. `eps.py` checks them with the Python
+    package (`load_dsl`): the requirements as written are unrealizable, with
+    the core, and the relaxed ones are realizable.
 - [**DATE21**][DATE21]: specification files used during the hands-on tutorial
     presented at the DATE 2021 University Booth.
 - **CPSWeek22**: demonstration presented at CPS-IoT Week 2022, about the
