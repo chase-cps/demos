@@ -1,14 +1,14 @@
 {
   "file": "specs.ltl",
-  "chase": "0.6.0",
+  "chase": "0.6.1",
   "contracts": {
     "Joint1": {
       "feasible": {
-        "key": "0c5a2b41943dfda5",
+        "key": "095e3aaab78dec77",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.05,
-        "at": "2026-10-31T14:14:50",
+        "seconds": 0.02,
+        "at": "2026-10-31T16:14:36",
         "trace": {
           "prefix": [],
           "loop": [
@@ -53,11 +53,11 @@
     },
     "Joint2": {
       "feasible": {
-        "key": "bac4282031ce5cef",
+        "key": "985e7fa864bdb6b9",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.05,
-        "at": "2026-10-31T14:14:50",
+        "seconds": 0.02,
+        "at": "2026-10-31T16:14:36",
         "trace": {
           "prefix": [],
           "loop": [
@@ -102,11 +102,11 @@
     },
     "Joint3": {
       "feasible": {
-        "key": "d49bb06346846a2d",
+        "key": "1397bde1c00ee608",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.04,
-        "at": "2026-10-31T14:14:50",
+        "seconds": 0.02,
+        "at": "2026-10-31T16:14:36",
         "trace": {
           "prefix": [],
           "loop": [
@@ -151,11 +151,11 @@
     },
     "Joints": {
       "feasible": {
-        "key": "9ee42274ff34c821",
+        "key": "0411cabd75c0cbf1",
         "result": "sat",
         "tool": "nuxmv/ic3",
-        "seconds": 0.39,
-        "at": "2026-10-31T14:14:50",
+        "seconds": 0.16,
+        "at": "2026-10-31T16:14:36",
         "trace": {
           "prefix": [
             {
@@ -246,6 +246,16 @@
       "tool": "nuxmv/ic3",
       "seconds": 1.73,
       "at": "2026-10-31T14:14:52"
+    },
+    {
+      "key": "a7049fe97e598da6",
+      "check": "refines",
+      "refined": "Joint1+Joint2+Joint3",
+      "abstract": "Joints",
+      "result": "valid",
+      "tool": "nuxmv/ic3",
+      "seconds": 1.01,
+      "at": "2026-10-31T16:14:37"
     }
   ]
 }

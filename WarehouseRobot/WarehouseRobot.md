@@ -44,7 +44,7 @@ assumes: `|w| <= 0.8`.
 <p align="center">
   <img src="images/step1-quotient-q.png" alt="Step 1: the system with perception, localization, and the dashed box Q open">
   <br>
-  <em>Step 1: Q, the place of the controller, between perception and localization.</em>
+  <em>Step 1: Q, the place of the controller, next to perception and localization.</em>
 </p>
 
 **Step 2. The requirements of the mission.** _MissionOnly_, the
