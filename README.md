@@ -6,6 +6,28 @@ website and its README show each step with its diagram.
 
 They are grouped by what they show; the website has the same groups.
 
+### AI agents and code
+
+- [**PaymentAssistant**][PAYMENT] (payment assistant agent): a task in
+    natural language (AppWorld) becomes the contract of an agent over its
+    tool calls, split among sub-agents. The plan does not refine the parent
+    (the counterexample never sends the text); the quotient Q3 says that
+    sub-agent 3 must promise `F text3`, and the repaired sub-agent refines
+    it; an unsat core finds the clause against the request of the user.
+- [**ContractsInC**][CONTRACTSINC] (C): the
+    contract written in the C file (ESBMC, CBMC, or ACSL clauses), next to
+    the code. `chase-cps view
+    FILE.c` draws each function as a component and checks it: a
+    counterexample on the ports and the broken term in red, and a function
+    with no clause checked as code alone (`safe`), with the line of the
+    overflow.
+- [**DroneGrid**][DRONEGRID] (fire-suppression drones, C): the reactions of
+    two drones in C, checked one function at a time. The contracts (z3)
+    find that the coordinator lets a drone move into the cell of the other;
+    the quotient tells the fixed coordinator from the old one; ESBMC checks
+    each function against its contract, and no check runs on the whole
+    program.
+
 ### Repair and signals
 
 - [**Heater**][HEATER] (thermostat): a thermostat in signal temporal logic
@@ -32,28 +54,6 @@ They are grouped by what they show; the website has the same groups.
 - [**Deadline**][DEADLINE] (arbiter): the least bound on the waiting time
     of a request (2), repaired from counterexamples of nuXmv in two rounds
     and checked against every value.
-
-### Code and agents
-
-- [**ContractsInC**][CONTRACTSINC] (C): the
-    contract written in the C file (ESBMC, CBMC, or ACSL clauses), next to
-    the code. `chase-cps view
-    FILE.c` draws each function as a component and checks it: a
-    counterexample on the ports and the broken term in red, and a function
-    with no clause checked as code alone (`safe`), with the line of the
-    overflow.
-- [**DroneGrid**][DRONEGRID] (fire-suppression drones, C): the reactions of
-    two drones in C, checked one function at a time. The contracts (z3)
-    find that the coordinator lets a drone move into the cell of the other;
-    the quotient tells the fixed coordinator from the old one; ESBMC checks
-    each function against its contract, and no check runs on the whole
-    program.
-- [**PaymentAssistant**][PAYMENT] (payment assistant agent): a task in
-    natural language (AppWorld) becomes the contract of an agent over its
-    tool calls, split among sub-agents. The plan does not refine the parent
-    (the counterexample never sends the text); the quotient Q3 says that
-    sub-agent 3 must promise `F text3`, and the repaired sub-agent refines
-    it; an unsat core finds the clause against the request of the user.
 
 ### Hardware
 
