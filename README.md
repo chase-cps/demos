@@ -4,77 +4,119 @@ This repository contains the demonstrations of [CHASE][WEB]. Each one
 follows a design problem from its requirements to a result; its page on the
 website and its README show each step with its diagram.
 
+They are grouped by what they show; the website has the same groups.
+
+### Repair and signals
+
+- [**Heater**][HEATER] (thermostat): a thermostat in signal temporal logic
+    overshoots its requirement (77 for at most 75, robustness -2). Repair
+    finds the threshold (74, or 77 for the requirement), and ESBMC checks
+    that the C code of the thermostat, called once per step, implements the
+    repaired step.
+- [**Braking**][BRAKING] (emergency braking): the braking system of
+    ContrACT (MEMOCODE 2026). Brake 1 misses its bound by 0.05 ms
+    (counterexample from z3). Repair finds the least change of the bound
+    (4.05), or of the inconsistency of the network link: 11 when Brake 1
+    takes no delay, as in the paper, or 10.05 when it absorbs the 0.95 it
+    can.
+- [**DroneAltitude**][DRONEALTITUDE] (fire-suppression drones, signal
+    temporal logic): a drone climbs to its drop altitude in the wind. The
+    robustness says by how much it misses (2.5 m below in a wind of 1).
+    Repair shows that no climb rate can fix it and gives what the
+    requirement can ask: a tolerance of 2.5, or a wind of at most 17/21.
+- [**DroneTiming**][DRONETIMING] (fire-suppression drones, linear
+    constraints): the timing of the drones of ContrACT (MDFS) as a linear
+    program over the reals. The worst case is 280 ms, as in the paper, and
+    repair gives the margins: the least bound (280), the slowest planner
+    (192 ms), and the largest delay of the mission (179 ms).
+- [**Deadline**][DEADLINE] (arbiter): the least bound on the waiting time
+    of a request (2), repaired from counterexamples of nuXmv in two rounds
+    and checked against every value.
+
+### Code and agents
+
+- [**ContractsInC**][CONTRACTSINC] (C, ESBMC and CBMC clauses): the
+    contract written in the C file, next to the code. `chase-cps view
+    FILE.c` draws each function as a component and checks it: a
+    counterexample on the ports and the broken term in red, and a function
+    with no clause checked as code alone (`safe`), with the line of the
+    overflow.
+- [**DroneGrid**][DRONEGRID] (fire-suppression drones, C): the reactions of
+    two drones in C, checked one function at a time. The contracts (z3)
+    find that the coordinator lets a drone move into the cell of the other;
+    the quotient tells the fixed coordinator from the old one; ESBMC checks
+    each function against its contract, and no check runs on the whole
+    program.
 - [**PaymentAssistant**][PAYMENT] (payment assistant agent): a task in
     natural language (AppWorld) becomes the contract of an agent over its
-    tool calls, split among sub-agents. The plan misses a deliverable, the
-    quotient says what sub-agent 3 must do, and an unsat core finds a clause
-    against the request of the user.
+    tool calls, split among sub-agents. The plan does not refine the parent
+    (the counterexample never sends the text); the quotient Q3 says that
+    sub-agent 3 must promise `F text3`, and the repaired sub-agent refines
+    it; an unsat core finds the clause against the request of the user.
+
+### Hardware
+
 - [**Escalation**][ESCALATION] (security chip): the escalation link of a
     toy OpenTitan, checked module by module: the RTL of each module
     implements its contract, and the contracts together refine the
-    requirements, with no check on the whole design.
-- [**LiftPlusCruise**][LPC] (aircraft): the requirements of the
-    Lift-Plus-Cruise case study of [FRET][FRET], with real variables. They
-    are consistent with a hover within 12 steps, not within 6, and the
-    quotient by the mode logic says what the pilot must do.
+    requirements, with no check on the whole design. A faster sender breaks
+    its contract, with the counterexample on the RTL.
 - [**AHB**][AHB] (bus arbiter): the arbiter of the AMBA AHB bus as two
-    viewpoints in SystemVerilog Assertions. Their merge is unrealizable
-    until the masters release a locked bus, and is then synthesized.
+    viewpoints in SystemVerilog Assertions, merged. Without the assumption
+    that a master releases a locked bus, the merge is unrealizable, and its
+    core points to that assumption; with it, slugs synthesizes a controller
+    of 81 states, which implements the merge.
 - [**BufferSwap**][BUFFERSWAP] (circuit buffer swap): a buffer of BaseJump
     STL is replaced by a smaller one. The new buffer does not refine the old
-    one, but it refines the quotient, the contract of its place; the RTL is
-    checked with Yosys and nuXmv, and with Jasper.
+    one (a counterexample of 4 steps), but it refines the quotient, the
+    contract of its place; the RTL is checked with Yosys and nuXmv, and the
+    quotient is written as SVA for Jasper.
+
+### Aircraft and robots
+
+- [**LiftPlusCruise**][LPC] (aircraft): the requirements of the
+    Lift-Plus-Cruise case study of [FRET][FRET], with real variables. They
+    are consistent with a hover within 12 steps, not within 6 (an unsat
+    core of 8 requirements); the quotient by the mode logic says what the
+    pilot must do, two pilots fail it, and the one that slows down and turns
+    on the hover control refines it.
 - [**WarehouseRobot**][WAREHOUSE] (warehouse robot): the controller of a
-    robot is delegated; the quotient by perception and localization is its
-    contract, and requirements written for the mission alone fail it.
-- [**Charger**][CHARGER] (charging station): one design iteration of an
-    arbiter for two robots: an unrealizable arbiter, a realizable one, one
-    that is not well separated, one that is vacuous, and the composition
-    with the robots.
+    robot is delegated. The quotient by perception and localization, on
+    real variables, is its contract and asks for `|w| <= 0.8`; the
+    requirements written for the mission alone, and with margins, fail it
+    with counterexamples; the contract with the yaw rate refines it.
 - [**LMFSM**][LMFSM] (autopilot): the state machine of the Lockheed Martin
-    challenge; the unrealizable cores find the requirements in conflict, and
-    the corrected autopilot and sensor refine the timed requirement.
-- **RoboticJoints** and **CPSWeek22** (robotic joints): three joints
-    refine the contract of a robotic arm and are synthesized; `scaling.py`
-    measures the refinement for N joints. CPSWeek22 is the version shown at
-    CPS-IoT Week 2022.
-- **DATE18** (power system): requirements written in the domain-specific
-    language of CHASE. `DATE18/eps.py` checks the power system of the DATE
-    2018 paper with the Python package: the requirements as written are
-    unrealizable, with the core, and the relaxed ones are realizable.
-- [**FDL2024**][FDL2024] (factory): a small factory of the FDL 2024 paper,
-    in the same language; `FDL2024/factory.py` checks that the controller of
-    its gates is realizable.
-- [**DATE21**][DATE21]: the hands-on tutorial of the DATE 2021 University
-    Booth, with the console tools of CHASE.
-- [**Braking**][BRAKING] (emergency braking): the braking system of
-    ContrACT (MEMOCODE 2026). Brake 1 misses its bound by 0.05 ms; repair
-    finds the least change of the bound (4.05) or of the inconsistency of
-    the network link (11, or 10.05 when Brake 1 absorbs part of the delay).
-- [**Heater**][HEATER] (thermostat): a thermostat in signal temporal logic
-    overshoots its requirement; repair finds the threshold (74), the worst
-    case is given by the robustness, and ESBMC checks that the C code of
-    the thermostat implements the repaired step.
-- [**Deadline**][DEADLINE] (arbiter): the least bound on the waiting time of
-    a request (2), repaired by counterexamples from nuXmv and checked
-    against every value.
-- [**DroneTiming**][DRONETIMING] (fire-suppression drones, linear
-    constraints): the timing of the drones of ContrACT (MDFS) as a linear
-    program over the reals: the worst case of 280 ms of the paper, and the
-    margins (the least bound, the slowest planner, the largest delay of the
-    mission) by repair.
-- [**DroneGrid**][DRONEGRID] (fire-suppression drones, C): the reactions of
-    two drones in C, checked one function at a time: the contracts find
-    that the coordinator lets a drone move into the cell of the other, and
-    ESBMC checks each function against its contract.
-- [**DroneAltitude**][DRONEALTITUDE] (fire-suppression drones, signal
-    temporal logic): a drone climbs to its drop altitude in the wind; the
-    controller cannot meet the tolerance (impossible), and repair says what
-    the requirement can ask.
-- [**ContractsInC**][CONTRACTSINC] (C, ESBMC and CBMC clauses): the
-    contract written in the C file, next to the code; `chase-cps view
-    FILE.c` draws each function as a component and checks it, and a
-    function with no clause is checked as code alone (`safe`).
+    challenge. The unrealizable cores find four conflicts in the autopilot
+    and one in the sensor; the corrected parts do not refine FSM-001 (a
+    counterexample of 3 steps) but refine its timed version.
+
+### Controller synthesis
+
+- [**Charger**][CHARGER] (charging station): four candidate arbiters for
+    two robots, each problem caught by another check: Greedy is
+    unrealizable, Fair is realizable (a controller of 18 states), Pushy is
+    not well separated, Trusting is vacuous; Fair with the robots refines
+    the system.
+- [**RoboticJoints**][ROBOTICJOINTS] (robotic arm): three joint contracts
+    refine the contract of the arm, and each joint has a controller of 72
+    states (the whole arm has at least 375,000). `scaling.py` proves the
+    refinement for up to 8 joints in 4.8 s, and finds the counterexample of
+    a broken joint. [**CPSWeek22**][CPSWEEK22] is the same demo as shown at
+    CPS-IoT Week 2022, with its original scripts.
+
+### Domain-specific language
+
+- [**DATE18**][DATE18] (power system): the aircraft power system of the
+    DATE 2018 paper. As written, the requirements are unrealizable; the core
+    is the never-connect pattern and the 15 ms bound of a DC bus. Relaxed,
+    they are realizable, with a controller of 97 states.
+- [**FDL2024**][FDL2024] (factory): a small factory of the FDL 2024 paper.
+    The controller of its gates is realizable in 0.1 s, with slugs and with
+    gr1c.
+- [**DATE21**][DATE21] (tutorial): the hands-on tutorial of the DATE 2021
+    University Booth: the domain-specific language on the power system, and
+    the console on a robotic arm (refinement both ways, composition, and
+    synthesis of the coordinator).
 
 The Python scripts use the CHASE Python package, version 0.5.0 or later
 (`pip install chase-cps`; BufferSwap and Escalation with
@@ -108,3 +150,6 @@ all of them but nuXmv, whose license does not allow redistribution:
 [DRONEGRID]: DroneGrid/DroneGrid.md
 [DRONEALTITUDE]: DroneAltitude/DroneAltitude.md
 [CONTRACTSINC]: ContractsInC/ContractsInC.md
+[ROBOTICJOINTS]: RoboticJoints/RoboticJoints.md
+[CPSWEEK22]: CPSWeek22/CPSWeek22.md
+[DATE18]: DATE18/DATE18.md
