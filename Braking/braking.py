@@ -1,12 +1,13 @@
 """Braking: repairing the timing of an emergency braking system.
 
 The braking system of ContrACT (Xiao, Lutz, Castillo-Effen, Nuzzo, MEMOCODE
-2026): the pedal path p -> a -> b and the camera path c -> d -> e -> f,
-where e is a network link with the inconsistency kappa (10). braking.json
-has the timing contracts that ContrACT builds for each node (t: timestamp,
-d: start, T: completion), and two system contracts:
+2026): the pedal path BrakePedal -> PedalProcessing -> Brake1 and the
+camera path Camera -> Detection -> Link -> Brake2, where Link is a network
+link with the inconsistency kappa (10). braking.ltl has the timing
+contracts that ContrACT builds for each node (t: timestamp, d: start, T:
+completion), and two system contracts:
 
-- SysB: Brake 1 (b) starts at most lam_b (4) after its timestamp, given
+- SysB: Brake 1 starts at most lam_b (4) after its timestamp, given
   the delay of 1 that the camera path can cause it (the offset of
   ContrACT);
 - DelayF: the camera path delays Brake 1 by at most y_f (0.95, what Brake 1
@@ -28,21 +29,19 @@ uses the CHASE Python package (pip install chase-cps[z3]):
     python braking.py --expect     # exit code 1 when a result is not the expected one
 """
 
-import json
 import os
 import sys
 from fractions import Fraction
 
-from chase_cps import Contract, refines, repair
+from chase_cps import load_spec, refines, repair
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def main(expect: bool) -> int:
-    with open(os.path.join(HERE, "braking.json")) as f:
-        c = {d["name"]: Contract.from_dict(d) for d in json.load(f)["contracts"]}
-    pedal = c["p"].compose(c["a"]).compose(c["b"])
-    camera = c["c"].compose(c["d"]).compose(c["e"]).compose(c["f"])
+    c = load_spec(os.path.join(HERE, "braking.ltl"))
+    pedal = c["BrakePedal"].compose(c["PedalProcessing"]).compose(c["Brake1"])
+    camera = c["Camera"].compose(c["Detection"]).compose(c["Link"]).compose(c["Brake2"])
     results = []
 
     def show(step, text, got, want):

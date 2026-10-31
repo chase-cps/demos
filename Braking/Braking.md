@@ -6,38 +6,55 @@ the inconsistency of the network link grow, for the requirement to hold?
 
 This is the braking system of ContrACT (Xiao, Lutz, Castillo-Effen, Nuzzo,
 *Contract-Based Consistency and Availability Analysis for Distributed
-Cyber-Physical Systems*, MEMOCODE 2026). The pedal `p` is processed by `a`,
-which triggers Brake 1 (`b`); the camera `c` triggers the detection `d`,
-whose result crosses the network link `e` to Brake 2 (`f`). `b` and `f` run
-on the same controller, and the camera path can delay `b`.
+Cyber-Physical Systems*, MEMOCODE 2026). `BrakePedal` is processed by
+`PedalProcessing`, which triggers `Brake1`; the `Camera` triggers the
+obstacle `Detection`, whose result crosses the network `Link` to `Brake2`.
+`Brake1` and `Brake2` are two reactions of the same Braking reactor, which
+handles its events in the order of their timestamps: while `Brake2` waits
+for late camera data, a pedal event that comes after it waits too. This is
+how the camera path delays Brake 1 (the offset of the paper).
 
-`braking.json` has the timing contracts that ContrACT builds for each node,
-over the timestamp `t`, the start `d`, and the completion `T` of each event,
-and two system contracts:
+`braking.ltl` has the timing contracts that ContrACT builds for each node
+(Section III-C of the paper), over the timestamp `t`, the start `d`, and
+the completion `T` of each event:
 
-- `SysB`: Brake 1 starts at most `lam_b` (4) after its timestamp, given the
-  delay of 1 that the camera path can cause it (the offset of ContrACT).
-- `DelayF`: the camera path delays Brake 1 by at most `y_f` (0.95, what
-  Brake 1 can absorb: 4 - 3.05 from its own path).
+- a source (`BrakePedal`, `Camera`) starts at its timestamp or later and
+  runs at most its worst-case latency;
+- a processor (`PedalProcessing`, `Detection`, `Brake1`) takes the
+  timestamp of its trigger and starts when the trigger completes;
+- the `Link` schedules the receiver `kappa` (10) after the sender (the
+  inconsistency) and delivers the data at most 9 after;
+- `Brake2` starts at the later of the release of its event and the arrival
+  of the data.
 
-The link `e` schedules `f` `kappa` (10) after `d`. The contracts compare
-reals with no temporal operator, so z3 checks them, and `repair` computes
-at once the values for which the check fails (quantifier elimination), then
-the least change.
+Two system contracts state the requirements:
+
+- `SysB` (equation (8)): given that the pedal event is released at most
+  `offset` (1) after its timestamp, Brake 1 starts at most `lam_b` (4)
+  after its own.
+- `DelayF`: Brake 2 starts at most `y_f` after its timestamp, the delay it
+  passes on to Brake 1. Brake 1 can absorb `y_f = 0.95` (4 - 3.05 from its
+  own path).
+
+`offset`, `lam_b`, `kappa`, and `y_f` are named constants (`real constant`).
+The contracts compare reals with no temporal operator, so z3 checks them,
+and `repair` computes at once the values for which the check fails
+(quantifier elimination), then the least change.
 
 ### The steps
 
-**Step 1. The bound is violated.** The pedal path does not refine `SysB`:
-Brake 1 can start 3.05 late on its own path, plus 1 from the camera path:
-4.05.
+**Step 1. The bound is violated.** The pedal path (`BrakePedal`,
+`PedalProcessing`, `Brake1` composed) does not refine `SysB`: Brake 1 can
+start 3.05 late on its own path, plus 1 from the camera path: 4.05.
 
 **Step 2. Repair the bound.** `repair` gives `lam_b = 4.05`, optimal: the
 paper's option A.
 
-**Step 3. Repair the link, no delay.** With `y_f = 0` (the camera path never
-delays Brake 1), `repair` gives `kappa = 11`: the paper's option B. The
-detection takes up to 2 + 9 = 11 ms to reach `f`, so with `kappa = 11` it
-never waits.
+**Step 3. Repair the link, no delay.** The camera path (`Camera`,
+`Detection`, `Link`, `Brake2` composed) must refine `DelayF`. With `y_f = 0`
+(the camera path never delays Brake 1), `repair` gives `kappa = 11`: the
+paper's option B (Table II). The detection takes up to 2 + 9 = 11 ms to
+reach `Brake2`, so with `kappa = 11` it never waits.
 
 **Step 4. Repair the link, the delay that Brake 1 absorbs.** Brake 1 can
 take a delay of 0.95 and still start within 4 (3.05 + 0.95). With
@@ -51,4 +68,5 @@ exactly 4.0, which passes; 10.04 gives 4.01, which fails.
 ```
 pip install "chase-cps[z3]"
 python braking.py --expect
+chase-cps repair braking.ltl --refines BrakePedal+PedalProcessing+Brake1 SysB --param lam_b=0..10
 ```
