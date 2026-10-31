@@ -12,10 +12,11 @@ controller of the gates. This script checks it with the CHASE Python package
      fail.
   2. Without the secondary conveyors (the lines of gates 3, 4, 7, and 8
      left out), they are unrealizable: the core is the 3 terms of the
-     counter of bay 2. The core takes about 4 minutes.
+     counter of bay 2. slugs takes about 4 minutes: only with --all.
 
     python factory.py
     python factory.py --expect     # exit code 1 when a result is not the expected one
+    python factory.py --all        # step 2 too
 
 The check needs slugs.
 """
@@ -37,8 +38,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--expect", action="store_true",
                         help="exit with code 1 when a result is not the expected one")
-    parser.add_argument("--timeout", type=float, default=300.0,
-                        help="time limit of the check, in seconds")
+    parser.add_argument("--timeout", type=float, default=900.0,
+                        help="time limit of each check, in seconds")
+    parser.add_argument("--all", action="store_true",
+                        help="step 2 too: the factory without its secondary conveyors (about 4 minutes)")
     args = parser.parse_args()
 
     factory = load_dsl(os.path.join(HERE, "dsl_factory_realizable.txt"), name="Factory")
@@ -52,23 +55,24 @@ def main() -> int:
           + ("   (expected realizable)" if wrong else ""))
 
     # 2. the same factory without the secondary conveyors: nothing feeds a machine
-    # whose main conveyor fails
-    with open(os.path.join(HERE, "dsl_factory_realizable.txt")) as f:
-        text = "".join(l for l in f if not any(f"(gate {g})" in l for g in (3, 4, 7, 8)))
-    with tempfile.TemporaryDirectory() as tmp:
-        path = os.path.join(tmp, "dsl_factory_no_secondary.txt")
-        with open(path, "w") as f:
-            f.write(text)
-        reduced = load_dsl(path, name="FactoryNoSecondary")
-    start = time.time()
-    r2 = is_realizable(reduced, core=True, timeout=args.timeout)
-    kept = r2.core.core.guarantees if r2.core is not None else []
-    bad = r2.status != "unrealizable" or len(kept) != 3
-    print(f"\n2. Without the secondary conveyors: {r2.status} [{time.time() - start:.1f} s]"
-          + ("   (expected unrealizable, a core of 3 terms)" if bad else ""))
-    for g in kept:
-        print("   ", g if isinstance(g, str) else ltl.to_str(g))
-    wrong = wrong or bad
+    # whose main conveyor fails (slugs takes about 4 minutes: only with --all)
+    if args.all:
+        with open(os.path.join(HERE, "dsl_factory_realizable.txt")) as f:
+            text = "".join(l for l in f if not any(f"(gate {g})" in l for g in (3, 4, 7, 8)))
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "dsl_factory_no_secondary.txt")
+            with open(path, "w") as f:
+                f.write(text)
+            reduced = load_dsl(path, name="FactoryNoSecondary")
+        start = time.time()
+        r2 = is_realizable(reduced, core=True, timeout=args.timeout)
+        kept = r2.core.core.guarantees if r2.core is not None else []
+        bad = r2.status != "unrealizable" or len(kept) != 3
+        print(f"\n2. Without the secondary conveyors: {r2.status} [{time.time() - start:.1f} s]"
+              + ("   (expected unrealizable, a core of 3 terms)" if bad else ""))
+        for g in kept:
+            print("   ", g if isinstance(g, str) else ltl.to_str(g))
+        wrong = wrong or bad
 
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(factory, checks=[(factory, r)], open=[factory],
