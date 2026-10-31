@@ -1,5 +1,5 @@
-# view: --refines Room+Thermostat Comfort --implementation heater.c:thermostat ThermostatStep
-# view: --open Comfort ThermostatStep
+# view: --refines Room+Thermostat Comfort --implementation heater.c:thermostat Thermostat
+# view: --open Comfort
 NAME: heater;
 
 # A room heated by a thermostat, over 10 steps. The heater adds u units
@@ -16,6 +16,8 @@ CONTRACT Room:
         T = 60;
         G[0,9] (T' = T + u - 1);
 
+# heater.c implements it: the function is called once per step (each step,
+# u is thermostat(T)).
 CONTRACT Thermostat:
     input integer (0:200) variable T;
     output integer (0:3) variable u;
@@ -24,16 +26,6 @@ CONTRACT Thermostat:
         true;
     Guarantees:
         G[0,9] ((T < theta -> u = 3) & (T >= theta -> u = 0));
-
-# One step of the thermostat: the contract of the C function heater.c.
-CONTRACT ThermostatStep:
-    input integer (0:200) variable T;
-    output integer (0:3) variable u;
-    integer constant theta 76;
-    Assumptions:
-        true;
-    Guarantees:
-        (T < theta -> u = 3) & (T >= theta -> u = 0);
 
 CONTRACT Comfort:
     output integer (0:200) variable T;

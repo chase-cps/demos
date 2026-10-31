@@ -8,7 +8,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T23:07:53"
+        "at": "2026-10-31T00:21:13"
       }
     },
     "Room": {
@@ -17,7 +17,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T23:07:53"
+        "at": "2026-10-31T00:21:13"
       }
     },
     "Thermostat": {
@@ -26,29 +26,20 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T23:07:53"
-      }
-    },
-    "ThermostatStep": {
-      "feasible": {
-        "key": "04012e7ed001b213",
-        "result": "sat",
-        "tool": "z3",
-        "seconds": 0.0,
-        "at": "2026-10-30T23:07:53"
+        "at": "2026-10-31T00:21:13"
       }
     }
   },
   "relations": [
     {
-      "key": "d2587a132c2b28c1",
+      "key": "91c3e3149f56973a",
       "check": "implementation",
       "model": "/Users/yifengxiao/Documents/dependencies/demos/Heater/heater.c:thermostat",
-      "contract": "ThermostatStep",
+      "contract": "Thermostat",
       "result": "invalid",
       "tool": "esbmc",
-      "seconds": 0.27,
-      "at": "2026-10-30T23:07:53"
+      "seconds": 0.11,
+      "at": "2026-10-31T00:21:13"
     },
     {
       "key": "8b82bc5e177708c1",
@@ -58,7 +49,7 @@
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.01,
-      "at": "2026-10-30T23:07:53",
+      "at": "2026-10-31T00:21:13",
       "failed": "guarantees"
     }
   ]

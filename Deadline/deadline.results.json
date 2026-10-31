@@ -8,16 +8,16 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T23:07:54"
+        "at": "2026-10-31T00:21:14"
       }
     },
     "Bound": {
       "feasible": {
         "key": "1626558f3196023c",
         "result": "sat",
-        "tool": "nuxmv/ic3",
-        "seconds": 0.04,
-        "at": "2026-10-30T23:07:54"
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-31T00:21:14"
       }
     },
     "Client": {
@@ -26,7 +26,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T23:07:54"
+        "at": "2026-10-31T00:21:14"
       }
     },
     "Wait": {
@@ -35,7 +35,7 @@
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T23:07:54"
+        "at": "2026-10-31T00:21:14"
       }
     }
   },
@@ -48,7 +48,7 @@
       "result": "invalid",
       "tool": "nuxmv/ic3",
       "seconds": 0.03,
-      "at": "2026-10-30T23:07:54",
+      "at": "2026-10-31T00:21:14",
       "failed": "guarantees"
     }
   ]

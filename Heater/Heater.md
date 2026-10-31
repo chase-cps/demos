@@ -9,11 +9,10 @@ The contracts are in `heater.ltl`, over 10 steps:
 - `Room`: the temperature `T` starts at 60; at each step it rises by the
   heat `u` and falls by 1 (`G[0,9] (T' = T + u - 1)`).
 - `Thermostat`: it heats (`u = 3`) while `T < theta`, and stops at or
-  above it. `theta` is a constant, 76.
+  above it. `theta` is a constant, 76. Its code is the C function
+  `thermostat` in `heater.c`, called once per step.
 - `Comfort`: the requirement, `G[0,10] (T <= tmax)`, with the constant
   `tmax` at 75.
-- `ThermostatStep`: one step of the thermostat, the contract of the C
-  function `thermostat` in `heater.c`.
 
 The formulas read a bounded number of steps (signal temporal logic in
 discrete time), so z3 checks them.
@@ -34,26 +33,27 @@ the room reaches 75 and no more.
 the requirement accepts the overshoot. Which one to change is the
 designer's choice; `repair` changes only the constants it is given.
 
-**Step 4. The code.** `heater.c` heats while `T < 74`. ESBMC checks that it
-implements `ThermostatStep` with `theta = 74`, and that it does not with
-`theta = 76`. Asked the other way, `repair` finds the threshold that the
-code implements: 74. Each round runs ESBMC and turns its counterexample (a
-temperature where the code and the contract disagree) into a condition on
-`theta`.
+**Step 4. The code.** `heater.c` heats while `T < 74`, and is called once
+per step: each step of the thermostat is one call. So ESBMC checks one
+call against the formula of one step of `Thermostat`
+(`(T < theta -> u = 3) & (T >= theta -> u = 0)`): the code implements
+`Thermostat` with `theta = 74`, and not with `theta = 76` (with `T = 75`
+it returns 0). Asked the other way, `repair` finds the threshold that the
+code implements: 74.
 
 <p align="center">
-  <img src="images/before-and-after-repair.png" alt="Before the repair (theta = 76, red) and after it (theta = 74, green): the refinement of Comfort, and heater.c against one step of the thermostat">
+  <img src="images/before-and-after-repair.png" alt="Before the repair (theta = 76, red) and after it (theta = 74, green): the room and the thermostat inside Comfort, the thermostat with its C code">
   <br>
-  <em>Before the repair (theta = 76, red) and after it (theta = 74, green): the refinement of Comfort, and heater.c against one step of the thermostat.</em>
+  <em>Before the repair (theta = 76, red) and after it (theta = 74, green): the room and the thermostat inside Comfort, the thermostat with its C code.</em>
 </p>
 
 ### Content of the directory
 The directory of the demo contains:
-- `heater.ltl`: the contracts of the room, the thermostat, one step of the
-  thermostat, and the requirement, in signal temporal logic in discrete
-  time. The lines `# view:` at the top give the refinement and the C
-  implementation that `chase-cps view` draws;
-- `heater.c`: one step of the thermostat in C;
+- `heater.ltl`: the contracts of the room, the thermostat, and the
+  requirement, in signal temporal logic in discrete time. The lines
+  `# view:` at the top draw the room and the thermostat inside the
+  requirement, the thermostat with its C code;
+- `heater.c`: the thermostat in C, called once per step;
 - `heater.py`: the steps with the CHASE Python package;
 - `heater.results.json`: the results of `chase-cps view heater.ltl --check`;
 - `out/heater.html`: the diagram above, written by `heater.py`.
