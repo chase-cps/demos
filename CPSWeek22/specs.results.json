@@ -1,41 +1,218 @@
 {
   "file": "specs.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.0",
   "contracts": {
     "Joint1": {
       "feasible": {
-        "key": "615d1d692751514b",
+        "key": "0c5a2b41943dfda5",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-31T02:08:27"
+        "seconds": 0.04,
+        "at": "2026-10-31T14:14:53",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "j1_dangle": 3,
+              "j1_angle": 3,
+              "req_j1": false,
+              "j1_done": true,
+              "j1_cmd": 0
+            },
+            {
+              "j1_dangle": 1,
+              "j1_angle": 0,
+              "req_j1": true,
+              "j1_done": false,
+              "j1_cmd": 0
+            },
+            {
+              "j1_dangle": 1,
+              "j1_angle": 0,
+              "req_j1": true,
+              "j1_done": false,
+              "j1_cmd": 1
+            },
+            {
+              "j1_dangle": 1,
+              "j1_angle": 1,
+              "req_j1": true,
+              "j1_done": true,
+              "j1_cmd": 0
+            },
+            {
+              "j1_dangle": 1,
+              "j1_angle": 1,
+              "req_j1": false,
+              "j1_done": true,
+              "j1_cmd": 0
+            }
+          ]
+        }
       }
     },
     "Joint2": {
       "feasible": {
-        "key": "543bfd065feea926",
+        "key": "bac4282031ce5cef",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.03,
-        "at": "2026-10-31T02:08:27"
+        "at": "2026-10-31T14:14:53",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "j2_dangle": 3,
+              "j2_angle": 3,
+              "req_j2": false,
+              "j2_done": true,
+              "j2_cmd": 0
+            },
+            {
+              "j2_dangle": 1,
+              "j2_angle": 0,
+              "req_j2": true,
+              "j2_done": false,
+              "j2_cmd": 0
+            },
+            {
+              "j2_dangle": 1,
+              "j2_angle": 0,
+              "req_j2": true,
+              "j2_done": false,
+              "j2_cmd": 1
+            },
+            {
+              "j2_dangle": 1,
+              "j2_angle": 1,
+              "req_j2": true,
+              "j2_done": true,
+              "j2_cmd": 0
+            },
+            {
+              "j2_dangle": 1,
+              "j2_angle": 1,
+              "req_j2": false,
+              "j2_done": true,
+              "j2_cmd": 0
+            }
+          ]
+        }
       }
     },
     "Joint3": {
       "feasible": {
-        "key": "4d9dd391357cf501",
+        "key": "d49bb06346846a2d",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.03,
-        "at": "2026-10-31T02:08:27"
+        "seconds": 0.04,
+        "at": "2026-10-31T14:14:54",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "j3_dangle": 3,
+              "j3_angle": 3,
+              "req_j3": false,
+              "j3_done": true,
+              "j3_cmd": 0
+            },
+            {
+              "j3_dangle": 1,
+              "j3_angle": 0,
+              "req_j3": true,
+              "j3_done": false,
+              "j3_cmd": 0
+            },
+            {
+              "j3_dangle": 1,
+              "j3_angle": 0,
+              "req_j3": true,
+              "j3_done": false,
+              "j3_cmd": 1
+            },
+            {
+              "j3_dangle": 1,
+              "j3_angle": 1,
+              "req_j3": true,
+              "j3_done": true,
+              "j3_cmd": 0
+            },
+            {
+              "j3_dangle": 1,
+              "j3_angle": 1,
+              "req_j3": false,
+              "j3_done": true,
+              "j3_cmd": 0
+            }
+          ]
+        }
       }
     },
     "Joints": {
       "feasible": {
-        "key": "496f5d14cb20581d",
+        "key": "9ee42274ff34c821",
         "result": "sat",
         "tool": "nuxmv/ic3",
-        "seconds": 0.2,
-        "at": "2026-10-31T02:08:27"
+        "seconds": 0.26,
+        "at": "2026-10-31T14:14:53",
+        "trace": {
+          "prefix": [
+            {
+              "j1_dangle": 4,
+              "j1_angle": 4,
+              "j2_dangle": 4,
+              "j2_angle": 0,
+              "j3_dangle": 4,
+              "j3_angle": 3,
+              "j1_cmd": 0,
+              "j2_cmd": 0,
+              "j3_cmd": 0,
+              "req_j1": false,
+              "req_j2": false,
+              "req_j3": false,
+              "j1_done": true,
+              "j2_done": false,
+              "j3_done": false
+            }
+          ],
+          "loop": [
+            {
+              "j1_dangle": 1,
+              "j1_angle": 1,
+              "j2_dangle": 1,
+              "j2_angle": 1,
+              "j3_dangle": 3,
+              "j3_angle": 3,
+              "j1_cmd": 0,
+              "j2_cmd": 0,
+              "j3_cmd": 0,
+              "req_j1": false,
+              "req_j2": false,
+              "req_j3": true,
+              "j1_done": true,
+              "j2_done": true,
+              "j3_done": true
+            },
+            {
+              "j1_dangle": 1,
+              "j1_angle": 1,
+              "j2_dangle": 1,
+              "j2_angle": 1,
+              "j3_dangle": 3,
+              "j3_angle": 3,
+              "j1_cmd": 0,
+              "j2_cmd": 0,
+              "j3_cmd": 0,
+              "req_j1": true,
+              "req_j2": true,
+              "req_j3": false,
+              "j1_done": true,
+              "j2_done": true,
+              "j3_done": true
+            }
+          ]
+        }
       }
     }
   },
@@ -59,6 +236,16 @@
       "tool": "nuxmv/ic3",
       "seconds": 1.26,
       "at": "2026-10-31T02:08:28"
+    },
+    {
+      "key": "b11b8e78fd240b71",
+      "check": "refines",
+      "refined": "Joint1+Joint2+Joint3",
+      "abstract": "Joints",
+      "result": "valid",
+      "tool": "nuxmv/ic3",
+      "seconds": 1.53,
+      "at": "2026-10-31T14:14:55"
     }
   ]
 }
