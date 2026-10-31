@@ -14,6 +14,9 @@ uses the CHASE Python package (pip install chase-cps):
   3. Every k from 0 to 9, checked one by one, gives the same answer: 2 is
      the least that passes.
 
+The page out/deadline.html draws the system inside Bound with k = 1 (red)
+and k = 2 (green).
+
     python deadline.py
     python deadline.py --expect     # exit code 1 when a result is not the expected one
 
@@ -23,7 +26,7 @@ The checks need nuXmv (or NuSMV) and z3.
 import os
 import sys
 
-from chase_cps import load_spec, refines, repair
+from chase_cps import load_spec, refines, repair, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -53,6 +56,17 @@ def main(expect: bool) -> int:
     passing = [k for k in range(10)
                if refines(system, bound.instantiate({"k": k})).status == "valid"]
     show(3, "the least k that passes, checking every k", passing[0] if passing else None, 2)
+    # the page: before and after the repair
+    pairs = []
+    for k in (1, 2):
+        both = c["Client"].compose(c["Arbiter"]).compose(c["Wait"])
+        b = bound.instantiate({"k": k}, name="Bound" if k == 1 else "Bound_repaired")
+        pairs.append((both, b, refines(both, b)))
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(refines=pairs, open=[b for _, b, _ in pairs],
+                                title="Deadline: before and after the repair"),
+                    os.path.join(HERE, "out", "deadline.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 0 if all(results) or not expect else 1
 
 

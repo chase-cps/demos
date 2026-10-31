@@ -1,3 +1,5 @@
+# view: --refines BrakePedal+PedalProcessing+Brake1 SysB
+# view: --refines Camera+Detection+Link+Brake2 DelayF --open SysB DelayF Link
 NAME: braking;
 
 # The automatic emergency braking system of ContrACT (Xiao, Lutz,

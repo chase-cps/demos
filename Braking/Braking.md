@@ -52,21 +52,39 @@ paper's option A.
 
 **Step 3. Repair the link, no delay.** The camera path (`Camera`,
 `Detection`, `Link`, `Brake2` composed) must refine `DelayF`. With `y_f = 0`
-(the camera path never delays Brake 1), `repair` gives `kappa = 11`: the
+the camera path never delays Brake 1, and `repair` gives `kappa = 11`: the
 paper's option B (Table II). The detection takes up to 2 + 9 = 11 ms to
-reach `Brake2`, so with `kappa = 11` it never waits.
+reach `Brake2`, so with `kappa = 11` it never waits. The paper asks for no
+delay at all: it does not let Brake 1 take part of the delay.
 
-**Step 4. Repair the link, the delay that Brake 1 absorbs.** Brake 1 can
-take a delay of 0.95 and still start within 4 (3.05 + 0.95). With
-`y_f = 0.95`, `repair` gives `kappa = 10.05`, a smaller change than 11. The
-camera path refines `DelayF` with 10.05 and not with 10.04. Run through the
-whole analysis of ContrACT, `kappa = 10.05` gives Brake 1 a worst case of
-exactly 4.0, which passes; 10.04 gives 4.01, which fails.
+**Step 4. Repair the link, the delay that Brake 1 absorbs.** Brake 1 starts
+at most 3.05 late on its own path, so it can take a delay of 0.95 and still
+start within 4. With `y_f = 0.95`, `repair` gives `kappa = 10.05`: the least
+change of the link when Brake 1 absorbs 0.95, smaller than the change to 11.
+The camera path refines `DelayF` with 10.05 and not with 10.04. Run through
+the whole analysis of ContrACT, `kappa = 10.05` gives Brake 1 a worst case
+of exactly 4.0, which passes; 10.04 gives 4.01, which fails.
+
+<p align="center">
+  <img src="images/before-and-after-repair.png" alt="The two paths before the repair (red: the refinements fail) and after it (green): lam_b = 4.05 for the pedal path, kappa = 10.05 for the camera path">
+  <br>
+  <em>The two paths before the repair (red: the refinements fail) and after it (green): lam_b = 4.05 for the pedal path, kappa = 10.05 for the camera path.</em>
+</p>
+
+### Content of the directory
+The directory of the demo contains:
+- `braking.ltl`: the contracts of the nodes and the two system contracts,
+  with their named constants. The lines `# view:` at the top give the
+  refinements that `chase-cps view` draws;
+- `braking.py`: the steps with the CHASE Python package;
+- `braking.results.json`: the results of `chase-cps view braking.ltl --check`;
+- `out/braking.html`: the diagram above, written by `braking.py`.
 
 ### Run it
 
 ```
 pip install "chase-cps[z3]"
 python braking.py --expect
+chase-cps view braking.ltl --check -o out/braking-view.html   # the # view: lines, before the repair
 chase-cps repair braking.ltl --refines BrakePedal+PedalProcessing+Brake1 SysB --param lam_b=0..10
 ```

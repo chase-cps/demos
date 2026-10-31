@@ -1,0 +1,65 @@
+{
+  "file": "heater.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Comfort": {
+      "feasible": {
+        "key": "06cf6e8191124bc1",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T21:39:27"
+      }
+    },
+    "Room": {
+      "feasible": {
+        "key": "7d129e67f471e8b3",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T21:39:27"
+      }
+    },
+    "Thermostat": {
+      "feasible": {
+        "key": "90a60696e942e57f",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T21:39:27"
+      }
+    },
+    "ThermostatStep": {
+      "feasible": {
+        "key": "04012e7ed001b213",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.01,
+        "at": "2026-10-30T21:39:27"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "d2587a132c2b28c1",
+      "check": "implementation",
+      "model": "/Users/yifengxiao/Documents/dependencies/demos/Heater/heater.c:thermostat",
+      "contract": "ThermostatStep",
+      "result": "invalid",
+      "tool": "esbmc",
+      "seconds": 0.34,
+      "at": "2026-10-30T21:39:49"
+    },
+    {
+      "key": "8b82bc5e177708c1",
+      "check": "refines",
+      "refined": "Room+Thermostat",
+      "abstract": "Comfort",
+      "result": "invalid",
+      "tool": "z3",
+      "seconds": 0.01,
+      "at": "2026-10-30T21:39:27",
+      "failed": "guarantees"
+    }
+  ]
+}

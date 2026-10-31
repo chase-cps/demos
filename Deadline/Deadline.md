@@ -31,9 +31,25 @@ cannot work, the value that passes is the least.
 **Step 3. Check every value.** Checking `k = 0, 1, ..., 9` one by one with
 nuXmv gives the same answer: 2 is the least that passes.
 
+<p align="center">
+  <img src="images/before-and-after-repair.png" alt="Before the repair (k = 1, red) and after it (k = 2, green)">
+  <br>
+  <em>Before the repair (k = 1, red) and after it (k = 2, green).</em>
+</p>
+
+### Content of the directory
+The directory of the demo contains:
+- `deadline.ltl`: the contracts of the client, the arbiter, the counter of
+  the wait, and the requirement. The line `# view:` at the top gives the
+  refinement that `chase-cps view` draws;
+- `deadline.py`: the steps with the CHASE Python package;
+- `deadline.results.json`: the results of `chase-cps view deadline.ltl --check`;
+- `out/deadline.html`: the diagram above, written by `deadline.py`.
+
 ### Run it
 
 ```
 pip install "chase-cps[z3]"      # and nuXmv: chase-cps install nuxmv --accept-license
 python deadline.py --expect
+chase-cps view deadline.ltl --check -o out/deadline-view.html
 ```

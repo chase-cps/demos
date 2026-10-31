@@ -1,0 +1,55 @@
+{
+  "file": "deadline.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Arbiter": {
+      "feasible": {
+        "key": "de466b868b460238",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.01,
+        "at": "2026-10-30T21:39:27"
+      }
+    },
+    "Bound": {
+      "feasible": {
+        "key": "1626558f3196023c",
+        "result": "sat",
+        "tool": "nuxmv/ic3",
+        "seconds": 0.02,
+        "at": "2026-10-30T21:39:27"
+      }
+    },
+    "Client": {
+      "feasible": {
+        "key": "a032f4cc3fe32147",
+        "result": "sat",
+        "tool": "nuxmv/ic3",
+        "seconds": 0.05,
+        "at": "2026-10-30T21:39:27"
+      }
+    },
+    "Wait": {
+      "feasible": {
+        "key": "56a448849bdceab5",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.01,
+        "at": "2026-10-30T21:39:27"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "28cc8f758bd4d91b",
+      "check": "refines",
+      "refined": "Client+Arbiter+Wait",
+      "abstract": "Bound",
+      "result": "invalid",
+      "tool": "nuxmv/ic3",
+      "seconds": 0.06,
+      "at": "2026-10-30T21:39:49",
+      "failed": "guarantees"
+    }
+  ]
+}

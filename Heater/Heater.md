@@ -41,9 +41,27 @@ code implements: 74. Each round runs ESBMC and turns its counterexample (a
 temperature where the code and the contract disagree) into a condition on
 `theta`.
 
+<p align="center">
+  <img src="images/before-and-after-repair.png" alt="Before the repair (theta = 76, red) and after it (theta = 74, green): the refinement of Comfort, and heater.c against one step of the thermostat">
+  <br>
+  <em>Before the repair (theta = 76, red) and after it (theta = 74, green): the refinement of Comfort, and heater.c against one step of the thermostat.</em>
+</p>
+
+### Content of the directory
+The directory of the demo contains:
+- `heater.ltl`: the contracts of the room, the thermostat, one step of the
+  thermostat, and the requirement, in signal temporal logic in discrete
+  time. The lines `# view:` at the top give the refinement and the C
+  implementation that `chase-cps view` draws;
+- `heater.c`: one step of the thermostat in C;
+- `heater.py`: the steps with the CHASE Python package;
+- `heater.results.json`: the results of `chase-cps view heater.ltl --check`;
+- `out/heater.html`: the diagram above, written by `heater.py`.
+
 ### Run it
 
 ```
 pip install "chase-cps[z3]"      # and ESBMC or CBMC for step 4
 python heater.py --expect
+chase-cps view heater.ltl --check -o out/heater-view.html
 ```

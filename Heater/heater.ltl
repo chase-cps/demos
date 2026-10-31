@@ -1,3 +1,5 @@
+# view: --refines Room+Thermostat Comfort --implementation heater.c:thermostat ThermostatStep
+# view: --open Comfort ThermostatStep
 NAME: heater;
 
 # A room heated by a thermostat, over 10 steps. The heater adds u units

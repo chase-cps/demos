@@ -25,6 +25,9 @@ uses the CHASE Python package (pip install chase-cps[z3]):
      absorb (y_f = 0.95): kappa = 10.05, a smaller change. With 10.05 the
      camera path refines DelayF; with 10.04 it does not.
 
+The page out/braking.html draws each requirement with the path that must
+refine it, before the repair (red) and after it (green).
+
     python braking.py
     python braking.py --expect     # exit code 1 when a result is not the expected one
 """
@@ -33,7 +36,7 @@ import os
 import sys
 from fractions import Fraction
 
-from chase_cps import load_spec, refines, repair
+from chase_cps import load_spec, refines, repair, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -68,6 +71,24 @@ def main(expect: bool) -> int:
         camera.instantiate({"kappa": Fraction(201, 20)}), c["DelayF"]).status, "valid")
     show(4, "kappa = 10.04 refines DelayF", refines(
         camera.instantiate({"kappa": Fraction(251, 25)}), c["DelayF"]).status, "invalid")
+    # the page: before and after each repair
+    def paths(lam=None, kappa=None):
+        sys_b = c["SysB"] if lam is None else c["SysB"].instantiate({"lam_b": lam}, name="SysB_repaired")
+        link = c["Link"] if kappa is None else c["Link"].instantiate({"kappa": kappa})
+        pedal = c["BrakePedal"].compose(c["PedalProcessing"]).compose(c["Brake1"])
+        camera = c["Camera"].compose(c["Detection"]).compose(link).compose(c["Brake2"])
+        return pedal, sys_b, camera, link
+    pairs, links = [], []
+    for lam, kappa in ((None, None), (Fraction(81, 20), Fraction(201, 20))):
+        pedal, sys_b, camera, link = paths(lam, kappa)
+        links.append(link)
+        delay = c["DelayF"] if kappa is None else c["DelayF"].instantiate({}, name="DelayF_repaired")
+        pairs += [(pedal, sys_b, refines(pedal, sys_b)), (camera, delay, refines(camera, delay))]
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(refines=pairs, open=[b for _, b, _ in pairs] + links,
+                                title="Braking: before and after the repair"),
+                    os.path.join(HERE, "out", "braking.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 0 if all(results) or not expect else 1
 
 

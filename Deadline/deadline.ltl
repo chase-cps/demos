@@ -1,3 +1,4 @@
+# view: --refines Client+Arbiter+Wait Bound --open Bound
 NAME: deadline;
 
 # A client asks for a resource and keeps asking until it is granted; the

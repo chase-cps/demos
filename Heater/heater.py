@@ -20,6 +20,10 @@ the design with the CHASE Python package (pip install chase-cps[z3]):
      step with theta = 74, not with theta = 76. Asked the other way, the
      repair finds the theta that the code implements: 74.
 
+The page out/heater.html draws the room and the thermostat inside Comfort,
+and the C function as an implementation of the step, with theta = 76 (red)
+and theta = 74 (green).
+
     python heater.py
     python heater.py --expect     # exit code 1 when a result is not the expected one
 
@@ -29,7 +33,8 @@ Steps 1 to 3 need z3; step 4 needs ESBMC or CBMC.
 import os
 import sys
 
-from chase_cps import CFunction, is_implementation, load_spec, minimize, refines, repair
+from chase_cps import (CFunction, Component, is_implementation, load_spec, minimize, refines,
+                       repair, viz)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -69,6 +74,23 @@ def main(expect: bool) -> int:
          is_implementation(f, step).status, "invalid")
     r = repair("impl", f, step, parameters={"theta": (0, 200, "int")})
     show(4, "the theta that the code implements", r.values, {"theta": 74})
+    # the page: before and after the repair
+    pairs, parts, thermostats = [], [], []
+    for theta in (76, 74):
+        thermostat = c["Thermostat"].instantiate({"theta": theta})
+        thermostats.append(thermostat)
+        both = c["Room"].compose(thermostat)
+        req = comfort.instantiate({}, name="Comfort" if theta == 76 else "Comfort_repaired")
+        pairs.append((both, req, refines(both, req)))
+        one = step.instantiate({"theta": theta}, name=f"ThermostatStep_{theta}")
+        parts.append(Component(f"heater.c, theta = {theta}", one, f,
+                               status=is_implementation(f, one).status))
+    os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
+    page = viz.save(viz.diagram(*parts, refines=pairs,
+                                open=[b for _, b, _ in pairs] + [k.contract for k in parts] + thermostats,
+                                title="Heater: before and after the repair"),
+                    os.path.join(HERE, "out", "heater.html"))
+    print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 0 if all(results) or not expect else 1
 
 
