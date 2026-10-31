@@ -166,8 +166,8 @@ def main() -> int:
 
     # the old system; OneFifo inside TwoFifo, which it does not refine; OneFifo in the hole of Slot.
     # The results of the refinements go with them, so that the page shows the counterexample.
-    # TwoFifo is drawn as a copy: the page puts the counterexample on the first box of a
-    # contract, which for TwoFifo itself is the buffer of the old system.
+    # TwoFifo is drawn as a copy: TwoFifo itself is the buffer of the old system, and OneFifo
+    # inside it there would hide the old system as it is.
     page = viz.save(viz.diagram(old, refines=[(new_fifo, dataclasses.replace(two), found["swap"]),
                                               (new_fifo, slot, found["slot"])],
                                 open=[slot], title="Buffer swap"),
