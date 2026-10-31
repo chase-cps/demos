@@ -45,6 +45,13 @@ neither into the cell of drone 0 nor where drone 0 goes. The parts with
 `CoordinatorSafe` refine `Fleet`. Both failures were found on the contracts,
 before looking at the code.
 
+No value can fix `Coordinator`: the check reads no named constant, and
+what is wrong is its rule. The quotient of `Fleet` by the other parts
+(`divide`) is the weakest contract the coordinator must meet, computed in
+a few milliseconds: `Coordinator` does not refine it, `CoordinatorSafe`
+does. The quotient is long (it is made of the terms of all the parts), so
+it is a check for a candidate rule rather than a rule to read.
+
 **Step 4. The code.** ESBMC checks each function against its contract:
 `plan0`, `plan1`, `move0`, and `move1` implement theirs; `grant`
 implements `Coordinator` (the contract says what the reaction does) but not

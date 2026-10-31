@@ -15,7 +15,10 @@ or CBMC for the C code):
   2. The same with drone 1 at its target: it stays, and drone 0 moves into
      its cell; the coordinator checks only drones that both move.
   3. CoordinatorSafe grants a move only into a cell that is free after the
-     step: the composition refines Fleet.
+     step: the composition refines Fleet. No value can fix Coordinator (the
+     check reads no constant): its rule must change. The quotient of Fleet
+     by the other parts is the weakest contract of the coordinator:
+     Coordinator does not refine it, CoordinatorSafe does.
   4. Each C function implements its contract (ESBMC): plan0, plan1, move0,
      move1, and grant, the reaction as written. grant does not implement
      CoordinatorSafe; grant_safe does. With grant_safe, each function
@@ -64,6 +67,12 @@ def main(expect: bool) -> int:
     trace(r)
     r = refines(step("CoordinatorSafe"), c["Fleet"])
     show(3, "the parts with CoordinatorSafe refine Fleet", r.status, "valid")
+    # what the coordinator must do: the quotient of Fleet by the other parts
+    others = c["Plan0"].compose(c["Plan1"]).compose(c["Move0"]).compose(c["Move1"])
+    needs = c["Fleet"].divide(others, name="CoordinatorNeeds")
+    show(3, "Coordinator refines the quotient Fleet / (the other parts)",
+         refines(c["Coordinator"], needs).status, "invalid")
+    show(3, "CoordinatorSafe refines it", refines(c["CoordinatorSafe"], needs).status, "valid")
 
     def code(file, function):
         return CFunction(os.path.join(HERE, file), function)
