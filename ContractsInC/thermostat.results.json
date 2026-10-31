@@ -1,0 +1,46 @@
+{
+  "file": "thermostat.c",
+  "chase": "0.5.0",
+  "contracts": {
+    "heat_per_area": {
+      "feasible": {
+        "key": "474708cf6fe7f0d4",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-31T01:02:35"
+      }
+    },
+    "thermostat": {
+      "feasible": {
+        "key": "826dd521c37daa95",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-31T01:02:35"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "c4dfc3207dec8365",
+      "check": "implementation",
+      "model": "thermostat.c:heat_per_area",
+      "contract": "heat_per_area",
+      "result": "invalid",
+      "tool": "esbmc",
+      "seconds": 0.11,
+      "at": "2026-10-31T01:02:35"
+    },
+    {
+      "key": "3be2153196358d8a",
+      "check": "implementation",
+      "model": "thermostat.c:thermostat",
+      "contract": "thermostat",
+      "result": "valid",
+      "tool": "esbmc",
+      "seconds": 0.12,
+      "at": "2026-10-31T01:02:35"
+    }
+  ]
+}

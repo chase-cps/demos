@@ -71,12 +71,16 @@ website and its README show each step with its diagram.
     temporal logic): a drone climbs to its drop altitude in the wind; the
     controller cannot meet the tolerance (impossible), and repair says what
     the requirement can ask.
+- [**ContractsInC**][CONTRACTSINC] (C, ESBMC and CBMC clauses): the
+    contract written in the C file, next to the code; `chase-cps view
+    FILE.c` draws each function as a component and checks it, and a
+    function with no clause is checked as code alone (`safe`).
 
 The Python scripts use the CHASE Python package, version 0.5.0 or later
 (`pip install chase-cps`; BufferSwap and Escalation with
 `pip install "chase-cps[rtl]"`; Braking, Heater, Deadline, DroneTiming,
-DroneGrid, and DroneAltitude with version 0.6.0 and
-`pip install "chase-cps[z3]"`, and Heater and DroneGrid with ESBMC or CBMC), and nuXmv and slugs, which `chase-cps
+DroneGrid, DroneAltitude, and ContractsInC with version 0.6.0 and
+`pip install "chase-cps[z3]"`, and Heater, DroneGrid, and ContractsInC with ESBMC or CBMC), and nuXmv and slugs, which `chase-cps
 install` installs. The console scripts expect `dsl_tool`, `logics_tool`,
 `slugs` (with its compiler, `$SLUGS/tools/StructuredSlugsParser/compiler.py`),
 and `nuXmv` in the `PATH`. The Docker image of CHASE
@@ -103,3 +107,4 @@ all of them but nuXmv, whose license does not allow redistribution:
 [DRONETIMING]: DroneTiming/DroneTiming.md
 [DRONEGRID]: DroneGrid/DroneGrid.md
 [DRONEALTITUDE]: DroneAltitude/DroneAltitude.md
+[CONTRACTSINC]: ContractsInC/ContractsInC.md
