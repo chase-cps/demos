@@ -4,29 +4,29 @@
   "contracts": {
     "Reach06": {
       "feasible": {
-        "key": "daf6f631ed60bcd1",
+        "key": "ff7d6f0e31c4a957",
         "result": "sat",
-        "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-30T00:04:51"
+        "tool": "z3",
+        "seconds": 0.03,
+        "at": "2026-10-31T02:10:39"
       }
     },
     "Reach12": {
       "feasible": {
-        "key": "590db3b045c0f0fc",
+        "key": "89555a0f2522e69c",
         "result": "sat",
-        "tool": "nuxmv/bdd",
+        "tool": "z3",
         "seconds": 0.01,
-        "at": "2026-10-30T00:04:51"
+        "at": "2026-10-31T02:10:39"
       }
     },
     "Vehicle": {
       "feasible": {
-        "key": "f86f2b8966ce747f",
+        "key": "99d9c4131dc531a8",
         "result": "sat",
         "tool": "nuxmv/bmc",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:04:51"
+        "seconds": 0.05,
+        "at": "2026-10-31T02:10:39"
       }
     }
   },

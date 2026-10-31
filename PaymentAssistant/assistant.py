@@ -163,6 +163,7 @@ def main() -> int:
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(plan, q3, slip, refines=[(TEXT, q3, text_q3)],
                                 checks=[(slip, "consistent", slip_consistent)],
+                                why=[(plan, "⪯", tools)],      # the counterexample of step 1
                                 open=[PARENT, TEXT_FROM_TOOLS, q3, TEXT, slip],
                                 title="Payment assistant agent: decomposing a task"),
                     os.path.join(HERE, "out", "assistant.html"))

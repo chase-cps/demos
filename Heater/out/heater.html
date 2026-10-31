@@ -146,8 +146,9 @@
   .rp-spin { width:10px; height:10px; border:1.6px solid #d5dddd; border-top-color:var(--teal); border-radius:50%;
              animation:turn 0.8s linear infinite; }
   .rp-tracewrap { overflow:auto; max-height:260px; margin-top:6px; }
-  .rp-values { display:grid; grid-template-columns:repeat(auto-fill, minmax(92px, 1fr)); gap:2px 10px;
+  .rp-values { display:grid; grid-template-columns:repeat(auto-fill, minmax(92px, max-content)); gap:2px 18px;
                font:11px Menlo, Monaco, monospace; color:var(--soft); }
+  .rp-values span { white-space:nowrap; }
   .rp-values .port { color:var(--ink); font-weight:600; }
   table.rp-trace { border-collapse:collapse; font:11px Menlo, Monaco, monospace; }
   table.rp-trace th { font:600 10.5px Helvetica, Arial, sans-serif; color:var(--soft); text-align:right; padding:2px 8px;
@@ -157,14 +158,15 @@
   table.rp-trace tr.port td.v { color:var(--ink); font-weight:600; }
   .rp-link { border:0; background:none; color:var(--teal); text-decoration:underline; cursor:pointer;
              font:11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; padding:4px 0 0; }
-  pre.code { margin:0 0 12px; font:11.5px/1.55 Menlo, Monaco, monospace; color:var(--ink); }
+  pre.code { margin:0 0 12px; font:11.5px/1.55 Menlo, Monaco, monospace; color:var(--ink); overflow-x:auto; }
   pre.code span.n { display:inline-block; width:2.4em; color:var(--faint); text-align:right; margin-right:12px;
                     user-select:none; -webkit-user-select:none; }
   #popview h4 { font:600 12px -apple-system, Helvetica, Arial, sans-serif; color:var(--soft); margin:12px 0 4px; }
-  .q-item { padding:8px 12px 8px 14px; border-bottom:1px solid #f1f4f4; cursor:pointer; display:grid; gap:2px; }
+  .q-item { padding:9px 10px 8px 14px; border-bottom:1px solid #f1f4f4; cursor:pointer; display:grid; gap:3px; }
   .q-item.on { background:#eef3f9; }
   .q-item:last-child { border-bottom:0; } .q-item:hover { background:var(--fill); }
-  .q-item .t { display:flex; gap:6px; align-items:center; font-weight:600; font-size:12px; }
+  /* the title of an item as the title of its details: no jump from one to the other */
+  .q-item .t { display:flex; gap:8px; align-items:center; font-weight:600; font-size:12.5px; }
   .q-item .s { color:var(--soft); font-size:11px; } .q-item .s.ok { color:var(--ok); } .q-item .s.old { color:var(--warn); }
   .q-item .v { font:11px Menlo, Monaco, monospace; color:var(--ink); }
   .tools #repairs { width:auto; padding:0 7px; gap:4px; display:none; color:var(--bad); font:600 11.5px Helvetica, Arial, sans-serif; }
@@ -261,13 +263,13 @@ function wrap(f) {
   }
   out.push(rest); return out;
 }
-// Each part opens with a tag: K (named constants), A (assumes), G (guarantees), E (an environment).
+// Each part opens with a tag: θ (parameters: named constants), A (assumes), G (guarantees), E (an environment).
 // With a core in focus, its terms are on a red ground: [kind, tag, text, in the core].
 // src: the lines of the terms in the file, [first, last], when known.
 function terms(c, out, core, src) {
   const part = (tag, fs, hit, at) => fs.forEach((f, j) => wrap(f).forEach((l, i) =>
     out.push(["f", i || j ? "" : tag, l, hit.includes(j), at && at[j]])));
-  if (c.K) part("K", c.K, []);           // the named constants and their values
+  if (c.K) part("θ", c.K, []);           // the parameters (named constants) and their values
   part("A", c.A, core ? core.A : [], src && src.A);
   if (c.E) part("E", c.E, []);
   else part("G", c.G.length ? c.G : ["true"], core ? core.G : [], c.G.length && src && src.G);
@@ -308,7 +310,7 @@ function lines(n) {
   };
   if (n.note) out.push(["s", "", n.note]);
   if (n.contract && open.has("c:" + n.id)) {
-    if (n.composed) out.push(["s", "", "Contract " + n.contract.name]);
+    if (n.composed && open.has("k:" + n.id)) out.push(["s", "", "Contract " + n.contract.name]);
     part(n.contract, "contract");
   }
   if (n.composed && open.has("k:" + n.id)) {
@@ -340,7 +342,7 @@ function icons(n) {
     else if (n.model.source === "c") out.push([kind, n.model.code ? "m:" + n.id : null, "function " + n.model.name + from
       + ": its outputs come from its inputs, one call at a time (ESBMC, CBMC)" + (n.model.code ? ". Click: its code" : "")]);
     else out.push([kind, null, "model " + n.model.name + from + (f && f.too_many
-      ? ": more than " + f.count + " states, too many to show" : ": no registers, its outputs are functions of its inputs")]);
+      ? ": " + (f.more ? "more than " : "") + f.count + " states, too many to show" : ": no registers, its outputs are functions of its inputs")]);
   }
   return out;
 }
@@ -382,6 +384,7 @@ const WHAT = { "A": "compatible: the assumptions A are satisfiable",
                "WS": "well-separated: the component cannot win by making the environment break A",
                "¬V": "not vacuous: each liveness guarantee asks something of the component",
                "M ⊨ C": "the model implements the contract",
+               "safe": "safe code: no overflow, division by zero, access out of bounds, or failed assert",
                "E ⊨ A": "the environment satisfies the assumptions",
                "⪯": "what is inside refines this contract" };
 const checks = n => show.checks && n.checks ? n.checks : [];
@@ -561,12 +564,13 @@ function drawNode(g, e, ox, oy) {
     const fix = c.status === "invalid";
     ix += tag(t, ix, y + 6, c.name, c.status) + 4;
     tip(t, (WHAT[c.name] || c.name) + " — " + (SAYS[c.status] || "not checked") + (c.reason ? " (" + c.reason + ")" : "")
-           + (c.core ? (on ? ". Click: hide the core" : ". Click: show the core") : "") + (fix ? ", and why it fails" : ""));
+           + (fix ? ". Click: why it fails" : c.core ? (on ? ". Click: hide the core" : ". Click: show the core") : ""));
     if (on) el("rect", { x: ix - 4 - tagWidth(c.name) - 2, y: y + 4, width: tagWidth(c.name) + 4, height: 20, rx: 5,
                          fill: "none", stroke: COLOR[c.status], "stroke-width": 1 }, t);
     if (c.core || fix) { t.setAttribute("class", "icon");
-      t.onclick = () => { if (fix && !on) openRepair(n, c.name);
-        if (!c.core) return;
+      // one that fails: its details, with its core shown; one that holds: its core on and off
+      t.onclick = () => { if (fix) { if (c.core) { focus[n.id] = i; open.add((c.core.part === "composed" ? "k:" : "c:") + n.id); }
+                                     return openRepair(n, c.name); }
         if (on) delete focus[n.id];
         else { focus[n.id] = i; open.add((c.core.part === "composed" ? "k:" : "c:") + n.id); } render(); }; } });
   if (busy && show.checks && n.contract && !checks(n).some(c => c.name === "A∧G" || c.name === "A")) {
@@ -582,7 +586,7 @@ function drawNode(g, e, ox, oy) {
                          : `M${cx - 3.5} ${cy + 1.5} L${cx} ${cy - 2} L${cx + 3.5} ${cy + 1.5}`,
                  fill: "none", stroke: shut ? "#fff" : "var(--teal)", "stroke-width": 1.4,
                  "stroke-linecap": "round", "stroke-linejoin": "round" }, f);
-    tip(f, (shut ? "Show the " : "Hide the ") + n.children.length + " boxes inside");
+    tip(f, (shut ? "Show the " : "Hide the ") + (n.children.length === 1 ? "box" : n.children.length + " boxes") + " inside");
     f.onclick = fold(n.id);
     rx -= ICON + 6;
   }
@@ -623,7 +627,8 @@ function drawNode(g, e, ox, oy) {
   (e.ports || []).forEach(p => {
     el("rect", { x: x + p.x, y: y + p.y, width: p.width, height: p.height, fill: "var(--teal)" }, g);
     (p.labels || []).forEach(l => { const t = text(g, x + p.x + l.x, y + p.y + l.y + 9, "w", l.text);
-      t.setAttribute("data-var", String(p.id).split(":").pop()); t.setAttribute("data-pbox", n.id); }); });
+      t.setAttribute("data-var", String(p.id).split(":").pop()); t.setAttribute("data-pbox", n.id);
+      if (l.x < 0) t.setAttribute("data-side", "left"); }); });
   (e.children || []).forEach(c => drawNode(g, c, x, y));
   (e.edges || []).forEach(ed => drawEdge(g, ed, x, y));
   if (folded.has(n.id)) return;
@@ -1013,7 +1018,7 @@ function help() {
   sample(s => { box(5, "#f5f7f7", "#17393b", 1.2)(s);
                 el("rect", { x: 14, y: 6, width: 20, height: 8, rx: 3, fill: "#fff", stroke: "#17393b" }, s); },
          "inside: refines the outer box");
-  [["contract", "assumptions A, guarantees G"], ["composed", "composed contract (⊗)"],
+  [["contract", "parameters θ, assumptions A, guarantees G"], ["composed", "composed contract (⊗)"],
    ["model", "model given (RTL, JSON, SMV)"], ["synth", "model synthesized (slugs)"]].forEach(([k, t]) =>
     sample(svg => icon(svg, k, 16, 2, false, t), t));
   sample(s => { el("rect", { x: 16, y: 2, width: 16, height: 16, rx: 4, fill: "#fff", stroke: "#17393b", "stroke-width": 1.1 }, s);
@@ -1025,7 +1030,7 @@ function help() {
     tag(svg, 44 - w - 2, 2, t, "valid"); tag(svg, 46, 2, t, "invalid");
     d2.appendChild(document.createTextNode(d)); h.appendChild(d2); };
   [["A", "compatible"], ["G", "consistent"], ["A∧G", "feasible"], ["R", "realizable"],
-   ["WS", "well-separated"], ["¬V", "no vacuous output"], ["M ⊨ C", "implements"],
+   ["WS", "well-separated"], ["¬V", "no vacuous output"], ["M ⊨ C", "implements"], ["safe", "safe code"],
    ["E ⊨ A", "environment"], ["⪯", "refines"]].forEach(([t, d]) => pair(t, d));
   sample(s => el("rect", { x: 4, y: 4, width: 40, height: 12, rx: 3, fill: "#f6dcd9" }, s), "core (click a red tag)");
   sample(s => { tag(s, 4, 2, "⪯", "invalid"); }, "click a result: the check, and its repairs");
@@ -1240,19 +1245,23 @@ function h(tag, attrs, ...kids) {
   return e;
 }
 function checkTitle(n, t) {
-  const r = (n.repair || {})[t];
-  if (r && r.check === "refines") return r.args[0].split("+").join(" ⊗ ") + " refines " + r.args[1];
-  if (r && r.check === "impl") return r.args[0].split("/").pop() + " implements " + r.args[1];
-  if (r && r.check === "env") return r.args[0].split("/").pop() + " is an environment of " + r.args[1];
-  if (r) return "A ∧ G of " + r.args[0] + " can hold";
+  const no = statusOf(n, t) === "invalid", r = (n.repair || {})[t];
+  const v = (yes, not) => no ? not : yes;
+  if (r && r.check === "refines") return r.args[0].split("+").join(" ⊗ ") + v(" refines ", " does not refine ") + r.args[1];
+  if (r && r.check === "impl") return r.args[0].split("/").pop() + v(" implements ", " does not implement ") + r.args[1];
+  if (r && r.check === "env") return r.args[0].split("/").pop() + v(" is an environment of ", " is not an environment of ") + r.args[1];
+  if (r) return "A ∧ G of " + r.args[0] + v(" can hold", " cannot hold");
   const req = (n.contract && n.contract.name) || n.title;           // from the box: what is inside, its model
   if (t === "⪯") {
-    const inner = n.note || (n.children || []).map(c => c.title).join(" ⊗ ");
-    return inner ? inner + " refines " + req : n.title;
+    // what is inside the box (the candidate in a hole, the parts of a decomposition), else its note
+    const inner = (n.children || []).filter(c => c.kind !== "hole").map(c => c.title).join(" ⊗ ") || n.note;
+    return inner ? inner + v(" refines ", " does not refine ") + req : n.title;
   }
-  if (t === "M ⊨ C" && n.model) return n.model.name + " implements " + req;
-  if (t === "E ⊨ A") return n.title + " is an environment";
-  return (WHAT[t] || t).split(":")[0] + ": " + req;
+  if (t === "M ⊨ C" && n.model) return n.model.name + (n.model.name === req ? v(" meets its contract", " does not meet its contract")
+                                                                          : v(" implements ", " does not implement ") + req);
+  if (t === "safe" && n.model) return n.model.name + v(" is safe code", " is not safe code");
+  if (t === "E ⊨ A") return n.title + v(" is an environment", " is not an environment");
+  return (no ? "not " : "") + (WHAT[t] || t).split(":")[0] + ": " + req;
 }
 // the tag of a check as the diagram draws it, for a panel
 function tagSvg(t, status) {
@@ -1274,12 +1283,14 @@ function showInspector(tab) {
   inspector.open = true;
   if (tab) inspector.tab = tab;
   document.body.classList.add("insp");
+  document.getElementById("repairs").classList.add("on");     // pressed while the panel is open
   renderInspector();
 }
 function hideInspector() {
   if (inspector.open) shiftView(1);
   inspector.open = false;
   document.body.classList.remove("insp");
+  document.getElementById("repairs").classList.remove("on");
   closeRepair();
 }
 async function openRepair(n, t) {
@@ -1344,18 +1355,15 @@ function fillPanel() {
   box.appendChild(h("div", { class: "rp-head" },
     tagSvg(t, st), h("b", {}, checkTitle(n, t)),
     h("button", { class: "rp-x", title: "Back to the list", onclick: closeRepair }, "×")));
-  const says = st === "valid" ? "Holds with the present values." : st === "invalid" ? "Does not hold with the present values."
-             : st === "unknown" ? "Not decided." : "Not checked yet.";
-  const head = h("div", { class: "rp-sec" }, h("div", { class: "rp-says" }, says));
-  box.appendChild(head);
+  const says = st === "valid" ? "Holds." : st === "invalid" ? null : st === "unknown" ? "Not decided." : "Not checked yet.";
+  if (says) box.appendChild(h("div", { class: "rp-sec" }, h("div", { class: "rp-says" }, says)));
   const why = whySection(n, t, st);
   if (why) box.appendChild(why);
   if (st !== "invalid") return;          // nothing to fix
   if (!r) { box.appendChild(noRepairSection(n, t)); return; }
   const s = stateOf(r), sig = repairSig(r);
   // the constants
-  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "How to fix: the values of the constants"),
-    h("div", { class: "rp-note", style: "margin:0 0 4px" }, "Pick the constants that may change, and their ranges."));
+  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h", title: "Pick the parameters that may change, and their ranges" }, "Repair ", h("span", { style: "text-transform:none" }, "θ")));
   r.constants.forEach(c => {
     const [lo, hi] = s.ranges[c.name];
     const num = (v, i) => h("input", { type: "number", value: v, step: c.type === "int" ? 1 : "any", "aria-label": (i ? "high" : "low") + " " + c.name,
@@ -1366,75 +1374,83 @@ function fillPanel() {
       h("span", { class: "rp-name" }, c.name + " = " + c.value),
       h("span", { class: "rp-range" }, num(lo, 0), "..", num(hi, 1)),
       h("span", {}),
-      h("span", { class: "rp-who" }, (c.type === "int" ? "integer" : "real") + " · " + c.owners.map(o => o.contract).join(", "),
-        h("span", { class: "rp-role " + c.role }, ROLE[c.role] || c.role),
-        c.role === "requirement" ? "changed only with your consent" : null)));
+      h("span", { class: "rp-who" }, (c.type === "int" ? "int" : "real") + " · " + c.owners.map(o => o.contract).join(", "),
+        c.role === "requirement" ? h("span", { class: "rp-role " + c.role, title: "Changed only with your consent" }, ROLE[c.role]) : null)));
   });
   const picked = r.constants.filter(c => s.picks[c.name]);
   const run = h("div", { class: "rp-run" });
   if (s.running) {
     run.appendChild(h("span", { class: "rp-spin" }));
-    run.appendChild(h("span", { class: "rp-says" }, "Finding repairs… " + s.running.done + " of " + s.running.of));
+    run.appendChild(h("span", { class: "rp-says" }, "Searching… " + s.running.done + " / " + s.running.of));
     run.appendChild(h("button", { class: "rp-btn", onclick: () => stopRepairs(r) }, "Stop"));
   } else {
     run.appendChild(h("button", { class: "rp-btn main", disabled: !how || !picked.length,
                                   onclick: () => findRepairs(n, t) }, s.options.length ? "Find again" : "Find repairs"));
-    run.appendChild(h("span", { class: "rp-says" }, !picked.length ? "Pick a constant to change."
-      : picked.length > 1 ? "Each alone, and all together." : ""));
+    if (!picked.length) run.appendChild(h("span", { class: "rp-says" }, "Pick a parameter."));
   }
   sec.appendChild(h("div", { style: "margin-top:8px" }, run));
   box.appendChild(sec);
   // the repairs
   if (s.options.length || s.error) {
-    const out = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "Repairs"));
-    s.options.forEach(o => out.appendChild(optionCard(n, t, r, s, o, sig)));
+    const out = h("div", { class: "rp-sec" }, h("div", { class: "rp-h",
+      title: "Each value has passed the check itself. Point at one to see it on the diagram." }, "Repairs"));
+    const seen = new Set();               // all together may give what one alone gave: shown once
+    s.options.forEach(o => { const k = changedKey(o); if (k && seen.has(k)) return; if (k) seen.add(k);
+                             out.appendChild(optionCard(n, t, r, s, o, sig)); });
     if (s.error) out.appendChild(h("div", { class: "rp-err" }, s.error));
-    out.appendChild(h("div", { class: "rp-note" }, "Each value has passed the check itself. Point at a repair to see it on the diagram."));
     box.appendChild(out);
   }
   if (!how) box.appendChild(h("div", { class: "rp-sec" },
-    h("div", { class: "rp-note", style: "margin-top:0" }, "This page cannot run repairs: open the file in VS Code, or draw it with chase-cps view FILE --serve. On the command line:"),
+    h("div", { class: "rp-note", style: "margin-top:0", title: "This page cannot run repairs: open the file in VS Code, or draw it with chase-cps view FILE --serve" }, "Repairs run in VS Code, or:"),
     h("div", { class: "rp-cmd" }, commandOf(r, s))));
 }
 // Why the check fails: in one line, then the counterexample (and its steps on the diagram).
 function whySection(n, t, st) {
   if (st !== "invalid") return null;
-  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "Why it fails"));
-  if (t !== "⪯" && t !== "M ⊨ C" && t !== "E ⊨ A") {
+  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "Counterexample"));
+  if (t !== "⪯" && t !== "M ⊨ C" && t !== "safe" && t !== "E ⊨ A") {
     const c = (n.checks || []).find(x => x.name === t);
-    sec.appendChild(h("div", {}, (WHAT[t] || t) + ": no." + (c && c.core ? " The terms in conflict are red in the box." : "")));
+    if (!(c && c.core)) return null;
+    sec.firstChild.textContent = "Why it fails";
+    sec.appendChild(h("div", {}, "The terms in conflict are red."));
     return sec;
   }
   const w = n.badge && n.badge.why, req = (n.contract && n.contract.name) || n.title;
   const code = n.model && n.model.source === "c";
-  const lead = !w ? null
-    : w.failed === "assumptions" ? "An environment that " + req + " accepts and the parts do not:"
-    : t === "⪯" ? "A behavior of the parts that breaks " + req + (w.violated && w.violated.length ? " (its terms in red):" : ":")
-    : t === "M ⊨ C" ? (code ? "A call of " + n.model.name + " that breaks " + req + ":" : "A run of the model that breaks " + req + ":")
-    : "A behavior of the environment that breaks the assumptions:";
+  // said only when the table does not: which side fails
+  const lead = w && w.failed === "assumptions" ? "Accepted by " + req + ", not by the parts." : null;
   if (w && w.trace) {
-    sec.appendChild(h("div", {}, lead));
+    if (lead) sec.appendChild(h("div", {}, lead));
     const terms = n.contract ? [].concat(n.contract.A || [], n.contract.G || [], n.contract.E || []).join(" ") : "";
     const named = new Set((terms.match(/[A-Za-z_]\w*/g) || []).filter(x => !/^(G|F|X|U|R|W|true|false)$/.test(x)));
     sec.appendChild(traceTable(w.trace, w.trace.vars.filter(v => named.has(v)), req));
     const last = w.trace.steps.length - 1;
     if (last > 0) {                        // a step of the counterexample, on the diagram
       const label = h("span", {}, "");
-      const say = k => { label.textContent = "step " + k + (w.trace.loop === k ? " ↺" : ""); };
+      const say = k => { label.textContent = (DATA.period ? "t = " + timeOf(k) : "step " + k) + (w.trace.loop === k ? " ↺" : ""); };
       const slider = h("input", { type: "range", min: 0, max: last, value: panel.step || 0, "aria-label": "step",
         oninput: e => { panel.step = +e.target.value; say(panel.step); replay(n, w.trace, panel.step); } });
       say(panel.step || 0);
-      sec.appendChild(h("div", { class: "rp-step" }, "On the diagram:", slider, label));
-    } else sec.appendChild(h("div", { class: "rp-note" }, "These values are on the diagram, in blue."));
+      sec.appendChild(h("div", { class: "rp-step", title: "The values of this step are on the diagram" }, slider, label));
+    }
   } else {
-    sec.appendChild(h("div", {}, "The counterexample was not kept with the result" + (inEditor()
-      ? ": press ▶ (Check)." : ": run the check again (chase-cps view FILE --check --no-results).")));
+    sec.appendChild(h("div", { class: "rp-note", title: inEditor() ? "" : "chase-cps view FILE --check --no-results" },
+                      "Not kept: " + (inEditor() ? "press ▶ to check again." : "run the check again.")));
   }
-  if (w && w.reason) sec.appendChild(h("div", { class: "rp-note" }, w.reason));
-  if (code && n.model.code) sec.appendChild(h("button", { class: "rp-link",
-    onclick: () => { inspector.tab = "code"; renderInspector(); } }, "Show the code"));
+  const toCode = () => { inspector.tab = "code"; renderInspector(); };
+  const why = w && w.reason ? reasonOf(w.reason) : null;
+  if (why) sec.appendChild(h("div", { class: "rp-note", title: w.reason }, why.text,
+    why.line && code && n.model.code ? [", ", h("button", { class: "rp-link", onclick: toCode }, "line " + why.line)]
+    : why.line ? ", line " + why.line : ""));
   return sec;
 }
+// The reason of a checker, short: "division by zero" and its line, without the file and the function.
+function reasonOf(r) {
+  const m = /^(?:[\w$]+: )?(.*?)\s*\((?:file \S+ )?line (\d+)[^)]*\)\s*$/.exec(r);
+  return m ? { text: m[1].charAt(0).toUpperCase() + m[1].slice(1), line: +m[2] } : { text: r, line: null };
+}
+// A step as the page shows it: its number, or its time i·Δτ when the diagram has a period.
+const timeOf = i => DATA.period ? String(+(i * Number(DATA.period)).toFixed(9)) : String(i);
 // A counterexample: one column per step (one only for a check of one call), the ports of the box first.
 function traceTable(tr, first, req) {
   const fmt = v => v === null || v === undefined ? "–" : typeof v === "boolean" ? (v ? "true" : "false") : String(v);
@@ -1443,16 +1459,17 @@ function traceTable(tr, first, req) {
   if (one) {                            // one call: name = value, in columns
     const grid = h("div", { class: "rp-values" }, order.map(i => h("span", { class: first.includes(tr.vars[i]) ? "port" : "" },
       tr.vars[i] + " = " + fmt(tr.steps[0][i]))));
-    const notes = [first.length ? "In bold, the variables of " + req + "." : null,
-                   tr.more ? tr.more + " more variables not kept." : null].filter(Boolean);
+    const notes = [tr.more ? tr.more + " more variables not kept." : null].filter(Boolean);
     return h("div", { class: "rp-tracewrap" }, grid, notes.length ? h("div", { class: "rp-note" }, notes.join(" ")) : null);
   }
-  const t = h("table", { class: "rp-trace" });
-  if (!one) t.appendChild(h("tr", {}, h("th", {}, "step"),
-    tr.steps.map((_, i) => h("th", { title: tr.loop === i ? "the loop starts here, and repeats forever" : "" },
-                             (tr.loop === i ? "↺ " : "") + i))));
+  const t = h("table", { class: "rp-trace", title: tr.vars.length ? "T: true, F: false" : "" });
+  const cell = v => typeof v === "boolean" ? (v ? "T" : "F") : fmt(v);       // a column per step: short
+  if (!one) t.appendChild(h("tr", {}, h("th", { title: DATA.period ? "time: a step every " + DATA.period + " s" : "" }, DATA.period ? "t" : "step"),
+    tr.steps.map((_, i) => h("th", { title: (tr.loop === i ? "the loop starts here, and repeats forever. " : "")
+                                            + (DATA.period ? "step " + i : "") },
+                             (tr.loop === i ? "↺ " : "") + timeOf(i)))));
   const rows = order.map(i => h("tr", { class: first.includes(tr.vars[i]) ? "port" : "" },
-    h("td", { class: "v" }, tr.vars[i]), tr.steps.map(st => h("td", {}, fmt(st[i])))));
+    h("td", { class: "v" }, tr.vars[i]), tr.steps.map(st => h("td", {}, cell(st[i])))));
   const LIMIT = one ? 24 : 12;
   rows.slice(0, LIMIT).forEach(r => t.appendChild(r));
   const wrap = h("div", { class: "rp-tracewrap" }, t);
@@ -1461,9 +1478,7 @@ function traceTable(tr, first, req) {
                    (rows.length - LIMIT) + " more variables");
     wrap.appendChild(more);
   }
-  const notes = [first.length ? "In bold, the variables of " + req + "." : null,
-                 tr.loop !== null && !one ? "From ↺, the steps repeat forever." : null,
-                 tr.cut ? "The first " + tr.steps.length + " steps." : null,
+  const notes = [tr.cut ? "The first " + tr.steps.length + " steps." : null,
                  tr.more ? tr.more + " more variables not kept." : null].filter(Boolean);
   if (notes.length) wrap.appendChild(h("div", { class: "rp-note" }, notes.join(" ")));
   return wrap;
@@ -1471,13 +1486,15 @@ function traceTable(tr, first, req) {
 // A check that fails with no constant to repair, or a page that cannot run repairs: in a few points.
 function noRepairSection(n, t) {
   const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "How to fix"));
-  const points = n.contract && n.contract.K
-    ? ["The constants (K) are repaired from the specification file.",
-       "Open it in VS Code, or with chase-cps view FILE --serve."]
-    : ["No value can fix it: the check reads no named constant.",
-       "What fails is a rule: the counterexample shows where.",
-       "Change the terms of a part, or of the requirement."]
-       .concat(t === "⪯" ? ["What a part must meet: divide the requirement by the other parts."] : []);
+  const clauses = n.model && n.model.source === "c" && n.model.name === ((n.contract || {}).name);
+  const points = t === "safe"
+    ? ["Fix the code, or exclude such inputs with a requires clause."]
+    : t === "M ⊨ C" && clauses && !(n.contract || {}).K
+    ? ["Fix the code, or change its requires / ensures clauses."]
+    : n.contract && n.contract.K
+    ? ["Repair θ in VS Code, or with chase-cps view FILE --serve."]
+    : ["No parameter (θ) to tune: change a term of a part or of the requirement."]
+       .concat(t === "⪯" ? ["What a part must guarantee: divide the requirement by the other parts (divide)."] : []);
   sec.appendChild(h("ul", { class: "rp-why" }, points.map(x => h("li", {}, x))));
   return sec;
 }
@@ -1485,25 +1502,26 @@ function optionCard(n, t, r, s, o, sig) {
   const res = o.res, old = o.sig !== sig && !o.applied;
   const names = o.names.join(", ");
   if (res.status !== "repaired") {
-    const text = res.status === "holds" ? "Holds with the present values: nothing to change."
-      : res.status === "impossible" ? "No value of " + names + " in " + o.names.map(k => "[" + o.ranges[k].join(", ") + "]").join(" × ") + " works: widen the range, pick another constant, or change a rule."
-      : res.bound !== undefined && res.bound !== null
-        ? "Stopped at the time limit. The least change is at least " + res.bound + " (proved); no value found yet."
-        : "Not decided" + (res.reason ? ": " + res.reason : ".");
-    const card = h("div", { class: "rp-opt " + res.status + (old ? " old" : "") },
-      h("div", { class: "rp-v" }, text), h("div", { class: "rp-m" }, (old ? "Out of date · " : "") + "changing " + names));
+    const text = res.status === "holds" ? "Holds already."
+      : res.status === "impossible" ? "No value in " + o.names.map(k => "[" + o.ranges[k].join(", ") + "]").join(" × ") + " works."
+      : res.bound !== undefined && res.bound !== null ? "Stopped: the least change is ≥ " + res.bound + "."
+      : "Not decided.";
+    const card = h("div", { class: "rp-opt " + res.status + (old ? " old" : ""), title: res.reason || "" },
+      h("div", { class: "rp-v", style: "font-family:inherit" }, text), h("div", { class: "rp-m" }, (old ? "Out of date · " : "") + names));
     if (res.status === "impossible" && !old) card.appendChild(h("div", { class: "rp-b" },
       h("button", { class: "rp-btn", onclick: () => { o.names.forEach(k => { const [a, b] = s.ranges[k], w = Math.max(b - a, 1);
-        s.ranges[k] = [a - w / 2, b + w / 2].map(x => r.constants.find(c => c.name === k).type === "int" ? Math.round(x) : x); });
+        s.ranges[k] = [a >= 0 ? Math.max(0, a - w / 2) : a - w / 2, b + w / 2]
+          .map(x => r.constants.find(c => c.name === k).type === "int" ? Math.round(x) : x); });
         findRepairs(n, t); } }, "Widen")));
     return card;
   }
   const v = h("div", { class: "rp-v" });
-  o.names.forEach((k, i) => { if (i) v.appendChild(document.createTextNode("   "));
-    v.append(k + " ", h("s", {}, o.from[k]), " → ", h("em", {}, res.text[k] === null ? String(res.values[k]) : res.text[k])); });
-  const meta = [o.applied ? "Applied: in the file" : old ? "Out of date" : null, "cost " + res.cost, res.optimal ? "optimal" : "least found",
-                res.method + (res.rounds ? ", " + res.rounds + (res.rounds === 1 ? " round" : " rounds") : ""),
-                res.seconds + " s"].filter(Boolean).join(" · ");
+  const moved = o.names.filter(k => !same(o, k));
+  (moved.length ? moved : o.names).forEach((k, i) => { if (i) v.appendChild(document.createTextNode("   "));
+    v.append(k + " ", h("s", {}, o.from[k]), " → ", h("em", {}, res.text[k] === null ? "≈ " + short(res.values[k]) : res.text[k])); });
+  const meta = [o.applied ? "Applied" : old ? "Out of date" : null, res.optimal ? "optimal" : "least found",
+                "change " + short(res.cost)].filter(Boolean).join(" · ");
+  const how = res.method + (res.rounds ? ", " + res.rounds + (res.rounds === 1 ? " round" : " rounds") : "") + ", " + res.seconds + " s";
   const req = o.names.some(k => (r.constants.find(c => c.name === k) || {}).role === "requirement");
   const lines = o.names.every(k => (r.constants.find(c => c.name === k) || { owners: [] }).owners.every(w => w.line));
   const exact = o.names.every(k => res.text[k] !== null);
@@ -1514,15 +1532,24 @@ function optionCard(n, t, r, s, o, sig) {
          : req ? "Changes a requirement" : "Write the value in the file",
     onclick: e => applyOption(n, t, r, o, e.target) }, o.applied ? "Applied" : "Apply");
   const card = h("div", { class: "rp-opt repaired" + (old ? " old" : "") + (shown ? " shown" : ""),
-                          onmouseenter: () => { if (!old) showPreview(previewOf(n, t, r, o)); },
+                          onmouseenter: () => { if (!old) hoverPreview(previewOf(n, t, r, o)); },
                           onmouseleave: () => clearPreview(false) },
-    v, h("div", { class: "rp-m" }, meta),
+    v, h("div", { class: "rp-m", title: how }, meta),
     h("div", { class: "rp-b" },
       h("button", { class: "rp-btn" + (shown ? " on" : ""), disabled: old, title: "Keep it drawn on the diagram",
                     onclick: () => { if (shown) clearPreview(true); else { const p = previewOf(n, t, r, o); p.pinned = true; showPreview(p); }
                                      renderPanel(); } }, "Preview"),
       apply));
   return card;
+}
+// a number in a few digits: 0.8095238095238095 is 0.8095
+const short = x => typeof x === "number" && !Number.isInteger(x) ? String(+x.toPrecision(4)) : String(x);
+// the value of a repair is the one it had
+const same = (o, k) => o.res.text[k] !== null && Number(o.res.text[k]) === Number(o.from[k]);
+// what a repair changes, as a key: the same changes from two runs are one repair
+function changedKey(o) {
+  if (o.res.status !== "repaired") return null;
+  return o.names.filter(k => !same(o, k)).map(k => k + "=" + o.res.text[k]).join(",");
 }
 function previewOf(n, t, r, o) {
   const owners = [];
@@ -1536,7 +1563,7 @@ function commandOf(r, s) {
   const q = a => /^[\w.+:\/-]+$/.test(a) ? a : JSON.stringify(a);
   const ps = r.constants.filter(c => s.picks[c.name]).map(c => "--param " + c.name + "=" + s.ranges[c.name][0] + ".."
                                                        + s.ranges[c.name][1] + (c.type === "int" ? ":int" : ""));
-  return ["chase-cps repair", q(DATA.title), flag, ...r.args.map(q), ...ps].join(" ");
+  return ["chase-cps repair", q(DATA.title.split("/").pop()), flag, ...r.args.map(q), ...ps].join(" ");
 }
 // The repairs of the constants picked: each alone, then all together.
 async function findRepairs(n, t) {
@@ -1650,12 +1677,19 @@ function showPreview(p) {
   }
 }
 function clearPreview(all) {
-  if (previewing && previewing.pinned && !all) {       // back to the one kept
-    const keep = previewing; previewing = null; showPreview(keep); return;
-  }
+  // back to the one kept, unless all go
+  const keep = !all && previewing && (previewing.pinned ? previewing : previewing.keep);
   document.querySelectorAll("#view text[data-was]").forEach(x => { x.textContent = x.getAttribute("data-was"); x.removeAttribute("data-was"); });
   document.querySelectorAll("#view .pv").forEach(x => x.remove());
-  if (all || !(previewing && previewing.pinned)) previewing = null;
+  previewing = null;
+  if (keep) showPreview(keep);
+}
+// pointing at a repair shows it for a while; the one kept comes back after
+function hoverPreview(p) {
+  const kept = previewing && (previewing.pinned ? previewing : previewing.keep);
+  if (kept && kept.option === p.option) return;
+  p.keep = kept || null;
+  showPreview(p);
 }
 function placePanel() {}
 // the list of the checks that fail (all of them: with or without constants)
@@ -1669,23 +1703,22 @@ function fillProblems(list) {
     const best = s && s.options.find(o => o.res.status === "repaired" && o.sig === sig);
     const what = s && s.running ? "finding repairs…"
       : best ? best.names.map(k => k + " " + best.from[k] + " → " + best.res.text[k]).join(", ")
-      : r ? "may change: " + r.constants.map(c => c.name + (c.role === "requirement" ? " (requirement)" : "")).join(", ")
-      : t === "A∧G" ? "the terms in conflict: in the box"
-      : n.contract && n.contract.K ? "constants (K): repaired from the specification file"
-      : "no constant: a rule to change";
-    const steps = w && w.trace ? (w.trace.steps.length === 1 ? "one call or step" : w.trace.steps.length + " steps") : null;
+      : r ? "θ: " + r.constants.map(c => c.name).join(", ")
+      : t === "A∧G" ? "terms in conflict"
+      : w && w.reason ? reasonOf(w.reason).text
+      : "no θ to tune";
     box.appendChild(h("div", { class: "q-item" + (panel && panel.id === n.id && panel.tag === t ? " on" : ""),
                                onclick: () => openRepair(n, t) },
       h("div", { class: "t" }, tagSvg(t, "invalid"), checkTitle(n, t)),
-      h("div", { class: best ? "v" : "s" }, (steps ? "counterexample, " + steps + " · " : "") + what)));
+      h("div", { class: best ? "v" : "s" }, what)));
   });
 }
 function fillCode(n) {
   const box = document.getElementById("repair"), c = n.model.code;
   box.innerHTML = "";
-  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, c.file + " · function " + n.model.name));
-  c.parts.forEach(q => {
-    sec.appendChild(h("div", { class: "rp-note", style: "margin:8px 0 2px" }, q.name + ", line " + q.line));
+  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h", style: "text-transform:none;letter-spacing:0" }, c.file));
+  c.parts.forEach((q, i) => {
+    if (c.parts.length > 1) sec.appendChild(h("div", { class: "rp-note", style: "margin:" + (i ? 8 : 4) + "px 0 2px" }, q.name));
     const pre = h("pre", { class: "code" });
     q.text.split("\n").forEach((l, i) => { pre.appendChild(h("span", { class: "n" }, String(q.line + i)));
                                          pre.appendChild(document.createTextNode(l + "\n")); });
@@ -1712,7 +1745,9 @@ function markPick() {
 function bringInto(n) {
   const b = document.querySelector('#view [data-box="' + n.id + '"] > rect'), v = document.getElementById("view");
   if (!b || !cam) return;
-  const r = b.getBoundingClientRect(), V = v.getBoundingClientRect();
+  const r = b.getBoundingClientRect(), all = v.getBoundingClientRect(), P = document.getElementById("insp");
+  const right = inspector.open && P && P.offsetParent ? Math.min(all.right, P.getBoundingClientRect().left - 8) : all.right;
+  const V = { left: all.left, top: all.top, bottom: all.bottom, right, width: right - all.left, height: all.height };
   if (r.left >= V.left && r.right <= V.right && r.top >= V.top + 40 && r.bottom <= V.bottom) return;
   const k = Math.min(cam.k, 0.9 * V.width / r.width * cam.k, 0.85 * (V.height - 40) / r.height * cam.k);
   if (k < cam.k) { const cx = r.left + r.width / 2, cy = r.top + r.height / 2; zoomAt(cx, cy, k / cam.k); }
@@ -1731,14 +1766,19 @@ function replay(n, tr, k) {
   document.querySelectorAll("#view text[data-var]").forEach(x => {
     const v = x.getAttribute("data-var");
     if (!(v in at) || !inside.has(x.getAttribute("data-pbox"))) return;
+    // a label left of its port keeps its right end at the port (the value may be longer than the type)
+    const w0 = x.getComputedTextLength();
     x.setAttribute("data-orig", x.textContent);
     x.textContent = v + " = " + fmt(at[v]);
     x.classList.add("pv-val");
+    if (x.getAttribute("data-side") === "left") { x.setAttribute("data-ox", x.getAttribute("x"));
+      x.setAttribute("x", +x.getAttribute("x") + w0 - x.getComputedTextLength()); }
   });
 }
 function clearReplay() {
   document.querySelectorAll("#view text[data-orig]").forEach(x => { x.textContent = x.getAttribute("data-orig");
-    x.removeAttribute("data-orig"); x.classList.remove("pv-val"); });
+    x.removeAttribute("data-orig"); x.classList.remove("pv-val");
+    if (x.hasAttribute("data-ox")) { x.setAttribute("x", x.getAttribute("data-ox")); x.removeAttribute("data-ox"); } });
 }
 function afterRender() {
   if (previewing) { const p = previewing; previewing = null; showPreview(p); }
@@ -1746,6 +1786,7 @@ function afterRender() {
   const n = panel && byId[panel.id], w = n && n.badge && tagOf(n.badge.text) === panel.tag && n.badge.why;
   if (w && w.trace) replay(n, w.trace, Math.min(panel.step || 0, w.trace.steps.length - 1));
   renderQueue();
+  if (inspector.open && inspector.tab !== "problems") renderInspector();   // new results: the details too
 }
 // The checks run by the editor: the button starts them (or stops them), and
 // the places where their results will be show three dots meanwhile.

@@ -1,14 +1,27 @@
-## Payment assistant agent: decomposing a task
+## Payment assistant agent: splitting a task among sub-agents
 
 **The question.** An assistant agent splits a task among sub-agents, each
 with a contract over its tool calls. Do the contracts of the sub-agents,
 together, refine the contract of the parent agent? If not, what is missing,
 and which sub-agent must do it?
 
+**What it shows.**
+- Refinement (LTL, nuXmv): the plan with the sub-agents as given does not
+  refine the parent; the counterexample pays and never sends the text
+  (0.5 s).
+- Quotient: Q3 = Parent / (Messages ∥ Payment ∥ Keep), the weakest
+  contract of sub-agent 3; it asks for `F text3`.
+- Refinement: _Text_ with `F text3` refines Q3 (0.0 s), and the plan with
+  it refines the parent (0.6 s).
+- Unsat core: a parent that also says "never pay" is inconsistent; the
+  core is the two clauses in conflict, `F tx2` and `G !tx2` (0.2 s).
+- Diagrams: the plan inside the parent, and the quotient drawn as a dashed
+  box with the candidate inside.
+
 <p align="center">
-  <img src="images/plan-of-sub-agents.png" alt="The plan: the sub-agents inside the contract of the parent">
+  <img src="images/overview-plan-and-quotient.png" alt="The page of the demo: the plan of the sub-agents inside the parent (refinement tag red), the quotient Q3 with Text inside it (green), and the parent with the slip, with its core">
   <br>
-  <em>The plan: the sub-agents inside the contract of the parent.</em>
+  <em>The plan of the sub-agents inside the parent, the quotient Q3 with <em>Text</em> inside it, and the parent with the slip.</em>
 </p>
 
 The task comes from [AppWorld](https://arxiv.org/abs/2407.18901) (task
@@ -48,9 +61,9 @@ the parent: the counterexample pays and never sends the text. No sub-agent
 promises `F text3`.
 
 <p align="center">
-  <img src="images/plan-does-not-refine-parent.png" alt="Step 1: the plan does not refine the parent; Text does not promise F text3">
+  <img src="images/step1-plan-does-not-refine-parent.png" alt="Step 1: the refinement tag of the plan clicked; the panel shows the counterexample in two steps (pay, then paid, and text3 false), and its values on the ports">
   <br>
-  <em>Step 1: the plan does not refine the parent; Text does not promise F text3.</em>
+  <em>Step 1: the plan does not refine the parent; in the counterexample <code>text3</code> stays false.</em>
 </p>
 
 **Step 2. What sub-agent 3 must do.** Only sub-agent 3 can send the text
@@ -59,15 +72,21 @@ promises `F text3`.
 with which the plan refines the parent. It asks for the rules of its tools
 and `F text3`.
 
+<p align="center">
+  <img src="images/step2-quotient-q3.png" alt="Step 2: the parent with Keep, Messages, Payment, and the dashed box Q3 open, which guarantees F text3">
+  <br>
+  <em>Step 2: Q3, what sub-agent 3 must do: its guarantees end with <code>F text3</code>.</em>
+</p>
+
 **Step 3. The repaired sub-agent.** _Text_ with `F text3` refines Q3, so
 the plan refines the parent. It may assume that the payment is done sooner
 or later (`F paid`): Q3 assumes it from what the other sub-agents
 guarantee.
 
 <p align="center">
-  <img src="images/quotient-q3-text-refines.png" alt="Steps 2 and 3: Q3 asks for F text3; Text refines it">
+  <img src="images/step3-text-refines-q3.png" alt="Step 3: Text open inside Q3, with the assumption F paid and the guarantee F text3; the refinement tag of Q3 is green">
   <br>
-  <em>Steps 2 and 3: Q3 asks for F text3; Text refines it.</em>
+  <em>Step 3: <em>Text</em>, with <code>F text3</code>, refines Q3.</em>
 </p>
 
 **Step 4. A clause against the request.** If the parent also says "never
@@ -76,7 +95,7 @@ inconsistent, and the unsat core is the two clauses in conflict: `F tx2`
 and `G !tx2`.
 
 <p align="center">
-  <img src="images/parent-inconsistent-core.png" alt="Step 4: the inconsistent parent, with the core highlighted in red">
+  <img src="images/step4-parent-inconsistent-core.png" alt="Step 4: ParentWithSlip with its consistency tag red, and the two clauses of the core, F tx2 and G !tx2, highlighted">
   <br>
   <em>Step 4: the inconsistent parent, with the core highlighted in red.</em>
 </p>
@@ -85,22 +104,19 @@ and `G !tx2`.
 The directory of the demo contains:
 - `requirements.txt`: the task, the plan, the variables, the contract of
   the parent (H1 to H8), and the contracts of the sub-agents;
-- `assistant.py`: the steps with the CHASE Python package.
+- `assistant.py`: the steps with the CHASE Python package;
+- `out/assistant.html`: the diagram above, written by `assistant.py`.
 
-### Python Flow
-The script needs the CHASE Python package, version 0.5.0, and nuXmv. From
-the directory of the demo:
+### Run it
 
 ```
-$> pip install chase-cps
-$> chase-cps install nuxmv --accept-license
-$> python3 assistant.py
+pip install chase-cps
+chase-cps install nuxmv --accept-license
+python assistant.py --expect
 ```
 
-The script prints the result of each step and writes the diagrams above in
+The script prints the result of each step and writes the diagram in
 `out/assistant.html`, a page to open in a browser: a click on a name opens
-or closes the contract, and a click on a red tag shows its core. The task
-and the contracts in words are in `requirements.txt`.
-
+or closes the contract, and a click on a red tag shows its counterexample.
 With `--expect` the script exits with code 1 when a result is not the
 expected one.

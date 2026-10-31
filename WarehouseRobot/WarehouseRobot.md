@@ -1,13 +1,25 @@
-## Warehouse robot: a controller to delegate
+## Warehouse robot: the contract of a controller to delegate
 
 **The question.** The local controller of a warehouse robot is given to a
 designer while perception and localization stay as they are. What must the
 controller satisfy for the robot to meet the requirements of the system?
 
+**What it shows.**
+- Quotient on reals: Q = System / (Perception ∥ Localization), the weakest
+  contract of the controller, the one to give to the designer; it asks for
+  `|w| <= 0.8`, what perception assumes.
+- Refinement on reals (nuXmv, SMT): the requirements written for the
+  mission alone do not refine Q, nor do they with margins for the errors;
+  each counterexample turns faster than perception allows (0.0 s each).
+- Refinement: the contract given to the designer refines Q (0.0 s), and
+  the robot with it refines the system (0.2 s).
+- Diagrams: the quotient drawn as a dashed box between perception and
+  localization, with each candidate inside it.
+
 <p align="center">
-  <img src="images/hole-q-for-controller.png" alt="The place of the controller: the hole Q next to perception and localization">
+  <img src="images/overview-three-candidates.png" alt="The page of the demo: three copies of the system, each with perception, localization, and the quotient Q with a candidate inside: MissionOnly (red), Margins (red), Dispatched (green)">
   <br>
-  <em>The place of the controller: the hole Q next to perception and localization.</em>
+  <em>The three candidate contracts of the controller, each in the place of the controller: two fail, one holds.</em>
 </p>
 
 The example is simplified from Damera, Matheu, and Baras, "Contract-Based
@@ -35,25 +47,32 @@ of the controller with which the robot meets the requirements: the contract
 to give to the designer. It guarantees the requirements of the system, and
 what perception assumes of the controller: `|w| <= 0.8`.
 
+<p align="center">
+  <img src="images/step1-quotient-q.png" alt="Step 1: the system with perception, localization, and the dashed box Q open, which guarantees G (c_true >= 0.4), F (rest & e_true <= 0.1), and G (w <= 0.8 & w >= -0.8)">
+  <br>
+  <em>Step 1: Q, the place of the controller, between perception and localization.</em>
+</p>
+
 **Step 2. The requirements of the mission.** _MissionOnly_, the
 requirements written on what the controller sees, does not refine Q: in the
 counterexample the reported clearance is 0.40 while the true one is
 lower, and the robot turns faster than perception allows.
 
 <p align="center">
-  <img src="images/missiononly-does-not-refine-q.png" alt="Step 2: MissionOnly does not refine Q">
+  <img src="images/step2-missiononly-does-not-refine-q.png" alt="Step 2: MissionOnly inside Q; the refinement tag of Q is red, and the panel shows the counterexample">
   <br>
-  <em>Step 2: MissionOnly does not refine Q.</em>
+  <em>Step 2: <em>MissionOnly</em> does not refine Q; the counterexample in the panel and on the wires.</em>
 </p>
 
 **Step 3. With margins for the errors.** _Margins_ adds the errors of
 perception and localization to the bounds, and does not refine Q either: it
-turns faster than perception allows, and the robot reaches the worker.
+turns faster than perception allows (`|w| = 1.2` in the counterexample), and
+the robot reaches the worker.
 
 <p align="center">
-  <img src="images/margins-does-not-refine-q.png" alt="Step 3: Margins does not refine Q">
+  <img src="images/step3-margins-does-not-refine-q.png" alt="Step 3: Margins inside Q; the refinement tag of Q is red, and the panel shows the counterexample">
   <br>
-  <em>Step 3: Margins does not refine Q.</em>
+  <em>Step 3: <em>Margins</em> does not refine Q: a yaw rate of 1.2 is allowed (the counterexample in the panel).</em>
 </p>
 
 **Step 4. With the yaw rate.** _Dispatched_, the contract given to the
@@ -61,9 +80,9 @@ designer, is _Margins_ with `|w| <= 0.8`. It refines Q, so the robot with
 it meets the requirements of the system.
 
 <p align="center">
-  <img src="images/dispatched-refines-q.png" alt="Step 4: Dispatched refines Q">
+  <img src="images/step4-dispatched-refines-q.png" alt="Step 4: Dispatched inside Q, with the guarantee G (w <= 0.8 & w >= -0.8); the refinement tag of Q is green">
   <br>
-  <em>Step 4: Dispatched refines Q.</em>
+  <em>Step 4: <em>Dispatched</em> refines Q.</em>
 </p>
 
 The paper finds the same two failures in simulation.
@@ -72,22 +91,18 @@ The paper finds the same two failures in simulation.
 The directory of the demo contains:
 - `requirements.txt`: the variables, the contracts, and the three candidate
   contracts of the controller;
-- `warehouse.py`: the steps with the CHASE Python package.
+- `warehouse.py`: the steps with the CHASE Python package;
+- `out/warehouse.html`: the diagram above, written by `warehouse.py`.
 
-### Python Flow
-The script needs the CHASE Python package, version 0.5.0, and nuXmv. From
-the directory of the demo:
+### Run it
 
 ```
-$> pip install chase-cps
-$> chase-cps install nuxmv --accept-license
-$> python3 warehouse.py
+pip install chase-cps
+chase-cps install nuxmv --accept-license
+python warehouse.py --expect
 ```
 
 The script prints the result of each step, with the counterexamples, and
-writes the diagrams above in `out/warehouse.html`, a page to open in a
-browser: a click on a name opens or closes the contract. The contracts in
-words are in `requirements.txt`.
-
-With `--expect` the script exits with code 1 when a result is not the
-expected one.
+writes the diagram in `out/warehouse.html`, a page to open in a browser: a
+click on a name opens or closes the contract. With `--expect` the script
+exits with code 1 when a result is not the expected one.
