@@ -1,0 +1,42 @@
+NAME: heater;
+
+# A room heated by a thermostat, over 10 steps. The heater adds u units
+# per step and the room loses 1. The thermostat heats (u = 3) while the
+# temperature is below theta. The requirement: the temperature stays at
+# most tmax.
+
+CONTRACT Room:
+    input integer (0:3) variable u;
+    output integer (0:200) variable T;
+    Assumptions:
+        true;
+    Guarantees:
+        T = 60;
+        G[0,9] (T' = T + u - 1);
+
+CONTRACT Thermostat:
+    input integer (0:200) variable T;
+    output integer (0:3) variable u;
+    integer constant theta 76;
+    Assumptions:
+        true;
+    Guarantees:
+        G[0,9] ((T < theta -> u = 3) & (T >= theta -> u = 0));
+
+# One step of the thermostat: the contract of the C function heater.c.
+CONTRACT ThermostatStep:
+    input integer (0:200) variable T;
+    output integer (0:3) variable u;
+    integer constant theta 76;
+    Assumptions:
+        true;
+    Guarantees:
+        (T < theta -> u = 3) & (T >= theta -> u = 0);
+
+CONTRACT Comfort:
+    output integer (0:200) variable T;
+    integer constant tmax 75;
+    Assumptions:
+        true;
+    Guarantees:
+        G[0,10] (T <= tmax);

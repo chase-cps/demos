@@ -47,10 +47,22 @@ website and its README show each step with its diagram.
     its gates is realizable.
 - [**DATE21**][DATE21]: the hands-on tutorial of the DATE 2021 University
     Booth, with the console tools of CHASE.
+- [**Braking**][BRAKING] (emergency braking): the braking system of
+    ContrACT (MEMOCODE 2026). Brake 1 misses its bound by 0.05 ms; repair
+    finds the least change of the bound (4.05) or of the inconsistency of
+    the network link (11, or 10.05 when Brake 1 absorbs part of the delay).
+- [**Heater**][HEATER] (thermostat): a thermostat in signal temporal logic
+    overshoots its requirement; repair finds the threshold (74), the worst
+    case is given by the robustness, and ESBMC checks that the C code of
+    the thermostat implements the repaired step.
+- [**Deadline**][DEADLINE] (arbiter): the least bound on the waiting time of
+    a request (2), repaired by counterexamples from nuXmv and checked
+    against every value.
 
 The Python scripts use the CHASE Python package, version 0.5.0 or later
 (`pip install chase-cps`; BufferSwap and Escalation with
-`pip install "chase-cps[rtl]"`), and nuXmv and slugs, which `chase-cps
+`pip install "chase-cps[rtl]"`; Braking, Heater, and Deadline with version
+0.6.0 and `pip install "chase-cps[z3]"`, and Heater with ESBMC or CBMC), and nuXmv and slugs, which `chase-cps
 install` installs. The console scripts expect `dsl_tool`, `logics_tool`,
 `slugs` (with its compiler, `$SLUGS/tools/StructuredSlugsParser/compiler.py`),
 and `nuXmv` in the `PATH`. The Docker image of CHASE
@@ -71,3 +83,6 @@ all of them but nuXmv, whose license does not allow redistribution:
 [WAREHOUSE]: WarehouseRobot/WarehouseRobot.md
 [PAYMENT]: PaymentAssistant/PaymentAssistant.md
 [ESCALATION]: Escalation/Escalation.md
+[BRAKING]: Braking/Braking.md
+[HEATER]: Heater/Heater.md
+[DEADLINE]: Deadline/Deadline.md

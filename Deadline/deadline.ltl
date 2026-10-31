@@ -1,0 +1,47 @@
+NAME: deadline;
+
+# A client asks for a resource and keeps asking until it is granted; the
+# arbiter grants it every third step (a round robin over three slots). Wait
+# counts the steps a request has waited. The requirement: no request waits
+# more than k steps.
+
+CONTRACT Client:
+    input boolean variable grant;
+    output boolean variable req;
+    Assumptions:
+        true;
+    Guarantees:
+        G ((req & !grant) -> X req);
+
+CONTRACT Arbiter:
+    input boolean variable req;
+    output boolean variable grant;
+    output integer (0:2) variable c;
+    Assumptions:
+        true;
+    Guarantees:
+        c = 0;
+        G ((c < 2) -> (c' = c + 1));
+        G ((c = 2) -> (c' = 0));
+        G (grant <-> (c = 2));
+
+CONTRACT Wait:
+    input boolean variable req;
+    input boolean variable grant;
+    output integer (0:9) variable w;
+    Assumptions:
+        true;
+    Guarantees:
+        w = 0;
+        G ((req & !grant) -> (w' = w + 1));
+        G (!(req & !grant) -> (w' = 0));
+
+CONTRACT Bound:
+    input boolean variable req;
+    input boolean variable grant;
+    input integer (0:9) variable w;
+    integer constant k 1;
+    Assumptions:
+        true;
+    Guarantees:
+        G (w <= k);
