@@ -28,7 +28,7 @@ The contracts are in SystemVerilog Assertions (sva/), the RTL in Verilog
      one cycle. In the whole link, a ping escalates the receiver.
 
 The page out/escalation.html draws the system inside Functional, with
-Functional and the receiver open.
+Functional and the receiver open, and the fast sender with its contract.
 
     python escalation.py
     python escalation.py --expect     # exit code 1 when a result is not the expected one
@@ -127,8 +127,10 @@ def main() -> int:
          lambda: refines(sender, slot, timeout=t))
 
     fast = rtl("esc_sender_fast", "esc_sender_fast.v")
-    step("5. The RTL of the fast sender implements Sender", "invalid",
-         lambda: is_implementation(fast, sender, timeout=t), show=True)
+    faster = Component("FastSender", sender, fast)
+    in_fast = step("5. The RTL of the fast sender implements Sender", "invalid",
+                   lambda: is_implementation(fast, sender, timeout=t), show=True)
+    faster.status = in_fast.status
     whole_fast = rtl("esc_link_fast", "esc_sender_fast.v", "esc_channel.v", "esc_receiver.v",
                      "esc_link_fast.v")
     step("   The whole RTL with the fast sender implements Functional", "invalid",
@@ -137,9 +139,11 @@ def main() -> int:
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     # Functional and the receiver are drawn open: the requirement, and the
     # contract and the state machine (4 states) of the receiver. The sender
-    # (23 states) stays closed; the channel has no registers.
-    page = viz.save(viz.diagram(link, title="Escalation link",
-                                open=[functional, link.components[2]]),
+    # (23 states) stays closed; the channel has no registers. The fast sender
+    # is drawn next to the link, with the counterexample on its tag.
+    page = viz.save(viz.diagram(link, faster, title="Escalation link",
+                                open=[functional, link.components[2]],
+                                why=[(faster, "M ⊨ C", in_fast, sender)]),
                     os.path.join(HERE, "out", "escalation.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 

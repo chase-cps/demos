@@ -38,6 +38,7 @@ Jasper.
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import os
 import sys
 import time
@@ -117,23 +118,25 @@ def main() -> int:
                             Component("Consumer", consumer)], contract=system)
     old.status = step("1. Producer, TwoFifo, Consumer refine System", "valid", old_system)
 
+    found = {}
+
     def swap():
-        r = refines(one, two)
+        r = found["swap"] = refines(one, two)
         part = getattr(r, r.failed) if r.failed else None
         text = f"   the {r.failed} fail; a counterexample:\n" + trace(part) if part is not None else ""
         return r.status, text
-    swapped = step("2. OneFifo refines TwoFifo", "invalid", swap)
+    step("2. OneFifo refines TwoFifo", "invalid", swap)
 
     # the quotient, with its terms: the guarantees of the neighbours are
     # assumed, and the guarantees of the system are guaranteed
     slot = system.divide(producer.compose(consumer), name="Slot", discharge=True)
 
     def quotient():
-        r = refines(one, slot)
+        r = found["slot"] = refines(one, slot)
         return r.status, ("   Slot = System / (Producer, Consumer)"
                           "\n   assume: " + "; ".join(ltl.to_str(f) for f in slot.assumptions)
                           + "\n   guarantee: " + "; ".join(ltl.to_str(f) for f in slot.guarantees))
-    in_slot = step("3. OneFifo refines Slot", "valid", quotient)
+    step("3. OneFifo refines Slot", "valid", quotient)
 
     def new_system():
         s = producer.compose(one, discharge=True).compose(consumer, discharge=True)
@@ -161,8 +164,12 @@ def main() -> int:
         step("   the RTL of bsg_one_fifo implements Slot", "valid", rtl_check(one_rtl, slot))
         step("   the RTL of bsg_one_fifo implements TwoFifo", "invalid", rtl_check(one_rtl, two))
 
-    # the old system; OneFifo inside TwoFifo, which it does not refine; OneFifo in the hole of Slot
-    page = viz.save(viz.diagram(old, refines=[(new_fifo, two, swapped), (new_fifo, slot, in_slot)],
+    # the old system; OneFifo inside TwoFifo, which it does not refine; OneFifo in the hole of Slot.
+    # The results of the refinements go with them, so that the page shows the counterexample.
+    # TwoFifo is drawn as a copy: the page puts the counterexample on the first box of a
+    # contract, which for TwoFifo itself is the buffer of the old system.
+    page = viz.save(viz.diagram(old, refines=[(new_fifo, dataclasses.replace(two), found["swap"]),
+                                              (new_fifo, slot, found["slot"])],
                                 open=[slot], title="Buffer swap"),
                     os.path.join(HERE, "out", "bufferswap.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
