@@ -4,69 +4,69 @@
   "contracts": {
     "Autopilot": {
       "feasible": {
-        "key": "2606dc57fd687bf8",
+        "key": "a0756e88f9a6977c",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-30T00:33:29"
+        "seconds": 0.02,
+        "at": "2026-10-31T02:13:38"
       }
     },
     "AutopilotFirst": {
       "feasible": {
-        "key": "904986f6f831dd81",
+        "key": "c0fafdd6bd2a6252",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:33:29"
+        "seconds": 0.06,
+        "at": "2026-10-31T02:13:38"
       }
     },
     "Sensor": {
       "feasible": {
-        "key": "d0aca857a85cfa6f",
+        "key": "a7b2fbe65476fe9c",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:33:29"
+        "at": "2026-10-31T02:13:38"
       }
     },
     "SensorFirst": {
       "feasible": {
-        "key": "bf96a3c82a66016d",
+        "key": "b44845d6256b8b75",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:33:29"
+        "seconds": 0.01,
+        "at": "2026-10-31T02:13:38"
       }
     },
     "System": {
       "feasible": {
-        "key": "c9eddbbb92960c92",
+        "key": "82368f23509038b4",
         "result": "sat",
-        "tool": "nuxmv/bdd",
+        "tool": "nuxmv/ic3",
         "seconds": 0.02,
-        "at": "2026-10-30T00:33:29"
+        "at": "2026-10-31T02:13:38"
       }
     },
     "SystemTimed": {
       "feasible": {
-        "key": "7ec82b1b933ef844",
+        "key": "6744004f2141874c",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:33:29"
+        "at": "2026-10-31T02:13:38"
       }
     }
   },
   "relations": [
     {
-      "key": "90faa925ff18ccf0",
+      "key": "b3cfa2edfe319760",
       "check": "refines",
       "refined": "Autopilot+Sensor",
       "abstract": "System",
       "result": "invalid",
       "tool": "nuxmv/ic3",
-      "seconds": 0.04,
-      "at": "2026-10-30T00:33:29",
+      "seconds": 0.05,
+      "at": "2026-10-31T02:13:38",
       "failed": "guarantees"
     }
   ]

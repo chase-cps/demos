@@ -1,63 +1,93 @@
-## IEEE/ACM Design Automation and Test in Europe 2021 - University Booth
+## Tutorial of DATE 2021: from requirements to a controller, with the two languages of CHASE
 
-This demo has been originally presented at the University Booth of the IEEE/ACM
-Design Automation and Test in Europe 2021. The demo is meant to guide the user 
-in using the two main modes of use provided by CHASE, _i.e._, using the Domain
-Specific Language (DSL) provided with the framework, or using the Logic-based
-language available in CHASE.
+**The question.** How does one go from requirements to a controller with
+CHASE? This hands-on tutorial was presented at the University Booth of the
+IEEE/ACM Design Automation and Test in Europe 2021. It guides the user
+through the two modes of use of CHASE: the domain-specific language (DSL)
+of patterns, on the power system of an aircraft, and the logic language
+with its console, on a robotic arm that picks, turns, and places a piece.
 
-### Content of the directory
-The directory of the demo contains:
-- `specs/`: the specification files to be used during the demo;
-- `solution.script`: the commands of the logics-based flow.
+**What it shows.**
+- The DSL (`dsl_tool`): requirements written as patterns become a GR(1)
+  specification for slugs. As written they are unrealizable; relaxed, they
+  are realizable, and slugs writes a controller of 97 states.
+- The console of the logic language (`logics_tool`): `show`, `refinement`,
+  `compose`, `verify`, and `synthesize`, one command per operation.
+- Refinement (nuXmv): _Mission_ refines _Target_; _Target_ does not refine
+  _Mission_, with a counterexample of five steps.
+- Composition and verification: the seven contracts composed into one
+  system, which is compatible and consistent (nuXmv finds a run of the
+  assumptions, of the guarantees, and of both).
+- Synthesis (slugs, GR(1)): the coordinator is realizable, and slugs writes
+  a controller of 128 states.
+- Diagrams: `diagram.sh` draws the refinements and the whole system with
+  the checks of each contract (all of them in 0.7 s).
 
-### DSL-based Flow
+<p align="center">
+  <img src="images/overview-all-checks.png" alt="The page of the demo: Mission inside Target (refinement green), Target inside Mission (refinement red), and the whole system with Mission, Coordinator, Move, Turn, Pick, and Place, each compatible, consistent, and realizable">
+  <br>
+  <em>The page of the demo: the two refinements and the whole system, with the checks of each contract.</em>
+</p>
 
-The first part of the demo is based on the DSL proposed in [1]. The objective
-is to realize a controller for a system starting from a set of requirements.
-The system is the Electrical Power System (EPS) described in [1]. 
+The power system of the first part is that of Nuzzo et al., "CHASE:
+Contract-based requirement engineering for cyber-physical system design"
+(DATE 2018); `../DATE18` has the same system with the Python package. Its
+requirements are:
 
-The requirements of the system are the following:
-#### Requirements
-- If possible, left DC buses shall be powered by left generators
-- Failed generators must be disconnected within 15 ms
-- Generators shall never connect in parallel through AC buses
-- A DC bus shall never be unpowered for more than 15 ms
+- If possible, left DC buses shall be powered by left generators.
+- Failed generators must be disconnected within 15 ms.
+- Generators shall never connect in parallel through AC buses.
+- A DC bus shall never be unpowered for more than 15 ms.
 
-#### Assumptions
-- When a contactor receives an open signal, it opens in 10ms or less
-- When a contactor receives an close signal, it closes in 10ms or less
-- Generators do not recover from failures
-- AC buses do not fail
-- Rectifiers do not fail
-- DC buses do not fail
-- Loads do not fail
-- At most 1 generator may fail
+Its assumptions are:
 
-The requirements are expressed using the DSL in
-`specs/template_0_unrealizable.txt`.
+- When a contactor receives an open signal, it opens in 10 ms or less.
+- When a contactor receives a close signal, it closes in 10 ms or less.
+- Generators do not recover from failures.
+- AC buses, rectifiers, DC buses, and loads do not fail.
+- At most 1 generator may fail.
 
-The first step, is to formalize the requirements by using CHASE:
+The robotic arm of the second part is described by seven contracts in
+`specs/robotic_arm.ltl`:
+
+- _Target_: the requirements of the mission;
+- _Mission_: the actions to be completed by the robot;
+- _Coordinator_: the controller of the system;
+- _Move_, _Turn_, _Pick_, _Place_: the four actions.
+
+### The steps
+
+**Step 1. The requirements in the DSL.** The requirements are expressed in
+`specs/template_0_unrealizable.txt`. The first step is to formalize them
+with CHASE:
 
 `$> dsl_tool -i specs/template_0_unrealizable.txt -o /tmp/template_0`
 
 The command writes `/tmp/template_0.structuredSlugs`, the specification for
-slugs. Then, verify the realizability of the specifications, using slugs.
-Slugs reads its own input format, so the file is first translated with the
-compiler distributed with slugs (`$SLUGS` is the directory of slugs; with
-`chase-cps install slugs`, it is under `~/.chase`):
+slugs. Slugs reads its own input format, so the file is first translated
+with the compiler distributed with slugs (`$SLUGS` is the directory of
+slugs; with `chase-cps install slugs`, it is under `~/.chase`):
 
 `$> python3 $SLUGS/tools/StructuredSlugsParser/compiler.py /tmp/template_0.structuredSlugs > /tmp/template_0.slugsin`\
 `$> slugs /tmp/template_0.slugsin`\
 `RESULT: Specification is unrealizable.`
 
-However, the requirements are not realizable. Thus, replace the second and
-fourth requirements with the following:
-- Failed generators must be disconnected within 20 ms
-- A DC bus shall never be unpowered for more than 30 ms
+The same check with the CHASE Python package, which calls slugs itself:
+
+`$> python3 -c "from chase_cps import load_dsl, is_realizable; print(is_realizable(load_dsl('specs/template_0_unrealizable.txt')).status)"`\
+`unrealizable`
+
+`../DATE18` shows the unrealizable core: the pattern that never connects
+the generators in parallel, and the 15 ms bound of one DC bus.
+
+**Step 2. Relaxed requirements, and a controller.** The second and the
+fourth requirements are replaced by:
+
+- Failed generators must be disconnected within 20 ms.
+- A DC bus shall never be unpowered for more than 30 ms.
 
 The file `specs/template_0_synthesizable.txt` specifies these requirements.
-Thus, first let's verify its realizability and try to synthesize it:
+Its realizability is checked, and a controller synthesized:
 
 `$> dsl_tool -i specs/template_0_synthesizable.txt -o /tmp/template_0`\
 `$> python3 $SLUGS/tools/StructuredSlugsParser/compiler.py /tmp/template_0.structuredSlugs > /tmp/template_0.slugsin`\
@@ -65,136 +95,127 @@ Thus, first let's verify its realizability and try to synthesize it:
 `RESULT: Specification is realizable.`\
 `$> slugs --explicitStrategy --jsonOutput /tmp/template_0.slugsin > /tmp/template_0.json`
 
-The last command writes the Mealy Machine implementing the control strategy
-for the system (in JSON).
+The last command writes the Mealy machine of the control strategy, in
+JSON: 97 states.
 
-The same checks can be run with the CHASE Python package, which calls slugs
-itself:
+**Step 3. Refinement in the console.** The second part uses the logic
+language. The specification is read by `logics_tool`, which opens its
+console (the command `help` lists the commands, and `show` prints the
+contracts):
 
-`$> python3 -c "from chase_cps import load_dsl, is_realizable; print(is_realizable(load_dsl('specs/template_0_unrealizable.txt')).status)"`\
-`unrealizable`
+`$> logics_tool -i specs/robotic_arm.ltl -o /tmp/`
 
-### Logic-based Flow
-
-The second part of the demo is based on the logic-based language of CHASE. In
-particular, it is based on a set of contracts expressed in LTL. 
-The system being modeled is a robotic arm, which has to pick, turn and place
-a piece of material.
-
-The formalization is provided in `specs/robotic_arm.ltl`.
-The specification is manipulated using the `logics_tool`:
-
-`logics_tool -i specs/robotic_arm.ltl -o /tmp/`
-
-The command will open the front-end console, which provides a set of commands
-that can be seen by using the `help` command.
-
-First, let's read the system specification:
-
-`$> show`
-
-The system is described by seven contracts:
-- _Target_: requirements of the mission; 
-- _Mission_: modeling the actions to be completed by the robot;
-- _Coordinator_: modeling the controller of the system;
-- _Move_: modeling the move action;
-- _Turn_: modeling the turn action;
-- _Pick_: modeling the pick action;
-- _Place_: modeling the place action.
-
-The console, allows to verify whether the _Target_ contract refines _Mission_,
-or viceversa. To do this:
+The console checks whether _Target_ refines _Mission_, or the reverse:
 
 `$> refinement Target Mission TM.smv`\
 `$> refinement Mission Target MT.smv`\
 `$> exit`
 
-Once back to the system console:
+Back to the system console:
 
 `$> nuXmv /tmp/TM.smv`
 
-The second formula is false, then _Target_ does not refine _Mission_.
-
-Then:
+The second formula is false: _Target_ does not refine _Mission_. _Target_
+does not set the target position or the angle: in the counterexample, the
+piece is picked at step 1, and at step 2 `xtarget`, `ytarget`, and
+`desired_angle` are still 0.
 
 `$> nuXmv /tmp/MT.smv`
 
-Both formulas are true. _Mission_ refines _Target_.
+Both formulas are true: _Mission_ refines _Target_. It keeps the
+assumptions of _Target_ and adds the target position and the angle to its
+guarantees.
 
-Then, it is possible to compose the system to create the complete specification.
-To do this, it is necessary to re-open the logics tool:
+<p align="center">
+  <img src="images/step3-mission-refines-target.png" alt="Step 3: Mission inside Target; Mission refines Target">
+  <br>
+  <em>Step 3: Mission refines Target (⪯ green).</em>
+</p>
 
-`$> logics_tool -i specs/robotic_arm.ltl -o /tmp/`
+<p align="center">
+  <img src="images/step3-target-does-not-refine-mission.png" alt="Step 3: Target inside Mission; the refinement fails, the guarantees of Mission that fail in red, and the counterexample in the panel at step 2">
+  <br>
+  <em>Step 3: Target does not refine Mission; the counterexample at step 2.</em>
+</p>
 
-The objective is to compose the system by using the logics tool.
-  
+**Step 4. The whole system.** The console composes the contracts into the
+complete specification, and checks it:
+
+`$> logics_tool -i specs/robotic_arm.ltl -o /tmp/`\
 `$> compose Mission Coordinator Top`\
 `$> verify Top top`\
 `$> compose Move Turn MT`\
 `$> compose MT Pick MTP`\
 `$> compose MTP Place Bottom`\
-`$> compose Top Bottom System` \
-`$> synthesize Coordinator coordinator slugs`
+`$> compose Top Bottom System`\
+`$> verify System system`\
+`$> exit`
 
-Finally, it is possible to verify the consistency and compatibility of the
-_System_ contract.
+`verify` writes `system.smv` with three properties: the negation of the
+assumptions, of the guarantees, and of both together. Each is expected to
+be false, and bounded model checking (`-bmc`) finds the counterexamples at
+once:
 
-`$> verify System system`
-
-The last command generates the `system.smv` to be used in nuXmv to verify
-the consistency and the compatibility of the contract. The properties are
-expected to be false, and bounded model checking (`-bmc`) finds the
-counterexamples at once:
-
-`$> exit`\
 `$> nuXmv -bmc /tmp/system.smv`
 
-For both assertions, the model checker returns a counter strategy: the
-contract is consistent and compatible.
+The three properties are false: the contract is compatible (its
+assumptions can hold), consistent (its guarantees can hold), and its
+assumptions and guarantees can hold together. `top.smv` gives the same
+results for _Top_.
 
-Finally, it is possible to synthesize the coordinator controller by using
-slugs, from the file written by `synthesize`:
+<p align="center">
+  <img src="images/step4-whole-system.png" alt="Step 4: the whole system: Mission, Coordinator, Move, Turn, Pick, and Place wired by their variables, each compatible (A), consistent (G), and realizable (R)">
+  <br>
+  <em>Step 4: the whole system, each contract compatible (A), consistent (G), and realizable (R).</em>
+</p>
+
+**Step 5. The coordinator.** In the console, `synthesize` writes the
+specification of the coordinator for slugs:
+
+`$> synthesize Coordinator coordinator slugs`
+
+Then slugs synthesizes the controller:
 
 `$> python3 $SLUGS/tools/StructuredSlugsParser/compiler.py /tmp/coordinator.structuredSlugs > /tmp/coordinator.slugsin`\
 `$> slugs /tmp/coordinator.slugsin`\
 `RESULT: Specification is realizable.`\
 `$> slugs --explicitStrategy --jsonOutput /tmp/coordinator.slugsin > /tmp/coordinator.json`
 
-The last command writes the Finite State Machine implementing the
-coordinator specification (in JSON).
+The last command writes the finite state machine of the coordinator, in
+JSON: 128 states.
 
-The file `solution.script` is a script specifying all the commands for the
-logics tool. The script will produce the files: `MT.smv`, `TM.smv`,
-`top.smv`, `system.smv`, and `coordinator.structuredSlugs` in the chosen output
-directory.
+### Content of the directory
+The directory of the demo contains:
+- `specs/requirements_1.txt`: the requirements of the power system, in
+  English;
+- `specs/template_0_unrealizable.txt`, `specs/template_0_synthesizable.txt`:
+  the power system in the DSL, as written and relaxed;
+- `specs/robotic_arm.ltl`: the seven contracts of the robotic arm;
+- `specs/robotic_arm.results.json`: the results kept by `chase-cps view`;
+- `solution.script`: all the commands of the console, steps 3 to 5;
+- `diagram.sh`: draws `out/robotic_arm.html` with `chase-cps view`;
+- `out/robotic_arm.html`: the diagrams above.
 
-### Diagram
-`sh diagram.sh` writes `out/robotic_arm.html`, a page to open in a browser:
-_Mission_ inside _Target_ and _Target_ inside _Mission_, drawn open, with the
-result of each refinement, and the whole system, _Mission_ ∥ _Coordinator_ ∥
-_Move_ ∥ _Turn_ ∥ _Pick_ ∥ _Place_, with the compatibility (A), the
-consistency (G), and the realizability (R) of each contract. It needs
-`chase-cps` and nuXmv.
+### Run it
 
-<p align="center">
-  <img src="images/mission-refines-target.png" alt="Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees">
-  <br>
-  <em>Mission refines Target: it keeps the assumptions of Target and adds the target position and the angle to its guarantees.</em>
-</p>
+```
+pip install chase-cps                       # version 0.5.0 or later
+chase-cps install nuxmv --accept-license
+chase-cps install slugs
+sh diagram.sh
+```
 
-<p align="center">
-  <img src="images/target-does-not-refine-mission.png" alt="Target does not refine Mission: it does not set the target position or the angle">
-  <br>
-  <em>Target does not refine Mission: it does not set the target position or the angle.</em>
-</p>
+`diagram.sh` writes `out/robotic_arm.html`, a page to open in a browser:
+_Mission_ inside _Target_ and _Target_ inside _Mission_, drawn open, with
+the result of each refinement, and the whole system, _Mission_ ∥
+_Coordinator_ ∥ _Move_ ∥ _Turn_ ∥ _Pick_ ∥ _Place_, with the compatibility
+(A), the consistency (G), and the realizability (R) of each contract. A
+click on the red tag opens the counterexample.
 
-<p align="center">
-  <img src="images/whole-system-wired.png" alt="The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables">
-  <br>
-  <em>The whole system: the mission and the coordinator, and the move, turn, pick, and place actions, wired by their variables.</em>
-</p>
+Console. `solution.script` has all the commands of steps 3 to 5. It writes
+`TM.smv`, `MT.smv`, `top.smv`, `system.smv`, and
+`coordinator.structuredSlugs` in the output directory:
 
-### References
-[1] Nuzzo, Pierluigi, et al. _CHASE: Contract-based requirement engineering for 
-cyber-physical system design._ in Proceeding of the 2018 Design, Automation and 
-Test in Europe Conference & Exhibition (DATE). IEEE, 2018.
+```
+$> logics_tool -i specs/robotic_arm.ltl -o /tmp/ -c solution.script
+```

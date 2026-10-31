@@ -4,38 +4,38 @@
   "contracts": {
     "Joint1": {
       "feasible": {
-        "key": "b5f9000c661db20e",
+        "key": "615d1d692751514b",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.03,
-        "at": "2026-10-30T00:33:29"
+        "seconds": 0.04,
+        "at": "2026-10-31T02:08:22"
       }
     },
     "Joint2": {
       "feasible": {
-        "key": "563fc0bc7a834a41",
+        "key": "543bfd065feea926",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.03,
-        "at": "2026-10-30T00:33:29"
+        "seconds": 0.04,
+        "at": "2026-10-31T02:08:22"
       }
     },
     "Joint3": {
       "feasible": {
-        "key": "5d19f2acefc5f160",
+        "key": "4d9dd391357cf501",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:33:29"
+        "seconds": 0.04,
+        "at": "2026-10-31T02:08:22"
       }
     },
     "Joints": {
       "feasible": {
-        "key": "13d352f2dd859f8d",
+        "key": "496f5d14cb20581d",
         "result": "sat",
         "tool": "nuxmv/ic3",
-        "seconds": 0.16,
-        "at": "2026-10-30T00:33:29"
+        "seconds": 0.54,
+        "at": "2026-10-31T02:08:22"
       }
     }
   },
@@ -49,6 +49,16 @@
       "tool": "nuxmv/ic3",
       "seconds": 4.72,
       "at": "2026-10-30T00:33:34"
+    },
+    {
+      "key": "bfa53568f75d3185",
+      "check": "refines",
+      "refined": "Joint1+Joint2+Joint3",
+      "abstract": "Joints",
+      "result": "valid",
+      "tool": "nuxmv/ic3",
+      "seconds": 3.15,
+      "at": "2026-10-31T02:08:26"
     }
   ]
 }

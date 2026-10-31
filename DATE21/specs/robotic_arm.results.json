@@ -66,5 +66,27 @@
       }
     }
   },
-  "relations": []
+  "relations": [
+    {
+      "key": "02179576348c0675",
+      "check": "refines",
+      "refined": "Target",
+      "abstract": "Mission",
+      "result": "invalid",
+      "tool": "nuxmv/ic3",
+      "seconds": 0.04,
+      "at": "2026-10-31T02:03:30",
+      "failed": "guarantees"
+    },
+    {
+      "key": "65c78a6ee200acf7",
+      "check": "refines",
+      "refined": "Mission",
+      "abstract": "Target",
+      "result": "valid",
+      "tool": "nuxmv/ic3",
+      "seconds": 0.04,
+      "at": "2026-10-31T02:03:30"
+    }
+  ]
 }

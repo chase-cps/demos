@@ -22,11 +22,11 @@
     },
     "Polite": {
       "feasible": {
-        "key": "e94e64aa4d2d486d",
+        "key": "c090f31575d16898",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:33:28"
+        "at": "2026-10-31T02:13:28"
       }
     },
     "Pushy": {
@@ -68,14 +68,14 @@
   },
   "relations": [
     {
-      "key": "158945ce29d59ea6",
+      "key": "b1982baa90f99d91",
       "check": "refines",
       "refined": "Robot1+Robot2+Greedy",
       "abstract": "System",
       "result": "valid",
       "tool": "nuxmv/bdd",
-      "seconds": 0.03,
-      "at": "2026-10-30T00:33:28"
+      "seconds": 0.06,
+      "at": "2026-10-31T02:13:28"
     }
   ]
 }
