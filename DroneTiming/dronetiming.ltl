@@ -1,0 +1,236 @@
+# view: --refines FireTick+FireSpread+FireStateRx Mission
+# view: --refines DroneTick+DroneSim2+Assign+Target+Plan+Grant+Move+DroneSim3 Available
+NAME: dronetiming;
+
+# The timing of the multi-drone fire suppression (MDFS) of ContrACT (Xiao,
+# Lutz, Castillo-Effen, Nuzzo, MEMOCODE 2026, Section V.B), a federation in
+# Lingua Franca. Each event v has three times: t_v its timestamp, d_v its
+# start, T_v its completion. The worst-case latencies (ms) are those of
+# Table III. The contracts are those that ContrACT builds (Section III-C).
+#
+#   mission (D_0):  FireTick -> FireSpread -> FireStateRx
+#   drone 0:        DroneTick -> DroneSim2 -> Plan -> Grant -> Move -> DroneSim3
+#                                         -> Assign -> Target -> (Plan waits)
+#
+# The three drones run the same pipeline on one timer; they do not wait for
+# each other, so one pipeline gives the bound of each. The mission subgraph
+# delays the drones by its own worst case (the offset).
+
+# The mission timer.
+CONTRACT FireTick:
+    output real variable t_ft;
+    output real variable d_ft;
+    output real variable T_ft;
+    Assumptions:
+        true;
+    Guarantees:
+        t_ft <= d_ft;
+        d_ft <= T_ft;
+        T_ft - d_ft <= 0;
+# FireSim_3: the fire spreads (59 ms).
+CONTRACT FireSpread:
+    input real variable t_ft;
+    input real variable d_ft;
+    input real variable T_ft;
+    output real variable t_fs;
+    output real variable d_fs;
+    output real variable T_fs;
+    Assumptions:
+        t_ft <= d_ft;
+    Guarantees:
+        t_fs = t_ft;
+        d_fs = T_ft;
+        t_fs <= d_fs;
+        d_fs <= T_fs;
+        T_fs - d_fs <= 59;
+
+# FireCoordinator_2: the coordinator reads the fire (0.4 ms).
+CONTRACT FireStateRx:
+    input real variable t_fs;
+    input real variable d_fs;
+    input real variable T_fs;
+    output real variable t_fr;
+    output real variable d_fr;
+    output real variable T_fr;
+    Assumptions:
+        t_fs <= d_fs;
+    Guarantees:
+        t_fr = t_fs;
+        d_fr = T_fs;
+        t_fr <= d_fr;
+        d_fr <= T_fr;
+        T_fr - d_fr <= 0.4;
+
+# What the mission subgraph delays the drones by: the coordinator starts
+# at most y0 after its timestamp, the mission timer released on time.
+CONTRACT Mission:
+    input real variable t_ft;
+    input real variable d_ft;
+    output real variable t_fr;
+    output real variable d_fr;
+    real constant y0 59;
+    Assumptions:
+        t_ft = d_ft;
+    Guarantees:
+        d_fr - t_fr <= y0;
+
+# The drone timer, shared by the three drones.
+CONTRACT DroneTick:
+    output real variable t_dk;
+    output real variable d_dk;
+    output real variable T_dk;
+    Assumptions:
+        true;
+    Guarantees:
+        t_dk <= d_dk;
+        d_dk <= T_dk;
+        T_dk - d_dk <= 0;
+# GridDroneSim_2: the drone reports its cell (55 ms).
+CONTRACT DroneSim2:
+    input real variable t_dk;
+    input real variable d_dk;
+    input real variable T_dk;
+    output real variable t_s2;
+    output real variable d_s2;
+    output real variable T_s2;
+    Assumptions:
+        t_dk <= d_dk;
+    Guarantees:
+        t_s2 = t_dk;
+        d_s2 = T_dk;
+        t_s2 <= d_s2;
+        d_s2 <= T_s2;
+        T_s2 - d_s2 <= 55;
+
+# FireCoordinator_3: the coordinator assigns the drone a target (33 ms).
+CONTRACT Assign:
+    input real variable t_s2;
+    input real variable d_s2;
+    input real variable T_s2;
+    output real variable t_a3;
+    output real variable d_a3;
+    output real variable T_a3;
+    Assumptions:
+        t_s2 <= d_s2;
+    Guarantees:
+        t_a3 = t_s2;
+        d_a3 = T_s2;
+        t_a3 <= d_a3;
+        d_a3 <= T_a3;
+        T_a3 - d_a3 <= 33;
+
+# GridDroneControl_2: the controller takes the target (8 ms).
+CONTRACT Target:
+    input real variable t_a3;
+    input real variable d_a3;
+    input real variable T_a3;
+    output real variable t_c2;
+    output real variable d_c2;
+    output real variable T_c2;
+    Assumptions:
+        t_a3 <= d_a3;
+    Guarantees:
+        t_c2 = t_a3;
+        d_c2 = T_a3;
+        t_c2 <= d_c2;
+        d_c2 <= T_c2;
+        T_c2 - d_c2 <= 8;
+
+# GridDroneControl_3: the controller plans its move (x_plan, 72 ms); it
+# waits for Target, an earlier reaction of the same reactor.
+CONTRACT Plan:
+    input real variable t_s2;
+    input real variable d_s2;
+    input real variable T_s2;
+    input real variable T_c2;
+    output real variable t_c3;
+    output real variable d_c3;
+    output real variable T_c3;
+    real constant x_plan 72;
+    Assumptions:
+        t_s2 <= d_s2;
+    Guarantees:
+        t_c3 = t_s2;
+        d_c3 >= T_s2;
+        d_c3 >= T_c2;
+        d_c3 <= T_s2 | d_c3 <= T_c2;
+        t_c3 <= d_c3;
+        d_c3 <= T_c3;
+        T_c3 - d_c3 <= x_plan;
+
+# FireCoordinator_4: the coordinator grants the move (0 ms); it waits
+# for Assign.
+CONTRACT Grant:
+    input real variable t_c3;
+    input real variable d_c3;
+    input real variable T_c3;
+    input real variable T_a3;
+    output real variable t_a4;
+    output real variable d_a4;
+    output real variable T_a4;
+    Assumptions:
+        t_c3 <= d_c3;
+    Guarantees:
+        t_a4 = t_c3;
+        d_a4 >= T_c3;
+        d_a4 >= T_a3;
+        d_a4 <= T_c3 | d_a4 <= T_a3;
+        t_a4 <= d_a4;
+        d_a4 <= T_a4;
+        T_a4 - d_a4 <= 0;
+
+# GridDroneControl_4: the controller sends the move (53 ms).
+CONTRACT Move:
+    input real variable t_a4;
+    input real variable d_a4;
+    input real variable T_a4;
+    input real variable T_c3;
+    output real variable t_c4;
+    output real variable d_c4;
+    output real variable T_c4;
+    Assumptions:
+        t_a4 <= d_a4;
+    Guarantees:
+        t_c4 = t_a4;
+        d_c4 >= T_a4;
+        d_c4 >= T_c3;
+        d_c4 <= T_a4 | d_c4 <= T_c3;
+        t_c4 <= d_c4;
+        d_c4 <= T_c4;
+        T_c4 - d_c4 <= 53;
+
+# GridDroneSim_3: the drone moves (0.4 ms), with a deadline.
+CONTRACT DroneSim3:
+    input real variable t_c4;
+    input real variable d_c4;
+    input real variable T_c4;
+    input real variable T_s2;
+    output real variable t_s3;
+    output real variable d_s3;
+    output real variable T_s3;
+    Assumptions:
+        t_c4 <= d_c4;
+    Guarantees:
+        t_s3 = t_c4;
+        d_s3 >= T_c4;
+        d_s3 >= T_s2;
+        d_s3 <= T_c4 | d_s3 <= T_s2;
+        t_s3 <= d_s3;
+        d_s3 <= T_s3;
+        T_s3 - d_s3 <= 0.4;
+
+# The requirement (availability, Section V.B): given that the drone timer
+# is released at most offset after its timestamp (the delay of the mission
+# subgraph), the drone moves at most lam after its timestamp.
+CONTRACT Available:
+    input real variable t_dk;
+    input real variable d_dk;
+    output real variable t_s3;
+    output real variable d_s3;
+    real constant offset 59;
+    real constant lam 400;
+    Assumptions:
+        t_dk <= d_dk;
+        d_dk - t_dk <= offset;
+    Guarantees:
+        d_s3 - t_s3 <= lam;

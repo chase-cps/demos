@@ -17,6 +17,15 @@
   .tools button svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.4;
                stroke-linecap:round; stroke-linejoin:round; }
   .tools .sep { width:1px; height:18px; background:#e3e8e8; margin:0 6px; }
+  [data-box].sel > rect:first-of-type { stroke:var(--teal); stroke-width:3px; }
+  .trow > .hl { display:none; } .trow.sel > .hl { display:inline; }
+  #export { display:none; position:absolute; right:12px; top:46px; background:#fff; border:1px solid #d5dddd;
+            border-radius:8px; padding:4px; gap:4px; box-shadow:0 4px 14px rgba(0,0,0,.08); z-index:7; }
+  #export button { font:600 12px Helvetica, Arial, sans-serif; border:1px solid #d5dddd; background:#fff;
+                   border-radius:6px; padding:4px 10px; cursor:pointer; color:var(--teal); }
+  #export button:hover { background:var(--fill); }
+  @media print { body > *:not(#print) { display:none !important; } #print { display:block !important; }
+                 #print svg { width:100%; height:auto; } @page { margin:12mm; } }
   #help { position:absolute; right:12px; top:46px; background:#fff; border:1px solid #d5dddd; border-radius:8px;
           box-shadow:0 6px 24px rgba(0,0,0,.12); padding:12px 14px; font:12px 'Arial Unicode MS', Helvetica, Arial, sans-serif;
           color:var(--soft); display:none; z-index:11; }
@@ -30,6 +39,12 @@
   #tip { display:none; position:fixed; z-index:20; max-width:420px; pointer-events:none;
          background:#1d2526; color:#fff; border-radius:4px; padding:5px 8px;
          font:12px/1.4 Helvetica, Arial, sans-serif; white-space:pre-wrap; }
+  #run, #runsep { display:none; } #run .turn { display:none; } #run.busy .idle { display:none; }
+  #run.busy .turn { display:inline; transform-origin:8px 8px; animation:turn 0.9s linear infinite; }
+  @keyframes turn { to { transform:rotate(360deg); } }
+  .pending circle { fill:var(--soft); animation:dot 1.2s ease-in-out infinite; }
+  .pending circle:nth-of-type(2) { animation-delay:0.2s; } .pending circle:nth-of-type(3) { animation-delay:0.4s; }
+  @keyframes dot { 0%, 80%, 100% { opacity:0.2; } 40% { opacity:1; } }
   #busy { display:none; position:fixed; right:14px; bottom:12px; z-index:6; padding:5px 12px;
           border-radius:12px; background:var(--teal); color:#fff; font:600 12px Helvetica, Arial, sans-serif;
           box-shadow:0 1px 4px rgba(0,0,0,.2); }
@@ -38,7 +53,7 @@
                   white-space:nowrap; background:#fff; }
   #context i { font:600 9.5px -apple-system, Helvetica, Arial, sans-serif; font-style:normal; color:#fff;
                background:#6f7f80; border-radius:4px; padding:2px 5px; }
-  #view { position:fixed; inset:0; overflow:hidden; cursor:grab; touch-action:none; }
+  #view { position:fixed; inset:0; overflow:hidden; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
   #view.moving { cursor:grabbing; }
   #view > svg { display:block; width:100%; height:100%; }
   svg text { font-family:-apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
@@ -62,28 +77,92 @@
   table.fsm td { padding:3px 16px 3px 0; border-bottom:1px solid #f1f4f4; vertical-align:top; }
   table.fsm td.st { color:var(--teal); font-weight:600; border-bottom:1px solid #e3e8e8; }
   table.fsm td.when { color:var(--soft); }
+  #repair, #queue { position:fixed; display:none; background:#fff; border:1px solid #d5dddd; border-radius:10px;
+                    box-shadow:0 10px 36px rgba(0,0,0,.16); font:12px/1.45 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+                    color:var(--ink); overflow:auto; max-height:calc(100vh - 70px); }
+  #repair { width:400px; max-width:calc(100vw - 24px); z-index:9; }
+  #queue { right:12px; top:46px; width:300px; max-width:calc(100vw - 24px); z-index:8; }
+  .rp-head { display:flex; gap:8px; align-items:center; padding:9px 10px 8px 14px; border-bottom:1px solid #e3e8e8;
+             position:sticky; top:0; background:#fff; }
+  .rp-head b { flex:1; font-size:12.5px; font-weight:600; min-width:0; overflow-wrap:anywhere; }
+  .rp-x { border:0; background:none; cursor:pointer; color:var(--soft); font-size:16px; line-height:1; padding:2px 6px; border-radius:5px; }
+  .rp-x:hover { background:var(--fill); color:var(--teal); }
+  .rp-tag { flex:none; display:block; }
+  .rp-chip { flex:none; font:600 10.5px 'Arial Unicode MS', 'Segoe UI', Helvetica, Arial, sans-serif; color:#fff; border-radius:4px;
+             padding:1px 6px; background:var(--faint); }
+  .rp-chip.valid { background:var(--ok); } .rp-chip.invalid { background:var(--bad); }
+  .rp-sec { padding:8px 14px 10px; border-bottom:1px solid #f1f4f4; }
+  .rp-sec:last-child { border-bottom:0; }
+  .rp-says { color:var(--soft); }
+  .rp-h { font:600 10.5px Helvetica, Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin:2px 0 6px; }
+  .rp-row { display:grid; grid-template-columns:16px minmax(0,1fr) auto; gap:2px 6px; align-items:center; padding:4px 0; }
+  .rp-row + .rp-row { border-top:1px dashed #edf1f1; }
+  .rp-row input[type=checkbox] { margin:0; accent-color:var(--teal); }
+  .rp-name { font:11.5px Menlo, Monaco, monospace; }
+  .rp-who { grid-column:2 / span 2; color:var(--soft); font-size:11px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .rp-role { font-size:10.5px; border:1px solid var(--line); border-radius:4px; padding:0 5px; color:var(--soft); }
+  .rp-role.requirement { color:var(--warn); border-color:var(--warn); }
+  .rp-range { display:flex; gap:3px; align-items:center; color:var(--soft); font:11px Menlo, Monaco, monospace; }
+  .rp-range input { width:54px; font:11px Menlo, Monaco, monospace; border:1px solid #d5dddd; border-radius:4px; padding:1px 4px; color:var(--ink); }
+  .rp-btn { font:600 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; border:1px solid #d5dddd; background:#fff;
+            border-radius:6px; padding:3px 10px; cursor:pointer; color:var(--teal); white-space:nowrap; }
+  .rp-btn:hover { background:var(--fill); }
+  .rp-btn.main { background:var(--teal); border-color:var(--teal); color:#fff; }
+  .rp-btn.on { background:#e6eeee; }
+  .rp-btn.warn { border-color:var(--warn); color:var(--warn); }
+  .rp-btn:disabled { opacity:.45; cursor:default; background:#fff; }
+  .rp-btn.main:disabled { background:var(--teal); }
+  .rp-run { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .rp-opt { border:1px solid #e3e8e8; border-radius:8px; padding:7px 10px; margin:6px 0 0; display:grid;
+            grid-template-columns:minmax(0,1fr) auto; gap:2px 8px; align-items:center; }
+  .rp-opt.repaired { border-color:#b9d6c4; } .rp-opt.repaired:hover, .rp-opt.shown { border-color:var(--ok); background:#f6faf7; }
+  .rp-opt.old { opacity:.6; }
+  .rp-v { font:11.5px Menlo, Monaco, monospace; overflow-wrap:anywhere; }
+  .rp-v s { color:var(--bad); } .rp-v em { font-style:normal; color:var(--ok); font-weight:600; }
+  .rp-m { grid-column:1; color:var(--soft); font-size:11px; }
+  .rp-b { grid-row:1 / span 2; grid-column:2; display:flex; gap:4px; align-items:center; }
+  .rp-note { color:var(--soft); font-size:11px; margin-top:6px; }
+  .rp-err { color:var(--bad); font-size:11px; margin-top:6px; white-space:pre-wrap; }
+  .rp-cmd { font:10.5px/1.5 Menlo, Monaco, monospace; background:var(--fill); border:1px solid #e3e8e8; border-radius:6px;
+            padding:5px 7px; margin-top:6px; white-space:pre-wrap; overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
+  .rp-spin { width:10px; height:10px; border:1.6px solid #d5dddd; border-top-color:var(--teal); border-radius:50%;
+             animation:turn 0.8s linear infinite; }
+  .q-item { padding:8px 12px 8px 14px; border-bottom:1px solid #f1f4f4; cursor:pointer; display:grid; gap:2px; }
+  .q-item:last-child { border-bottom:0; } .q-item:hover { background:var(--fill); }
+  .q-item .t { display:flex; gap:6px; align-items:center; font-weight:600; font-size:12px; }
+  .q-item .s { color:var(--soft); font-size:11px; } .q-item .s.ok { color:var(--ok); } .q-item .s.old { color:var(--warn); }
+  .q-item .v { font:11px Menlo, Monaco, monospace; color:var(--ink); }
+  .tools #repairs { width:auto; padding:0 7px; gap:4px; display:none; color:var(--bad); font:600 11.5px Helvetica, Arial, sans-serif; }
+  .tools #repairs svg { stroke:currentColor; }
 </style></head><body>
 <div id="top"><div id="context"></div>
   <span class="tools">
     <button id="all" title="Open all" onclick="openAll(!allOpen)"><svg viewBox="0 0 16 16"><path d="M4.5 6.5 8 3l3.5 3.5M4.5 9.5 8 13l3.5-3.5"/></svg></button>
-    <span class="sep"></span>
     <button title="Fit the diagram to the window (0); the wheel zooms where it points, a drag moves" onclick="fit()"><svg viewBox="0 0 16 16"><path d="M2 5.5V2h3.5M10.5 2H14v3.5M14 10.5V14h-3.5M5.5 14H2v-3.5"/></svg></button>
     <span class="sep"></span>
     <button class="on" title="Names of the ports" onclick="flip(this, 'names')"><svg viewBox="0 0 16 16"><rect x="4.5" y="3" width="7" height="10" rx="1.5"/><path d="M1.5 6h3M1.5 10h3M11.5 8h3"/></svg></button>
     <button class="on" title="Types of the ports (ranges, reals, bit vectors)" onclick="flip(this, 'types')"><svg viewBox="0 0 16 16"><path d="M1.5 8h13" stroke-width="2.4"/><path d="M6.5 11.5l3-7"/></svg></button>
     <button class="on" title="Transition labels of the models: the inputs that take each transition" onclick="flip(this, 'conditions')"><svg viewBox="0 0 16 16"><circle cx="3" cy="11" r="1.8"/><circle cx="13" cy="11" r="1.8"/><path d="M4.8 11h6.4"/><rect x="5" y="3" width="6" height="4" rx="1"/></svg></button>
     <button class="on" title="Results of the checks (A, G, R, ⪯, M ⊨ C, E ⊨ A) and their cores" onclick="flip(this, 'checks')"><svg viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="3"/><path d="M5.5 8l1.8 1.8L10.5 6.3"/></svg></button>
+    <span class="sep" id="runsep"></span>
+    <button id="run" title="Check: A ∧ G of each contract, and the refinements, implementations, and environments drawn" onclick="runChecks()"><svg viewBox="0 0 16 16"><path class="idle" d="M5 3.2v9.6L13 8z"/><path class="turn" d="M8 2.2a5.8 5.8 0 1 1-5.8 5.8"/></svg></button>
+    <button id="repairs" title="The checks that fail, and their repairs" onclick="toggleQueue()"><svg viewBox="0 0 16 16"><path d="M10.2 2.4a3.2 3.2 0 0 0-3.9 4.1L2.6 10.2a1.3 1.3 0 0 0 1.8 1.8l3.7-3.7a3.2 3.2 0 0 0 4.1-3.9l-1.9 1.9-1.6-.4-.4-1.6z"/></svg><span id="repcount"></span></button>
     <span class="sep"></span>
+    <button title="Export the whole diagram (SVG, PNG, PDF)" onclick="exportMenu()"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.8 6.8 8 10l3.2-3.2M2.5 11.5v2h11v-2"/></svg></button>
     <button title="What the shapes mean" onclick="help()"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.4"/><circle cx="8" cy="11.6" r=".4"/></svg></button>
-  </span><div id="help"></div></div>
+  </span><div id="help"></div><div id="export"><button onclick="exportAs('svg')">SVG</button><button onclick="exportAs('png')">PNG</button><button onclick="exportAs('pdf')">PDF</button></div></div>
 <div id="view"></div>
 <div id="stale"></div>
 <div id="busy">checking…</div>
 <div id="tip"></div>
 <div id="pop"><header><b id="poptitle"></b><button onclick="closePop()">close</button></header><div id="popview"></div></div>
+<div id="repair" role="dialog" aria-label="The check and its repairs"></div>
+<div id="queue" role="dialog" aria-label="The checks that fail"></div>
 <script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
 <script>
-let DATA = {"title": "Escalation link", "nodes": [{"kind": "group", "op": "system", "title": "Link", "note": "contract Functional \u00b7 Sender \u2297 Channel \u2297 Receiver", "contract": {"name": "Functional", "A": ["G (!err_ep & !err_en & !err_rp & !err_rn)"], "G": ["G (esc_req & X esc_req -> X X X esc_req_o)", "G (!esc_req & X !esc_req -> X X X !esc_req_o)", "G (!ping_req & !esc_req & X (ping_req & !esc_req) -> X X X X ping_ok)"]}, "inputs": ["err_en", "err_ep", "err_rn", "err_rp", "esc_req", "ping_req"], "outputs": ["esc_req_o", "ping_ok"], "children": [{"kind": "component", "title": "Sender", "contract": {"name": "Sender", "A": [], "G": ["!esc_p_tx", "G (esc_n_tx <-> !esc_p_tx)", "G (esc_req -> X esc_p_tx)", "G (!esc_req & !ping_req -> X !esc_p_tx)", "G (!esc_req & X (!esc_req & esc_p_tx) -> X X !esc_p_tx)", "G (!ping_req & !esc_req & X (ping_req & !esc_req) -> X X esc_p_tx)", "G (!ping_req & !esc_req & X (ping_req & !esc_req) & X X X (resp_p_tx & !resp_n_tx) -> X X X X ping_ok)", "G ((resp_p_tx <-> resp_n_tx) -> X integ_fail)"]}, "model": {"name": "esc_sender", "fsm": {"states": [{"id": "s0", "label": "esc_n_tx", "init": true}, {"id": "s1", "label": "esc_n_tx integ_fail", "init": false}, {"id": "s2", "label": "esc_p_tx integ_fail sent wait1", "init": false}, {"id": "s3", "label": "esc_p_tx sent wait1", "init": false}, {"id": "s4", "label": "esc_p_tx integ_fail", "init": false}, {"id": "s5", "label": "esc_p_tx", "init": false}, {"id": "s6", "label": "esc_n_tx integ_fail wait2", "init": false}, {"id": "s7", "label": "esc_n_tx wait2", "init": false}, {"id": "s8", "label": "esc_n_tx integ_fail sent wait2", "init": false}, {"id": "s9", "label": "esc_n_tx sent wait2", "init": false}, {"id": "s10", "label": "esc_p_tx integ_fail wait2", "init": false}, {"id": "s11", "label": "esc_p_tx wait2", "init": false}, {"id": "s12", "label": "esc_p_tx integ_fail sent wait2", "init": false}, {"id": "s13", "label": "esc_p_tx sent wait2", "init": false}, {"id": "s14", "label": "esc_n_tx ping_ok", "init": false}, {"id": "s15", "label": "esc_p_tx ping_ok sent wait1", "init": false}, {"id": "s16", "label": "esc_p_tx ping_ok", "init": false}, {"id": "s17", "label": "esc_n_tx integ_fail sent", "init": false}, {"id": "s18", "label": "esc_n_tx sent", "init": false}, {"id": "s19", "label": "esc_n_tx ping_ok sent", "init": false}, {"id": "s20", "label": "esc_p_tx integ_fail sent", "init": false}, {"id": "s21", "label": "esc_p_tx sent", "init": false}, {"id": "s22", "label": "esc_p_tx ping_ok sent", "init": false}], "edges": [{"from": "s0", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s0", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s1", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s4", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s5", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s14", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s16", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}], "count": 23, "registers": ["esc_p_tx", "esc_n_tx", "ping_ok", "integ_fail", "sent", "wait1", "wait2"]}, "source": "rtl"}, "badge": {"text": "M \u22a8 C", "status": "valid"}, "inputs": ["esc_req", "ping_req", "resp_n_tx", "resp_p_tx"], "outputs": ["esc_n_tx", "esc_p_tx", "integ_fail", "ping_ok"], "id": "n1", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "component", "title": "Channel", "contract": {"name": "Channel", "A": [], "G": ["G (esc_p_rx <-> !(esc_p_tx <-> err_ep))", "G (esc_n_rx <-> !(esc_n_tx <-> err_en))", "G (resp_p_tx <-> !(resp_p_rx <-> err_rp))", "G (resp_n_tx <-> !(resp_n_rx <-> err_rn))"]}, "model": {"name": "esc_channel", "fsm": null, "source": "rtl"}, "badge": {"text": "M \u22a8 C", "status": "valid"}, "inputs": ["err_en", "err_ep", "err_rn", "err_rp", "esc_n_tx", "esc_p_tx", "resp_n_rx", "resp_p_rx"], "outputs": ["esc_n_rx", "esc_p_rx", "resp_n_tx", "resp_p_tx"], "id": "n2", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "component", "title": "Receiver", "contract": {"name": "Receiver", "A": [], "G": ["!esc_req_o & X !esc_req_o", "G (esc_p_rx & !esc_n_rx & X (esc_p_rx & !esc_n_rx) -> X X esc_req_o)", "G (esc_p_rx | X X !esc_req_o)", "G (esc_p_rx | X !esc_req_o)", "G ((esc_p_rx <-> esc_n_rx) -> X (resp_p_rx & resp_n_rx))", "G ((esc_p_rx <-> esc_n_rx) | X !(resp_p_rx <-> resp_n_rx))", "G (!esc_p_rx & X (esc_p_rx & !esc_n_rx) -> X X (resp_p_rx & !resp_n_rx))"]}, "model": {"name": "esc_receiver", "fsm": {"states": [{"id": "s0", "label": "resp_n_rx", "init": true}, {"id": "s1", "label": "resp_p_rx resp_n_rx", "init": false}, {"id": "s2", "label": "resp_p_rx on_q", "init": false}, {"id": "s3", "label": "resp_n_rx esc_req_o on_q", "init": false}], "edges": [{"from": "s0", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s0", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s0", "to": "s2", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s1", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s1", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s1", "to": "s2", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s2", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s2", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s2", "to": "s3", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s3", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s3", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s3", "to": "s3", "label": "esc_p_rx & !esc_n_rx"}], "count": 4, "registers": ["resp_p_rx", "resp_n_rx", "esc_req_o", "on_q"]}, "source": "rtl"}, "badge": {"text": "M \u22a8 C", "status": "valid"}, "inputs": ["esc_n_rx", "esc_p_rx"], "outputs": ["esc_req_o", "resp_n_rx", "resp_p_rx"], "id": "n3", "types": {}, "children": [], "edges": [], "layout": "row", "open": true}], "edges": [{"from": [null, "in", "esc_req"], "to": ["n1", "in", "esc_req"], "var": "esc_req"}, {"from": [null, "in", "ping_req"], "to": ["n1", "in", "ping_req"], "var": "ping_req"}, {"from": ["n2", "out", "resp_n_tx"], "to": ["n1", "in", "resp_n_tx"], "var": "resp_n_tx"}, {"from": ["n2", "out", "resp_p_tx"], "to": ["n1", "in", "resp_p_tx"], "var": "resp_p_tx"}, {"from": [null, "in", "err_en"], "to": ["n2", "in", "err_en"], "var": "err_en"}, {"from": [null, "in", "err_ep"], "to": ["n2", "in", "err_ep"], "var": "err_ep"}, {"from": [null, "in", "err_rn"], "to": ["n2", "in", "err_rn"], "var": "err_rn"}, {"from": [null, "in", "err_rp"], "to": ["n2", "in", "err_rp"], "var": "err_rp"}, {"from": ["n1", "out", "esc_n_tx"], "to": ["n2", "in", "esc_n_tx"], "var": "esc_n_tx"}, {"from": ["n1", "out", "esc_p_tx"], "to": ["n2", "in", "esc_p_tx"], "var": "esc_p_tx"}, {"from": ["n3", "out", "resp_n_rx"], "to": ["n2", "in", "resp_n_rx"], "var": "resp_n_rx"}, {"from": ["n3", "out", "resp_p_rx"], "to": ["n2", "in", "resp_p_rx"], "var": "resp_p_rx"}, {"from": ["n2", "out", "esc_n_rx"], "to": ["n3", "in", "esc_n_rx"], "var": "esc_n_rx"}, {"from": ["n2", "out", "esc_p_rx"], "to": ["n3", "in", "esc_p_rx"], "var": "esc_p_rx"}, {"from": ["n1", "out", "ping_ok"], "to": [null, "out", "ping_ok"], "var": "ping_ok"}, {"from": ["n3", "out", "esc_req_o"], "to": [null, "out", "esc_req_o"], "var": "esc_req_o"}], "id": "n4", "types": {}, "layout": "row", "badge": {"text": "\u2aaf", "status": "valid"}, "open": true}], "edges": [], "context": []};
+let DATA = {"title": "Escalation link", "nodes": [{"kind": "group", "op": "system", "title": "Link", "note": "Contract Functional \u00b7 Sender \u2297 Channel \u2297 Receiver", "contract": {"name": "Functional", "A": ["G (!err_ep & !err_en & !err_rp & !err_rn)"], "G": ["G ((G[0,1] esc_req) -> X X X esc_req_o)", "G ((G[0,1] !esc_req) -> X X X !esc_req_o)", "G ((!ping_req & !esc_req & X (ping_req & !esc_req)) -> X X X X ping_ok)"]}, "inputs": ["err_en", "err_ep", "err_rn", "err_rp", "esc_req", "ping_req"], "outputs": ["esc_req_o", "ping_ok"], "children": [{"kind": "component", "title": "Sender", "contract": {"name": "Sender", "A": [], "G": ["!esc_p_tx", "G (esc_n_tx <-> !esc_p_tx)", "G (esc_req -> X esc_p_tx)", "G ((!esc_req & !ping_req) -> X !esc_p_tx)", "G ((!esc_req & X (!esc_req & esc_p_tx)) -> X X !esc_p_tx)", "G ((!ping_req & !esc_req & X (ping_req & !esc_req)) -> X X esc_p_tx)", "G ((!ping_req & !esc_req & X (ping_req & !esc_req) & X X X (resp_p_tx & !resp_n_tx)) -> X X X X ping_ok)", "G ((resp_p_tx <-> resp_n_tx) -> X integ_fail)"]}, "model": {"name": "esc_sender", "fsm": {"states": [{"id": "s0", "label": "esc_n_tx", "init": true}, {"id": "s1", "label": "esc_n_tx integ_fail", "init": false}, {"id": "s2", "label": "esc_p_tx integ_fail sent wait1", "init": false}, {"id": "s3", "label": "esc_p_tx sent wait1", "init": false}, {"id": "s4", "label": "esc_p_tx integ_fail", "init": false}, {"id": "s5", "label": "esc_p_tx", "init": false}, {"id": "s6", "label": "esc_n_tx integ_fail wait2", "init": false}, {"id": "s7", "label": "esc_n_tx wait2", "init": false}, {"id": "s8", "label": "esc_n_tx integ_fail sent wait2", "init": false}, {"id": "s9", "label": "esc_n_tx sent wait2", "init": false}, {"id": "s10", "label": "esc_p_tx integ_fail wait2", "init": false}, {"id": "s11", "label": "esc_p_tx wait2", "init": false}, {"id": "s12", "label": "esc_p_tx integ_fail sent wait2", "init": false}, {"id": "s13", "label": "esc_p_tx sent wait2", "init": false}, {"id": "s14", "label": "esc_n_tx ping_ok", "init": false}, {"id": "s15", "label": "esc_p_tx ping_ok sent wait1", "init": false}, {"id": "s16", "label": "esc_p_tx ping_ok", "init": false}, {"id": "s17", "label": "esc_n_tx integ_fail sent", "init": false}, {"id": "s18", "label": "esc_n_tx sent", "init": false}, {"id": "s19", "label": "esc_n_tx ping_ok sent", "init": false}, {"id": "s20", "label": "esc_p_tx integ_fail sent", "init": false}, {"id": "s21", "label": "esc_p_tx sent", "init": false}, {"id": "s22", "label": "esc_p_tx ping_ok sent", "init": false}], "edges": [{"from": "s0", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s0", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s0", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s1", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s1", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s2", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s2", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s3", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s3", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s4", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s4", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s5", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s5", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s6", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s6", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s7", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s7", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s8", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s8", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s9", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s9", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s10", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s10", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s15", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s11", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx"}, {"from": "s11", "to": "s16", "label": "esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s12", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s12", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s14", "label": "!esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s19", "label": "!esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s16", "label": "esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s13", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx"}, {"from": "s13", "to": "s22", "label": "esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s14", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s14", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s6", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s7", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s8", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s9", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s10", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s11", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s15", "to": "s12", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s15", "to": "s13", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s2", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s16", "to": "s3", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s4", "label": "esc_req & resp_p_tx & resp_n_tx | esc_req & !resp_p_tx & !resp_n_tx"}, {"from": "s16", "to": "s5", "label": "esc_req & !resp_p_tx & resp_n_tx | esc_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s17", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s17", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s18", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s18", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s19", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s19", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s20", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s20", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s21", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s21", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s1", "label": "!esc_req & !ping_req & resp_p_tx & resp_n_tx | !esc_req & !ping_req & !resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s0", "label": "!esc_req & !ping_req & !resp_p_tx & resp_n_tx | !esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s17", "label": "!esc_req & ping_req & !resp_p_tx & !resp_n_tx | !esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s18", "label": "!esc_req & ping_req & !resp_p_tx & resp_n_tx | !esc_req & ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s4", "label": "esc_req & !ping_req & !resp_p_tx & !resp_n_tx | esc_req & !ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s5", "label": "esc_req & !ping_req & !resp_p_tx & resp_n_tx | esc_req & !ping_req & resp_p_tx & !resp_n_tx"}, {"from": "s22", "to": "s20", "label": "esc_req & ping_req & !resp_p_tx & !resp_n_tx | esc_req & ping_req & resp_p_tx & resp_n_tx"}, {"from": "s22", "to": "s21", "label": "esc_req & ping_req & !resp_p_tx & resp_n_tx | esc_req & ping_req & resp_p_tx & !resp_n_tx"}], "count": 23, "registers": ["esc_p_tx", "esc_n_tx", "ping_ok", "integ_fail", "sent", "wait1", "wait2"]}, "source": "rtl"}, "badge": {"text": "M \u22a8 C", "status": "valid"}, "inputs": ["esc_req", "ping_req", "resp_n_tx", "resp_p_tx"], "outputs": ["esc_n_tx", "esc_p_tx", "integ_fail", "ping_ok"], "id": "n1", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "component", "title": "Channel", "contract": {"name": "Channel", "A": [], "G": ["G (esc_p_rx <-> !(esc_p_tx <-> err_ep))", "G (esc_n_rx <-> !(esc_n_tx <-> err_en))", "G (resp_p_tx <-> !(resp_p_rx <-> err_rp))", "G (resp_n_tx <-> !(resp_n_rx <-> err_rn))"]}, "model": {"name": "esc_channel", "fsm": null, "source": "rtl"}, "badge": {"text": "M \u22a8 C", "status": "valid"}, "inputs": ["err_en", "err_ep", "err_rn", "err_rp", "esc_n_tx", "esc_p_tx", "resp_n_rx", "resp_p_rx"], "outputs": ["esc_n_rx", "esc_p_rx", "resp_n_tx", "resp_p_tx"], "id": "n2", "types": {}, "children": [], "edges": [], "layout": "row"}, {"kind": "component", "title": "Receiver", "contract": {"name": "Receiver", "A": [], "G": ["G[0,1] !esc_req_o", "G ((G[0,1] (esc_p_rx & !esc_n_rx)) -> X X esc_req_o)", "G (esc_p_rx | X X !esc_req_o)", "G (esc_p_rx | X !esc_req_o)", "G ((esc_p_rx <-> esc_n_rx) -> X (resp_p_rx & resp_n_rx))", "G ((esc_p_rx <-> esc_n_rx) | X !(resp_p_rx <-> resp_n_rx))", "G ((!esc_p_rx & X (esc_p_rx & !esc_n_rx)) -> X X (resp_p_rx & !resp_n_rx))"]}, "model": {"name": "esc_receiver", "fsm": {"states": [{"id": "s0", "label": "resp_n_rx", "init": true}, {"id": "s1", "label": "resp_p_rx resp_n_rx", "init": false}, {"id": "s2", "label": "resp_p_rx on_q", "init": false}, {"id": "s3", "label": "resp_n_rx esc_req_o on_q", "init": false}], "edges": [{"from": "s0", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s0", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s0", "to": "s2", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s1", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s1", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s1", "to": "s2", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s2", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s2", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s2", "to": "s3", "label": "esc_p_rx & !esc_n_rx"}, {"from": "s3", "to": "s1", "label": "esc_p_rx & esc_n_rx | !esc_p_rx & !esc_n_rx"}, {"from": "s3", "to": "s0", "label": "!esc_p_rx & esc_n_rx"}, {"from": "s3", "to": "s3", "label": "esc_p_rx & !esc_n_rx"}], "count": 4, "registers": ["resp_p_rx", "resp_n_rx", "esc_req_o", "on_q"]}, "source": "rtl"}, "badge": {"text": "M \u22a8 C", "status": "valid"}, "inputs": ["esc_n_rx", "esc_p_rx"], "outputs": ["esc_req_o", "resp_n_rx", "resp_p_rx"], "id": "n3", "types": {}, "children": [], "edges": [], "layout": "row", "open": true}], "edges": [{"from": [null, "in", "esc_req"], "to": ["n1", "in", "esc_req"], "var": "esc_req"}, {"from": [null, "in", "ping_req"], "to": ["n1", "in", "ping_req"], "var": "ping_req"}, {"from": ["n2", "out", "resp_n_tx"], "to": ["n1", "in", "resp_n_tx"], "var": "resp_n_tx"}, {"from": ["n2", "out", "resp_p_tx"], "to": ["n1", "in", "resp_p_tx"], "var": "resp_p_tx"}, {"from": [null, "in", "err_en"], "to": ["n2", "in", "err_en"], "var": "err_en"}, {"from": [null, "in", "err_ep"], "to": ["n2", "in", "err_ep"], "var": "err_ep"}, {"from": [null, "in", "err_rn"], "to": ["n2", "in", "err_rn"], "var": "err_rn"}, {"from": [null, "in", "err_rp"], "to": ["n2", "in", "err_rp"], "var": "err_rp"}, {"from": ["n1", "out", "esc_n_tx"], "to": ["n2", "in", "esc_n_tx"], "var": "esc_n_tx"}, {"from": ["n1", "out", "esc_p_tx"], "to": ["n2", "in", "esc_p_tx"], "var": "esc_p_tx"}, {"from": ["n3", "out", "resp_n_rx"], "to": ["n2", "in", "resp_n_rx"], "var": "resp_n_rx"}, {"from": ["n3", "out", "resp_p_rx"], "to": ["n2", "in", "resp_p_rx"], "var": "resp_p_rx"}, {"from": ["n2", "out", "esc_n_rx"], "to": ["n3", "in", "esc_n_rx"], "var": "esc_n_rx"}, {"from": ["n2", "out", "esc_p_rx"], "to": ["n3", "in", "esc_p_rx"], "var": "esc_p_rx"}, {"from": ["n1", "out", "ping_ok"], "to": [null, "out", "ping_ok"], "var": "ping_ok"}, {"from": ["n3", "out", "esc_req_o"], "to": [null, "out", "esc_req_o"], "var": "esc_req_o"}], "id": "n4", "types": {}, "layout": "row", "badge": {"text": "\u2aaf", "status": "valid"}, "open": true}], "edges": [], "context": []};
+let busy = false;               // checks running in the editor (setBusy)
+let progressed = {};            // the results known while they run: contract name -> {tag: status}
 const LINE = 17, PAD = 10, PORT = 6, HEAD = 28, ICON = 16, INLINE_STATES = 8;
 const ctx = document.createElement("canvas").getContext("2d");
 function textWidth(s, font) { ctx.font = font; return ctx.measureText(s).width; }
@@ -148,14 +227,16 @@ function wrap(f) {
   }
   out.push(rest); return out;
 }
-// Each part opens with a tag: A (assumes), G (guarantees), E (an environment).
+// Each part opens with a tag: K (named constants), A (assumes), G (guarantees), E (an environment).
 // With a core in focus, its terms are on a red ground: [kind, tag, text, in the core].
-function terms(c, out, core) {
-  const part = (tag, fs, hit) => fs.forEach((f, j) => wrap(f).forEach((l, i) =>
-    out.push(["f", i || j ? "" : tag, l, hit.includes(j)])));
-  part("A", c.A, core ? core.A : []);
+// src: the lines of the terms in the file, [first, last], when known.
+function terms(c, out, core, src) {
+  const part = (tag, fs, hit, at) => fs.forEach((f, j) => wrap(f).forEach((l, i) =>
+    out.push(["f", i || j ? "" : tag, l, hit.includes(j), at && at[j]])));
+  if (c.K) part("K", c.K, []);           // the named constants and their values
+  part("A", c.A, core ? core.A : [], src && src.A);
   if (c.E) part("E", c.E, []);
-  else part("G", c.G.length ? c.G : ["true"], core ? core.G : []);
+  else part("G", c.G.length ? c.G : ["true"], core ? core.G : [], c.G.length && src && src.G);
 }
 const focused = n => show.checks && n.id in focus ? n.checks[focus[n.id]].core : null;
 
@@ -166,7 +247,7 @@ function lines(n) {
   const out = [], core = focused(n);
   const part = (c, which) => {
     const ts = [];
-    terms(c, ts, core && core.part === which ? core : null);
+    terms(c, ts, core && core.part === which ? core : null, which === "contract" ? n.source : null);
     if (ts.length <= LONG) { out.push(...ts); return; }
     const parts = [];                  // A and G cut apart: the first lines of each
     ts.forEach(t => (t[1] || !parts.length) ? parts.push([t]) : parts[parts.length - 1].push(t));
@@ -176,19 +257,21 @@ function lines(n) {
       const keep = Math.max(1, i === parts.length - 1 ? left : Math.max(Math.floor(SHORT / parts.length), SHORT - rest));
       let room = keep - p.filter(t => t[3]).length;   // the lines of a core in focus are kept first
       const shown = p.filter(t => t[3] || room-- > 0);
-      if (shown[0] !== p[0]) shown[0] = [shown[0][0], p[0][1], shown[0][2], shown[0][3]];
+      if (shown[0] !== p[0]) shown[0] = [shown[0][0], p[0][1], shown[0][2], shown[0][3], shown[0][4]];
       out.push(...shown);
-      if (p.length > shown.length) out.push(["more", "", "⋯ " + (p.length - shown.length) + " more lines", c]);
+      if (p.length > shown.length)   // with the lines of the terms it hides, for the cursor
+        out.push(["more", "", "⋯ " + (p.length - shown.length) + " more lines", c,
+                  p.filter(t => !shown.includes(t) && t[4]).map(t => t[4])]);
       left -= Math.min(keep, shown.length);
     });
   };
   if (n.note) out.push(["s", "", n.note]);
   if (n.contract && open.has("c:" + n.id)) {
-    if (n.composed) out.push(["s", "", "the contract " + n.contract.name]);
+    if (n.composed) out.push(["s", "", "Contract " + n.contract.name]);
     part(n.contract, "contract");
   }
   if (n.composed && open.has("k:" + n.id)) {
-    out.push(["s", "", "the composition " + n.composed.name]);
+    out.push(["s", "", "Composition " + n.composed.name]);
     part(n.composed, "composed");
   }
   return out;
@@ -196,22 +279,25 @@ function lines(n) {
 const lineWidth = ([k, tag, t]) => (k === "f" ? 20 : 0) + textWidth(t, k === "f" ? FONT_F : FONT_S);
 function showTerms(n, c) {     // the whole contract, in the panel
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"), ts = [];
-  terms(c, ts, null);
-  document.getElementById("poptitle").textContent = n.title + " · contract " + c.name;
-  document.getElementById("popview").innerHTML = "<table class='fsm'>" + ts.map(([k, tag, t]) =>
-    "<tr><td class='st'>" + (tag || "") + "</td><td>" + esc(t) + "</td></tr>").join("") + "</table>";
+  terms(c, ts, null, c === n.contract ? n.source : null);
+  document.getElementById("poptitle").textContent = n.title + " · Contract " + c.name;
+  document.getElementById("popview").innerHTML = "<table class='fsm'>" + ts.map(([k, tag, t, , at]) =>
+    "<tr" + (at ? " data-line='" + at[0] + "'" + (inEditor() ? " title='double click: line " + at[0] + "'" : "") : "")
+    + "><td class='st'>" + (tag || "") + "</td><td>" + esc(t) + "</td></tr>").join("") + "</table>";
   document.getElementById("pop").style.display = "flex";
 }
 
 function icons(n) {
   const out = [];
-  if (n.contract) out.push(["contract", "c:" + n.id, "contract " + n.contract.name]);
-  if (n.composed) out.push(["composed", "k:" + n.id, "the composition " + n.composed.name]);
+  if (n.contract) out.push(["contract", "c:" + n.id, "Contract " + n.contract.name]);
+  if (n.composed) out.push(["composed", "k:" + n.id, "Composition " + n.composed.name]);
   if (n.model) {             // a model with nothing to draw has its icon, grey
     const f = n.model.fsm;
-    const from = { controller: " (synthesized by slugs)", rtl: " (RTL)", json: " (JSON)", smv: " (SMV)" }[n.model.source] || "";
+    const from = { controller: " (synthesized by slugs)", rtl: " (RTL)", json: " (JSON)", smv: " (SMV)", c: " (C)" }[n.model.source] || "";
     const kind = n.model.source === "controller" ? "synth" : "model";
     if (states(n)) out.push([kind, "m:" + n.id, "model " + n.model.name + from + ", " + f.count + " states"]);
+    else if (n.model.source === "c") out.push([kind, null, "function " + n.model.name + from
+      + ": its outputs come from its inputs, one call at a time (ESBMC, CBMC)"]);
     else out.push([kind, null, "model " + n.model.name + from + (f && f.too_many
       ? ": more than " + f.count + " states, too many to show" : ": no registers, its outputs are functions of its inputs")]);
   }
@@ -238,6 +324,14 @@ function tag(g, x, y, s, status) {
   else { const t = text(g, x + 6, y + 11.8, "", s);
          t.setAttribute("style", "font:" + FONT_T + ";fill:" + ink); }
   return tagWidth(s);
+}
+// A check running: a tag as wide as its result will be, with three dots.
+function pending(g, x, y, s) {
+  const w = tagWidth(s), p = el("g", { class: "pending" }, g);
+  el("rect", { x, y, width: w, height: 16, rx: 4, fill: "#fff", stroke: "var(--line)", "stroke-width": 1 }, p);
+  [-5, 0, 5].forEach(d => el("circle", { cx: x + w / 2 + d, cy: y + 8, r: 1.6 }, p));
+  tip(p, (WHAT[s] || s) + " — being checked");
+  return w;
 }
 const SAYS = { valid: "holds", invalid: "does not hold", unknown: "not decided" };
 const WHAT = { "A": "compatible: the assumptions A are satisfiable",
@@ -409,23 +503,35 @@ function drawNode(g, e, ox, oy) {
   if (n.kind === "component" || n.kind === "environment") el("line", { x1: x, y1: y + HEAD - 2, x2: x + e.width, y2: y + HEAD - 2,
                                            stroke: "#e3e8e8", "stroke-width": 1 }, box);
   const name = text(box, x + PAD, y + 18, "h", n.title);
-  if (n.contract) { name.onclick = toggle("c:" + n.id); tip(name, "Click: open or close the contract"); }
+  if (n.contract) {
+    const flip = toggle("c:" + n.id);
+    name.onclick = e => { flip(); if (e.detail === 2) reveal(n.source && n.source.line); };   // a double click opens and closes: as it was
+    tip(name, "Click: open or close the contract" + (n.source && typeof acquireVsCodeApi === "function"
+                                                     ? " · double click: its text in the editor" : ""));
+  }
   let ix = x + PAD + textWidth(n.title, FONT_H) + 10;
   icons(n).forEach(([kind, key, title]) => {
     const on = key && open.has(key), c = icon(box, kind, ix, y + 6, on, title, !key);
     if (key) c.onclick = (kind === "model" || kind === "synth") && !on && !inlineModel(n) ? () => showModel(n) : toggle(key);
     ix += ICON + 4; });
   if (checks(n).length) ix += 6;
-  checks(n).forEach((c, i) => {      // a click on a check that has a core shows the core
-    const t = el("g", {}, box), on = focus[n.id] === i;
+  checks(n).forEach((c, i) => {      // a click on a check that has a core shows the core; on one that fails, its repairs
+    const t = el("g", { "data-check": n.id + "|" + c.name, "data-text": c.name }, box), on = focus[n.id] === i;
+    const fix = c.status === "invalid" && n.repair && n.repair[c.name];
     ix += tag(t, ix, y + 6, c.name, c.status) + 4;
     tip(t, (WHAT[c.name] || c.name) + " — " + (SAYS[c.status] || "not checked") + (c.reason ? " (" + c.reason + ")" : "")
-           + (c.core ? (on ? ". Click: hide the core" : ". Click: show the core") : ""));
+           + (c.core ? (on ? ". Click: hide the core" : ". Click: show the core") : "") + (fix ? ", and the repairs" : ""));
     if (on) el("rect", { x: ix - 4 - tagWidth(c.name) - 2, y: y + 4, width: tagWidth(c.name) + 4, height: 20, rx: 5,
                          fill: "none", stroke: COLOR[c.status], "stroke-width": 1 }, t);
-    if (c.core) { t.setAttribute("class", "icon");
-      t.onclick = () => { if (on) delete focus[n.id];
+    if (c.core || fix) { t.setAttribute("class", "icon");
+      t.onclick = () => { if (fix && !on) openRepair(n, c.name);
+        if (!c.core) return;
+        if (on) delete focus[n.id];
         else { focus[n.id] = i; open.add((c.core.part === "composed" ? "k:" : "c:") + n.id); } render(); }; } });
+  if (busy && show.checks && n.contract && !checks(n).some(c => c.name === "A∧G" || c.name === "A")) {
+    const known = (progressed[n.contract.name] || {})["A∧G"];   // A ∧ G: known already, or being checked
+    ix += (known ? tag(el("g", {}, box), ix, y + 6, "A∧G", known) : pending(el("g", {}, box), ix, y + 6, "A∧G")) + 4;
+  }
   let rx = x + e.width - PAD;
   if (inside(n)) {             // fold: hide or show the boxes inside
     const f = el("g", { class: "icon" }, box), shut = folded.has(n.id), cx = rx - ICON / 2, cy = y + 14;
@@ -439,20 +545,34 @@ function drawNode(g, e, ox, oy) {
     f.onclick = fold(n.id);
     rx -= ICON + 6;
   }
-  if (n.badge && show.checks) { const b = el("g", {}, box), w = tagWidth(n.badge.text);
-    tag(b, rx - w, y + 6, n.badge.text, n.badge.status);
+  if (n.badge && show.checks) { const b = el("g", { "data-check": n.id + "|" + tagOf(n.badge.text), "data-text": n.badge.text,
+                                                   class: "icon" }, box), w = tagWidth(n.badge.text);
+    const known = busy && !n.badge.status && n.contract && (progressed[n.contract.name] || {})[n.badge.text];
+    if (busy && !n.badge.status && !known) pending(b, rx - w, y + 6, n.badge.text);
+    else tag(b, rx - w, y + 6, n.badge.text, n.badge.status || known);
     tip(b, (WHAT[n.badge.text.split(" of ")[0]] || n.badge.text) + " — " + (SAYS[n.badge.status] || "not checked")
-           + (inside(n) ? ". Click: hide or show the boxes inside" : ""));
-    if (inside(n)) { b.setAttribute("class", "icon"); b.onclick = fold(n.id); } }
-  sz.ls.forEach(([k, label, s, core], i) => {
+           + ". Click: the check" + ((n.repair || {})[tagOf(n.badge.text)] ? ", and its repairs" : ""));
+    b.onclick = () => openRepair(n, tagOf(n.badge.text)); }
+  sz.ls.forEach(([k, label, s, core, at], i) => {
+    const frame = r => el("rect", { class: "hl", x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, rx: 3,
+                                     fill: "none", stroke: "var(--teal)", "stroke-width": 1.5 }, r);
     const ty = y + HEAD + 12 + i * LINE, row = el("g", {}, box);
     if (k === "f") {
       if (core) el("rect", { x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, rx: 3, fill: "#f6dcd9" }, row);
+      if (at) {             // its lines in the file: the editor goes there, and marks it from there
+        row.setAttribute("class", "trow"); row.setAttribute("data-line", at[0]); row.setAttribute("data-last", at[1]);
+        el("rect", { x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, fill: "transparent" }, row);   // the whole line
+        frame(row);
+        tip(row, (at[0] === at[1] ? "line " + at[0] : "lines " + at[0] + "–" + at[1])
+                 + (inEditor() ? " · double click: there in the editor" : "")); }
       if (label) { el("rect", { x: x + PAD, y: ty - 10, width: 13, height: 13, rx: 3, fill: "var(--teal)" }, row);
                    const t = text(row, x + PAD + 6.5, ty, "s", label); t.setAttribute("text-anchor", "middle");
                    t.setAttribute("style", "font-size:9.5px;font-weight:700;fill:#fff"); }
-      text(row, x + PAD + 20, ty, "f", s); }
+      const ft = text(row, x + PAD + 20, ty, "f", s);
+      if (n.contract && (n.contract.K || []).includes(s)) {      // a named constant: a repair shown changes it
+        ft.setAttribute("data-const", s.split(" = ")[0]); ft.setAttribute("data-cbox", n.id); } }
     else if (k === "more") {
+      if (at && at.length) { row.setAttribute("class", "trow"); row.setAttribute("data-hidden", JSON.stringify(at)); frame(row); }
       const t = text(row, x + PAD + 20, ty, "s", s);
       t.setAttribute("style", "fill:var(--teal);cursor:pointer;text-decoration:underline");
       tip(t, "the whole contract");
@@ -562,6 +682,7 @@ function place() {
     dots.setAttribute("width", step); dots.setAttribute("height", step);
     dots.setAttribute("patternTransform", `translate(${cam.x % step},${cam.y % step})`);
   }
+  placePanel();
 }
 function fit() {
   const v = document.getElementById("view"), W = v.clientWidth, H = v.clientHeight - TOP;
@@ -579,16 +700,35 @@ function zoomBy(f) { if (!cam) return; const v = document.getElementById("view")
   const v = document.getElementById("view");
   let drag = null;
   const live = t => { for (let e = t; e && e !== v; e = e.parentNode) if (e.onclick) return true; return false; };
+  // the pointer is held by the view once it moves, not before: a click or a
+  // double click on a box still reaches the box
   v.addEventListener("pointerdown", e => {
     if (!cam || e.button !== 0 || live(e.target)) return;
-    drag = { x: e.clientX, y: e.clientY, cx: cam.x, cy: cam.y };
-    v.setPointerCapture(e.pointerId); v.classList.add("moving");
+    drag = { x: e.clientX, y: e.clientY, cx: cam.x, cy: cam.y, id: e.pointerId, held: false };
   });
   v.addEventListener("pointermove", e => {
     if (!drag) return;
+    if (!drag.held) {
+      if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) < 4) return;
+      drag.held = true; v.setPointerCapture(drag.id); v.classList.add("moving");
+    }
     cam.x = drag.cx + e.clientX - drag.x; cam.y = drag.cy + e.clientY - drag.y; place();
   });
   const stop = () => { drag = null; v.classList.remove("moving"); };
+  // a double click on a box (not on its name, which opens it): its text
+  v.addEventListener("dblclick", e => {
+    for (let t = e.target; t && t !== v; t = t.parentNode) {
+      if (t.onclick) return;
+      const line = t.getAttribute && t.getAttribute("data-line");   // a term: its line
+      if (line) { reveal(+line); return; }
+      const id = t.getAttribute && t.getAttribute("data-box");
+      if (id && byId[id] && byId[id].source) { reveal(byId[id].source.line); return; }
+    }
+  });
+  document.getElementById("popview").addEventListener("dblclick", e => {
+    const tr = e.target.closest && e.target.closest("tr[data-line]");
+    if (tr) reveal(+tr.getAttribute("data-line"));
+  });
   v.addEventListener("pointerup", stop); v.addEventListener("pointercancel", stop);
   v.addEventListener("wheel", e => {
     if (!cam) return;
@@ -597,6 +737,7 @@ function zoomBy(f) { if (!cam) return; const v = document.getElementById("view")
     zoomAt(e.clientX, e.clientY, Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.002)));          // a pinch comes with ctrl
   }, { passive: false });
   document.addEventListener("keydown", e => {
+    if (e.key === "Escape") { closeRepair(); return; }
     if (e.target.closest && e.target.closest("input, textarea")) return;
       if (!cam) return;
     if (e.key === "+" || e.key === "=") zoomBy(1.25);
@@ -682,12 +823,29 @@ function rowsOf(out) {
     rows[rows.length - 1].push(...u.ids); used += (used ? 40 : 0) + u.w; });
   return rows.length > 1 ? rows : null;
 }
+// Boxes wired to each other at the top are laid out by ELK in columns: the
+// column of each box, and its place in it, stay those of the first drawing.
+let colPlan = null;              // key -> [column, place]
+function colsOf(out) {
+  if (!(DATA.edges || []).length) return null;
+  const keys = keysOf(DATA.nodes), cs = out.children || [], xs = [];
+  cs.forEach(c => { if (!xs.some(x => Math.abs(x - c.x) < 20)) xs.push(c.x); });
+  xs.sort((a, b) => a - b);
+  const col = c => xs.findIndex(x => Math.abs(x - c.x) < 20), plan = {};
+  cs.forEach(c => { const same = cs.filter(d => col(d) === col(c)).sort((a, b) => a.y - b.y);
+                    plan[keys[c.id]] = [col(c), same.indexOf(c)]; });
+  return plan;
+}
 function layout() {
+  const keys = colPlan ? keysOf(DATA.nodes) : {};
   const items = rootRows
     ? rootRows.map((ids, r) => ({ id: "root:row" + r, x: 0, y: r * 40, edges: [],
         children: ids.map((id, i) => toElk(byId[id], i, 0)),
         layoutOptions: Object.assign({}, FLOW, { "elk.padding": "[top=0,left=0,bottom=0,right=0]", "elk.alignment": "LEFT" }) }))
-    : DATA.nodes.map((n, i) => toElk(n, i, 0));
+    : DATA.nodes.map((n, i) => { const e = toElk(n, i, 0), at = colPlan && colPlan[keys[n.id]];
+        if (at) Object.assign(e.layoutOptions, { "elk.layered.layering.layerChoiceConstraint": String(at[0]),
+                                                 "elk.layered.crossingMinimization.positionChoiceConstraint": String(at[1]) });
+        return e; });
   return new ELK().layout({ id: "root", children: items, edges: rootEdges(),
     // with INCLUDE_CHILDREN, every level takes the direction of the root
     layoutOptions: Object.assign({ "elk.algorithm": "layered", "elk.direction": "RIGHT",
@@ -698,7 +856,8 @@ async function render() {
   for (const n of boxes)
     if (open.has("m:" + n.id) && inlineModel(n) && !MODELS[n.id]) MODELS[n.id] = await layoutModel(n);
   widen = {};
-  if (rowPlan === undefined) { rootRows = null; rowPlan = planOf(rowsOf(await layout())); }
+  if (rowPlan === undefined) { rootRows = null; colPlan = null; const first = await layout();
+                                rowPlan = planOf(rowsOf(first)); colPlan = rowPlan ? null : colsOf(first); }
   rootRows = rowsFromPlan();
   let out = await layout();
   for (let pass = 0; pass < 3; pass++) {
@@ -730,6 +889,41 @@ async function render() {
   const g = svgIn(document.getElementById("view"), out.width, out.height);
   (out.children || []).forEach(c => drawNode(g, c, 0, 0));
   (out.edges || []).forEach(ed => drawEdge(g, ed, 0, 0));
+  select(selectedLine, false, selectedAt);
+  afterRender();
+}
+
+// From the diagram to the text, and back: a double click on a box asks the
+// editor to show where it is written; the editor tells the line of the
+// cursor, and the box written there is marked (and brought into view).
+let selectedLine = null, selectedAt = null;
+const inEditor = () => typeof acquireVsCodeApi === "function";
+function reveal(line) {
+  if (!inEditor() || !line) return;
+  vscodeApi = vscodeApi || acquireVsCodeApi();
+  vscodeApi.postMessage({ type: "chase-reveal", line });
+}
+// line: where the contract of the cursor starts; at: the line of the cursor
+function select(line, bring, at) {
+  selectedLine = line; selectedAt = at || null;
+  let hit = null;
+  document.querySelectorAll("[data-box]").forEach(e => {
+    const n = byId[e.getAttribute("data-box")], on = !!(line && n && n.source && n.source.line === line);
+    e.classList.toggle("sel", on);
+    if (on && !hit) hit = e;
+  });
+  document.querySelectorAll(".trow").forEach(r => {
+    const box = r.closest("[data-box]"), hidden = r.getAttribute("data-hidden");
+    const ranges = hidden ? JSON.parse(hidden) : [[+r.getAttribute("data-line"), +r.getAttribute("data-last")]];
+    const on = !!(selectedAt && box && box.classList.contains("sel") && ranges.some(([a, z]) => a <= selectedAt && selectedAt <= z));
+    r.classList.toggle("sel", on);
+  });
+  if (!hit || !bring || !cam) return;
+  const r = hit.getBoundingClientRect(), v = document.getElementById("view").getBoundingClientRect();
+  if (r.left >= v.left && r.right <= v.right && r.top >= v.top + TOP && r.bottom <= v.bottom) return;
+  cam.x += (v.left + v.width / 2) - (r.left + r.width / 2);
+  cam.y += (v.top + TOP + (v.height - TOP) / 2) - (r.top + r.height / 2);
+  place();
 }
 
 // A model with more states is shown in a panel, as a table of moves.
@@ -773,7 +967,7 @@ function help() {
     sample(svg => icon(svg, k, 16, 2, false, t), t));
   sample(s => { el("rect", { x: 16, y: 2, width: 16, height: 16, rx: 4, fill: "#fff", stroke: "#17393b", "stroke-width": 1.1 }, s);
                 el("path", { d: "M20.5 11.5 L24 8 L27.5 11.5", fill: "none", stroke: "#17393b", "stroke-width": 1.4 }, s); },
-         "hide the boxes inside (or click ⪯)");
+         "hide the boxes inside");
   // a check: green when it holds, red when not, grey when undecided
   const pair = (t, d) => { const d2 = document.createElement("div");
     const svg = el("svg", { width: 88, height: 20 }, d2), w = tagWidth(t);
@@ -783,6 +977,7 @@ function help() {
    ["WS", "well-separated"], ["¬V", "no vacuous output"], ["M ⊨ C", "implements"],
    ["E ⊨ A", "environment"], ["⪯", "refines"]].forEach(([t, d]) => pair(t, d));
   sample(s => el("rect", { x: 4, y: 4, width: 40, height: 12, rx: 3, fill: "#f6dcd9" }, s), "core (click a red tag)");
+  sample(s => { tag(s, 4, 2, "⪯", "invalid"); }, "click a result: the check, and its repairs");
   const wire = (w, d) => sample(s => el("line", { x1: 4, y1: 10, x2: 44, y2: 10, stroke: "#7d8c8d", "stroke-width": w }, s), d);
   wire(1.1, "Boolean");
   wire(1.8, "integer or real");
@@ -877,6 +1072,7 @@ function load(data, token) {
   document.title = DATA.title;
   drawContext();
   if (token > staleAt) stale(null);    // a newer reason stays
+  rebindPanel();
   return render();
 }
 // The file cannot be drawn as it is now: the diagram of the last version
@@ -894,8 +1090,523 @@ window.addEventListener("message", e => {
   if (m.type === "chase-data") setData(m.data).catch(err => stale("Cannot draw the diagram: " + err));
   else if (m.type === "chase-checks") setChecks(m.data).catch(err => stale("Cannot draw the checks: " + err));
   else if (m.type === "chase-stale") stale(m.reason);
-  else if (m.type === "chase-busy") document.getElementById("busy").style.display = m.on ? "block" : "none";
+  else if (m.type === "chase-select") select(m.line, true, m.at);
+  else if (m.type === "chase-busy") setBusy(m.on);
+  else if (m.type === "chase-progress") progress(m.event);
+  else if (m.type === "chase-repair-result") {
+    const a = asked[m.id];
+    if (a) { delete asked[m.id]; if (m.error) a.no(new Error(m.error)); else a.ok(m.result); }
+  }
 });
+// Export: the whole diagram as it is drawn (what is open stays open), on a
+// white ground, the colors written out, so that the file stands alone.
+function exportMenu() {
+  const m = document.getElementById("export");
+  m.style.display = m.style.display === "flex" ? "none" : "flex";
+}
+function exported() {
+  const src = document.querySelector("#view > svg");
+  if (!src || !camera) return null;
+  const box = camera.getBBox(), pad = 16, w = Math.ceil(box.width + 2 * pad), h = Math.ceil(box.height + 2 * pad);
+  const svg = src.cloneNode(true);
+  svg.setAttribute("xmlns", NS);
+  svg.setAttribute("width", w); svg.setAttribute("height", h); svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  [...svg.children].filter(c => c.tagName === "rect").forEach(c => c.remove());   // the dots
+  svg.querySelectorAll(".sel").forEach(e => e.classList.remove("sel"));            // the box of the cursor
+  const g = [...svg.children].find(c => c.tagName === "g");
+  g.setAttribute("transform", `translate(${pad - box.x},${pad - box.y})`);
+  const ground = document.createElementNS(NS, "rect");
+  ground.setAttribute("width", w); ground.setAttribute("height", h); ground.setAttribute("fill", "#fff");
+  svg.insertBefore(ground, g);
+  const style = document.createElementNS(NS, "style");
+  style.textContent = [...document.querySelectorAll("style")].map(x => x.textContent).join("\n");
+  svg.insertBefore(style, svg.firstChild);
+  svg.querySelectorAll("[data-tip]").forEach(e => e.removeAttribute("data-tip"));
+  const root = getComputedStyle(document.documentElement);
+  const text = new XMLSerializer().serializeToString(svg)
+    .replace(/var\((--[\w-]+)\)/g, (_, v) => root.getPropertyValue(v).trim() || "#000");
+  return { text, w, h };
+}
+let vscodeApi = null;
+// Repair. A click on the result of a check (⪯, M ⊨ C, E ⊨ A, or a red A∧G)
+// opens its panel by the tag: the named constants of the contracts of the
+// check, which of them may change and within which range, and the repairs,
+// found by chase-cps repair (run by the editor, or by chase-cps view
+// --serve); each has passed the check itself. A repair pointed at shows on
+// the diagram what it changes: the value struck out, the new one, and the
+// tag as it would be. With two or more checks that fail, the tools list
+// them all. A repair applied changes the declaration of the constant in the
+// file; the checks that read it run again, and the repairs found before for
+// other checks are marked out of date, found again when asked.
+const REPAIRS = {};       // the check (by its key) -> { picks, ranges, options, running, error }
+let panel = null;         // the panel open: { id, tag, nkey }
+let previewing = null;    // a repair drawn on the diagram: { id, tag, values, from, owners, pinned }
+const repairKey = r => r.check + " " + r.args.join(" ");
+const repairSig = r => JSON.stringify(r.constants.map(c => [c.name, c.value]));
+const backend = () => inEditor() ? "editor" : (location.protocol.startsWith("http") ? "serve" : null);
+const tagOf = t => t.startsWith("⪯") ? "⪯" : t.startsWith("E ⊨ A") ? "E ⊨ A" : t;
+function statusOf(n, t) {
+  if (n.badge && tagOf(n.badge.text) === t) return n.badge.status;
+  return ((n.checks || []).find(c => c.name === t) || {}).status;
+}
+function failing() {
+  const out = [];
+  boxes.forEach(n => Object.keys(n.repair || {}).forEach(t => { if (statusOf(n, t) === "invalid") out.push([n, t]); }));
+  return out;
+}
+function defaultRange(c) {
+  const v = Number(c.value), int = c.type === "int";
+  if (v > 0) return [0, int ? Math.max(2 * v, v + 10) : 2 * v];
+  if (v < 0) return [int ? Math.min(2 * v, v - 10) : 2 * v, 0];
+  return [-10, 10];
+}
+function stateOf(r) {
+  const k = repairKey(r);
+  const s = REPAIRS[k] = REPAIRS[k] || { picks: {}, ranges: {}, options: [], running: null, error: null };
+  r.constants.forEach(c => {
+    if (!(c.name in s.picks)) s.picks[c.name] = c.role !== "requirement";   // a requirement: only when asked
+    if (!(c.name in s.ranges)) s.ranges[c.name] = defaultRange(c);
+  });
+  return s;
+}
+// one element: h("div", { class: "x", onclick: f }, children...)
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const k in attrs || {}) {
+    const v = attrs[k];
+    if (v === undefined || v === null || v === false) continue;
+    if (k.startsWith("on")) e[k] = v;
+    else if (k === "class") e.className = v;
+    else if (k === "checked" || k === "disabled" || k === "value") e[k] = v;
+    else e.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => { if (c !== null && c !== undefined && c !== false)
+    e.appendChild(typeof c === "string" || typeof c === "number" ? document.createTextNode(String(c)) : c); });
+  return e;
+}
+function checkTitle(n, t) {
+  const r = (n.repair || {})[t];
+  if (r && r.check === "refines") return r.args[0].split("+").join(" ⊗ ") + " refines " + r.args[1];
+  if (r && r.check === "impl") return r.args[0].split("/").pop() + " implements " + r.args[1];
+  if (r && r.check === "env") return r.args[0].split("/").pop() + " is an environment of " + r.args[1];
+  if (r) return "A ∧ G of " + r.args[0] + " can hold";
+  return n.title;
+}
+// the tag of a check as the diagram draws it, for a panel
+function tagSvg(t, status) {
+  const svg = el("svg", { width: tagWidth(t) + 2, height: 18, class: "rp-tag" });
+  tag(svg, 1, 1, t, status || null);
+  return svg;
+}
+async function openRepair(n, t) {
+  const keys = keysOf(DATA.nodes);
+  panel = { id: n.id, tag: t, nkey: keys[n.id] };
+  document.getElementById("queue").style.display = "none";
+  const r0 = (n.repair || {})[t];
+  if (r0) {                             // the boxes that declare the constants, open: their values show
+    const owners = new Set(r0.constants.flatMap(c => c.owners.map(o => o.contract)));
+    let more = false;
+    (function walk(b) { if (b.contract && owners.has(b.contract.name) && !open.has("c:" + b.id)) { open.add("c:" + b.id); more = true; }
+                        (b.children || []).forEach(walk); })(n);
+    if (more) await render();
+  }
+  renderPanel();
+  makeRoom();
+  placePanel();
+  const r = (n.repair || {})[t];
+  if (r && backend() && statusOf(n, t) === "invalid") {   // found at once: the constants that may change already
+    const s = stateOf(r);
+    if (!s.running && !s.options.some(o => o.sig === repairSig(r)) && r.constants.some(c => s.picks[c.name]))
+      findRepairs(n, t);
+  }
+}
+// the diagram moves left when the panel would cover it on the right of the tag
+// where the panel goes: right of the box of the tag, at the height of the tag
+function anchorOf() {
+  const a = panel && document.querySelector('#view [data-check="' + panel.id + "|" + panel.tag + '"]');
+  if (!a) return null;
+  const t = a.getBoundingClientRect(), b = a.closest("[data-box]");
+  const outer = b ? b.querySelector("rect").getBoundingClientRect() : t;
+  return { left: outer.left, right: Math.max(t.right, outer.right), top: t.top, bottom: t.bottom };
+}
+function makeRoom() {
+  const box = document.getElementById("repair"), r = anchorOf();
+  if (!r || !cam) return;
+  const need = r.right + 10 + box.offsetWidth - (innerWidth - 12);
+  if (need > 0 && need < r.left - 60) { cam.x -= need; place(); }
+}
+function closeRepair() {
+  panel = null;
+  clearPreview(true);
+  document.getElementById("repair").style.display = "none";
+}
+// after a new drawing: the panel stays on the box that says the same
+function rebindPanel() {
+  previewing = null;
+  if (!panel) return;
+  const keys = keysOf(DATA.nodes), id = Object.keys(keys).find(i => keys[i] === panel.nkey);
+  if (!id || !byId[id]) { closeRepair(); return; }
+  panel.id = id;
+  renderPanel();
+}
+const ROLE = { part: "part", requirement: "requirement", contract: "contract" };
+function renderPanel() {
+  const box = document.getElementById("repair");
+  if (!panel) { box.style.display = "none"; return; }
+  const n = byId[panel.id];
+  if (!n) { closeRepair(); return; }
+  const t = panel.tag, r = (n.repair || {})[t], st = statusOf(n, t), how = backend();
+  box.innerHTML = "";
+  box.style.display = "block";
+  box.appendChild(h("div", { class: "rp-head" },
+    tagSvg(t, st), h("b", {}, checkTitle(n, t)),
+    h("button", { class: "rp-x", title: "Close (Esc)", onclick: closeRepair }, "×")));
+  const says = st === "valid" ? "Holds with the present values." : st === "invalid" ? "Does not hold with the present values."
+             : st === "unknown" ? "Not decided." : "Not checked yet.";
+  const head = h("div", { class: "rp-sec" }, h("div", { class: "rp-says" }, says));
+  box.appendChild(head);
+  if (!r) {
+    head.appendChild(h("div", { class: "rp-note" }, n.contract && n.contract.K
+      ? "Repairs are found on a specification file: open it with chase-cps view FILE --serve, or in VS Code."
+      : "This check reads no named constant. A repair changes named constants: write the number to change as one "
+        + "(integer constant k 2; or real constant lam 4.5;) and use its name in the terms."));
+    return;
+  }
+  const s = stateOf(r), sig = repairSig(r);
+  // the constants
+  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "Constants that may change"));
+  r.constants.forEach(c => {
+    const [lo, hi] = s.ranges[c.name];
+    const num = (v, i) => h("input", { type: "number", value: v, step: c.type === "int" ? 1 : "any", "aria-label": (i ? "high" : "low") + " " + c.name,
+      onchange: e => { const x = Number(e.target.value); if (Number.isFinite(x)) s.ranges[c.name][i] = x; renderQueue(); } });
+    sec.appendChild(h("div", { class: "rp-row" },
+      h("input", { type: "checkbox", checked: !!s.picks[c.name], "aria-label": "may change " + c.name,
+                   onchange: e => { s.picks[c.name] = e.target.checked; renderPanel(); } }),
+      h("span", { class: "rp-name" }, c.name + " = " + c.value),
+      h("span", { class: "rp-range" }, num(lo, 0), "..", num(hi, 1)),
+      h("span", {}),
+      h("span", { class: "rp-who" }, (c.type === "int" ? "integer" : "real") + " · " + c.owners.map(o => o.contract).join(", "),
+        h("span", { class: "rp-role " + c.role }, ROLE[c.role] || c.role),
+        c.role === "requirement" ? "changed only with your consent" : null)));
+  });
+  const picked = r.constants.filter(c => s.picks[c.name]);
+  const run = h("div", { class: "rp-run" });
+  if (s.running) {
+    run.appendChild(h("span", { class: "rp-spin" }));
+    run.appendChild(h("span", { class: "rp-says" }, "Finding repairs… " + s.running.done + " of " + s.running.of));
+    run.appendChild(h("button", { class: "rp-btn", onclick: () => stopRepairs(r) }, "Stop"));
+  } else {
+    run.appendChild(h("button", { class: "rp-btn main", disabled: !how || !picked.length,
+                                  onclick: () => findRepairs(n, t) }, s.options.length ? "Find again" : "Find repairs"));
+    run.appendChild(h("span", { class: "rp-says" }, !picked.length ? "Pick a constant to change."
+      : picked.length > 1 ? "Each alone, and all together." : ""));
+  }
+  sec.appendChild(h("div", { style: "margin-top:8px" }, run));
+  box.appendChild(sec);
+  // the repairs
+  if (s.options.length || s.error) {
+    const out = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "Repairs"));
+    s.options.forEach(o => out.appendChild(optionCard(n, t, r, s, o, sig)));
+    if (s.error) out.appendChild(h("div", { class: "rp-err" }, s.error));
+    out.appendChild(h("div", { class: "rp-note" }, "Each value has passed the check itself. Point at a repair to see it on the diagram."));
+    box.appendChild(out);
+  }
+  if (!how) box.appendChild(h("div", { class: "rp-sec" },
+    h("div", { class: "rp-note", style: "margin-top:0" }, "This page cannot run repairs: open the file in VS Code, or draw it with chase-cps view FILE --serve. On the command line:"),
+    h("div", { class: "rp-cmd" }, commandOf(r, s))));
+}
+function optionCard(n, t, r, s, o, sig) {
+  const res = o.res, old = o.sig !== sig && !o.applied;
+  const names = o.names.join(", ");
+  if (res.status !== "repaired") {
+    const text = res.status === "holds" ? "Holds with the present values: nothing to change."
+      : res.status === "impossible" ? "No value of " + names + " in " + o.names.map(k => "[" + o.ranges[k].join(", ") + "]").join(" × ") + " makes it hold."
+      : "Not decided" + (res.reason ? ": " + res.reason : ".");
+    const card = h("div", { class: "rp-opt " + res.status + (old ? " old" : "") },
+      h("div", { class: "rp-v" }, text), h("div", { class: "rp-m" }, (old ? "Out of date · " : "") + "changing " + names));
+    if (res.status === "impossible" && !old) card.appendChild(h("div", { class: "rp-b" },
+      h("button", { class: "rp-btn", onclick: () => { o.names.forEach(k => { const [a, b] = s.ranges[k], w = Math.max(b - a, 1);
+        s.ranges[k] = [a - w / 2, b + w / 2].map(x => r.constants.find(c => c.name === k).type === "int" ? Math.round(x) : x); });
+        findRepairs(n, t); } }, "Widen")));
+    return card;
+  }
+  const v = h("div", { class: "rp-v" });
+  o.names.forEach((k, i) => { if (i) v.appendChild(document.createTextNode("   "));
+    v.append(k + " ", h("s", {}, o.from[k]), " → ", h("em", {}, res.text[k] === null ? String(res.values[k]) : res.text[k])); });
+  const meta = [o.applied ? "Applied: in the file" : old ? "Out of date" : null, "cost " + res.cost, res.optimal ? "optimal" : "least found",
+                res.method + (res.rounds ? ", " + res.rounds + (res.rounds === 1 ? " round" : " rounds") : ""),
+                res.seconds + " s"].filter(Boolean).join(" · ");
+  const req = o.names.some(k => (r.constants.find(c => c.name === k) || {}).role === "requirement");
+  const lines = o.names.every(k => (r.constants.find(c => c.name === k) || { owners: [] }).owners.every(w => w.line));
+  const exact = o.names.every(k => res.text[k] !== null);
+  const can = backend() && !old && lines && exact && !o.applied;
+  const shown = previewing && previewing.pinned && previewing.option === o;
+  const apply = h("button", { class: "rp-btn" + (can ? " main" : ""), disabled: !can,
+    title: !exact ? "This value has no finite decimal: write a nearby one by hand" : !lines ? "No declaration of the constant in the file"
+         : req ? "Changes a requirement" : "Write the value in the file",
+    onclick: e => applyOption(n, t, r, o, e.target) }, o.applied ? "Applied" : "Apply");
+  const card = h("div", { class: "rp-opt repaired" + (old ? " old" : "") + (shown ? " shown" : ""),
+                          onmouseenter: () => { if (!old) showPreview(previewOf(n, t, r, o)); },
+                          onmouseleave: () => clearPreview(false) },
+    v, h("div", { class: "rp-m" }, meta),
+    h("div", { class: "rp-b" },
+      h("button", { class: "rp-btn" + (shown ? " on" : ""), disabled: old, title: "Keep it drawn on the diagram",
+                    onclick: () => { if (shown) clearPreview(true); else { const p = previewOf(n, t, r, o); p.pinned = true; showPreview(p); }
+                                     renderPanel(); } }, "Preview"),
+      apply));
+  return card;
+}
+function previewOf(n, t, r, o) {
+  const owners = [];
+  o.names.forEach(k => (r.constants.find(c => c.name === k) || { owners: [] }).owners.forEach(w => owners.push(w.contract)));
+  const values = {};
+  o.names.forEach(k => { values[k] = o.res.text[k] === null ? String(o.res.values[k]) : o.res.text[k]; });
+  return { id: n.id, tag: t, values, from: o.from, owners, option: o, pinned: false };
+}
+function commandOf(r, s) {
+  const flag = { refines: "--refines", impl: "--impl", env: "--env", verify: "--verify", compat: "--compat", consist: "--consist" }[r.check];
+  const q = a => /^[\w.+:\/-]+$/.test(a) ? a : JSON.stringify(a);
+  const ps = r.constants.filter(c => s.picks[c.name]).map(c => "--param " + c.name + "=" + s.ranges[c.name][0] + ".."
+                                                       + s.ranges[c.name][1] + (c.type === "int" ? ":int" : ""));
+  return ["chase-cps repair", q(DATA.title), flag, ...r.args.map(q), ...ps].join(" ");
+}
+// The repairs of the constants picked: each alone, then all together.
+async function findRepairs(n, t) {
+  const r = n.repair[t], s = stateOf(r);
+  const names = r.constants.filter(c => s.picks[c.name]).map(c => c.name);
+  if (!names.length || s.running) return;
+  const runs = names.map(k => [k]);
+  if (names.length > 1) runs.push(names);
+  const sig = repairSig(r), from = {};
+  r.constants.forEach(c => { from[c.name] = c.value; });
+  const token = {};
+  s.options = []; s.error = null; s.running = { done: 0, of: runs.length, token };
+  clearPreview(true);
+  renderPanel(); renderQueue();
+  for (const ks of runs) {
+    const params = ks.map(k => ({ name: k, low: s.ranges[k][0], high: s.ranges[k][1],
+                                  type: r.constants.find(c => c.name === k).type }));
+    const ranges = {}; ks.forEach(k => { ranges[k] = s.ranges[k].slice(); });
+    try {
+      const res = await askRepair({ check: r.check, args: r.args, params }, s);
+      if (!s.running || s.running.token !== token) return;
+      s.options.push({ names: ks, res, sig, from, ranges });
+    } catch (e) {
+      if (!s.running || s.running.token !== token) return;
+      s.error = String(e && e.message || e);
+      break;
+    }
+    s.running.done++;
+    renderPanel(); renderQueue();
+  }
+  s.running = null;
+  renderPanel(); renderQueue();
+}
+function stopRepairs(r) {
+  const s = stateOf(r);
+  if (s.cancel) s.cancel();
+  s.running = null;
+  renderPanel(); renderQueue();
+}
+let repairSeq = 0;
+const asked = {};
+function askRepair(req, s) {
+  const how = backend();
+  if (how === "editor") {
+    vscodeApi = vscodeApi || acquireVsCodeApi();
+    const id = ++repairSeq;
+    return new Promise((ok, no) => {
+      asked[id] = { ok, no };
+      s.cancel = () => { vscodeApi.postMessage({ type: "chase-repair-stop", id }); delete asked[id]; };
+      vscodeApi.postMessage({ type: "chase-repair", id, request: req });
+    });
+  }
+  if (how === "serve") {
+    const ctl = new AbortController();
+    s.cancel = () => ctl.abort();
+    return fetch("/repair", { method: "POST", headers: { "Content-Type": "application/json", "X-CHASE": "1" },
+                              body: JSON.stringify(req), signal: ctl.signal })
+      .then(x => x.json()).then(x => { if (x.error) throw new Error(x.error); return x.result; });
+  }
+  return Promise.reject(new Error("This page cannot run repairs."));
+}
+function applyOption(n, t, r, o, button) {
+  const req = o.names.some(k => (r.constants.find(c => c.name === k) || {}).role === "requirement");
+  if (req && !button.getAttribute("data-sure")) {       // a requirement: asked twice
+    button.setAttribute("data-sure", "1");
+    button.textContent = "Change the requirement?";
+    button.className = "rp-btn warn";
+    return;
+  }
+  const edits = [];
+  o.names.forEach(k => (r.constants.find(c => c.name === k) || { owners: [] }).owners
+    .forEach(w => edits.push({ line: w.line, name: k, value: o.res.text[k] })));
+  o.applied = true;
+  clearPreview(true);
+  const how = backend();
+  if (how === "editor") {
+    vscodeApi = vscodeApi || acquireVsCodeApi();
+    vscodeApi.postMessage({ type: "chase-apply", edits });
+  } else if (how === "serve") {
+    fetch("/apply", { method: "POST", headers: { "Content-Type": "application/json", "X-CHASE": "1" },
+                      body: JSON.stringify({ edits }) })
+      .then(x => x.json()).then(x => { if (x.error) { o.applied = false; stateOf(r).error = x.error; renderPanel(); } });
+  }
+  renderPanel();
+}
+// What a repair changes, drawn on the diagram without laying it out again.
+function showPreview(p) {
+  clearPreview(true);
+  previewing = p;
+  document.querySelectorAll("#view text[data-const]").forEach(x => {
+    const k = x.getAttribute("data-const"), b = byId[x.getAttribute("data-cbox")];
+    if (!(k in p.values) || !b || !b.contract || !p.owners.includes(b.contract.name)) return;
+    x.setAttribute("data-was", x.textContent);
+    x.textContent = k + " = ";
+    el("tspan", { fill: "var(--bad)", "text-decoration": "line-through" }, x).textContent = p.from[k];
+    el("tspan", { fill: "var(--ok)", "font-weight": "600" }, x).textContent = " → " + p.values[k];
+  });
+  const g = document.querySelector('#view [data-check="' + p.id + "|" + p.tag + '"]');
+  if (g) {
+    const r0 = g.querySelector("rect"), x = +r0.getAttribute("x"), y = +r0.getAttribute("y");
+    const w = el("g", { class: "pv" }, g);
+    tag(w, x, y, g.getAttribute("data-text"), null);
+    w.querySelector("rect").setAttribute("stroke", "var(--ok)");
+    w.querySelector("rect").setAttribute("stroke-dasharray", "3 2");
+    w.querySelectorAll("path").forEach(q => q.setAttribute("stroke", "var(--ok)"));
+    w.querySelectorAll("text").forEach(q => q.style.fill = "var(--ok)");
+    tip(w, "would hold with this repair");
+  }
+}
+function clearPreview(all) {
+  if (previewing && previewing.pinned && !all) {       // back to the one kept
+    const keep = previewing; previewing = null; showPreview(keep); return;
+  }
+  document.querySelectorAll("#view text[data-was]").forEach(x => { x.textContent = x.getAttribute("data-was"); x.removeAttribute("data-was"); });
+  document.querySelectorAll("#view .pv").forEach(x => x.remove());
+  if (all || !(previewing && previewing.pinned)) previewing = null;
+}
+function placePanel() {
+  const box = document.getElementById("repair");
+  if (!panel || box.style.display === "none") return;
+  const r = anchorOf();
+  const W = innerWidth, H = innerHeight, w = box.offsetWidth, hh = box.offsetHeight;
+  if (!r) { box.style.left = Math.max(12, W - w - 12) + "px"; box.style.top = "46px"; return; }
+  let x = r.right + 10;
+  if (x + w > W - 12) x = r.left - w - 10;               // on the left of the tag
+  if (x < 12) x = Math.max(12, Math.min(W - w - 12, r.left));
+  let y = x === r.right + 10 || x === r.left - w - 10 ? r.top - 8 : r.bottom + 8;
+  y = Math.max(46, Math.min(y, H - hh - 12));
+  box.style.left = x + "px"; box.style.top = y + "px";
+}
+// The checks that fail, with their repairs: on the tools when there are two or more.
+function renderQueue() {
+  const list = failing(), b = document.getElementById("repairs"), q = document.getElementById("queue");
+  b.style.display = list.length >= 2 ? "inline-flex" : "none";
+  document.getElementById("repcount").textContent = list.length;
+  if (list.length < 2) { q.style.display = "none"; return; }
+  if (q.style.display !== "block") return;
+  q.innerHTML = "";
+  q.appendChild(h("div", { class: "rp-head" }, h("b", {}, "Checks that fail · " + list.length),
+    h("button", { class: "rp-x", title: "Close", onclick: () => { q.style.display = "none"; } }, "×")));
+  const names = list.map(([n, t]) => n.repair[t].constants.flatMap(c => c.owners.map(o => o.contract + "." + c.name)));
+  list.forEach(([n, t], i) => {
+    const r = n.repair[t], s = stateOf(r), sig = repairSig(r);
+    const best = s.options.find(o => o.res.status === "repaired" && o.sig === sig);
+    const old = !best && s.options.some(o => o.sig !== sig);
+    const shared = list.map((x, j) => j !== i && names[j].filter(k => names[i].includes(k)).length ? x[0].title : null).filter(Boolean);
+    q.appendChild(h("div", { class: "q-item", onclick: () => { bringTo(n, t); openRepair(n, t); } },
+      h("div", { class: "t" }, tagSvg(t, "invalid"), checkTitle(n, t)),
+      h("div", { class: "s" }, "constants: " + r.constants.map(c => c.name + (c.role === "requirement" ? " (requirement)" : "")).join(", ")),
+      s.running ? h("div", { class: "s" }, "finding repairs…")
+      : best ? h("div", { class: "v" }, best.names.map(k => k + " " + best.from[k] + " → " + best.res.text[k]).join(", "))
+      : old ? h("div", { class: "s old" }, "repairs out of date: the file has changed")
+      : h("div", { class: "s" }, "no repair found yet"),
+      shared.length ? h("div", { class: "s" }, "shares a constant with " + shared.join(", ")) : null));
+  });
+}
+function toggleQueue() {
+  const q = document.getElementById("queue");
+  q.style.display = q.style.display === "block" ? "none" : "block";
+  renderQueue();
+}
+// the view moves so that the tag of the check is in the middle
+function bringTo(n, t) {
+  const a = document.querySelector('#view [data-check="' + n.id + "|" + t + '"]'), v = document.getElementById("view");
+  if (!a || !cam) return;
+  const r = a.getBoundingClientRect();
+  cam.x += v.clientWidth * 0.4 - r.left; cam.y += v.clientHeight * 0.4 - r.top;
+  place();
+}
+function afterRender() {
+  if (previewing) { const p = previewing; previewing = null; showPreview(p); }
+  placePanel();
+  renderQueue();
+}
+// The checks run by the editor: the button starts them (or stops them), and
+// the places where their results will be show three dots meanwhile.
+function setBusy(on) {
+  busy = !!on;
+  progressed = {};
+  document.getElementById("run").classList.toggle("busy", busy);
+  document.getElementById("run").title = busy ? "Checking… Click to stop"
+    : "Check: A ∧ G of each contract, and the refinements, implementations, and environments drawn";
+  if (DATA) render();
+}
+// A result known while the checks run: on its box at once (a few at a time).
+const TAGS = { feasible: ["of", "A∧G"], refines: ["abstract", "⪯"] };
+let redraw = null;
+function progress(e) {
+  const where = TAGS[e.check];
+  if (!where || !busy) return;
+  const status = { sat: "valid", valid: "valid", unsat: "invalid", invalid: "invalid" }[e.result] || "unknown";
+  (progressed[e[where[0]]] = progressed[e[where[0]]] || {})[where[1]] = status;
+  clearTimeout(redraw);
+  redraw = setTimeout(() => { if (DATA) render(); }, 60);
+}
+function runChecks() {
+  if (!inEditor()) return;
+  vscodeApi = vscodeApi || acquireVsCodeApi();
+  vscodeApi.postMessage({ type: busy ? "chase-stop" : "chase-check" });
+}
+if (inEditor()) {                  // the Check button, in a group of its own
+  document.getElementById("run").style.display = "inline-flex";
+  document.getElementById("runsep").style.display = "inline-block";
+}
+function deliver(name, mime, data) {
+  if (typeof acquireVsCodeApi === "function") {      // in an editor: it asks where to save
+    vscodeApi = vscodeApi || acquireVsCodeApi();
+    vscodeApi.postMessage({ type: "chase-export", name, mime, data });
+    return;
+  }
+  const a = document.createElement("a");
+  a.download = name;
+  a.href = data.startsWith("data:") ? data : URL.createObjectURL(new Blob([data], { type: mime }));
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function exportAs(kind) {
+  document.getElementById("export").style.display = "none";
+  const e = exported();
+  if (!e) return;
+  const name = (DATA.title || "diagram").replace(/\.[^.]*$/, "").replace(/[^\w.-]+/g, "_");
+  if (kind === "svg") return deliver(name + ".svg", "image/svg+xml", e.text);
+  const img = new Image();
+  img.onload = () => {
+    const k = 2, c = document.createElement("canvas");
+    c.width = e.w * k; c.height = e.h * k;
+    const x = c.getContext("2d"); x.scale(k, k); x.drawImage(img, 0, 0);
+    if (kind === "png") return deliver(name + ".png", "image/png", c.toDataURL("image/png"));
+    // PDF: the vector page, through the print dialog of the browser ("Save as PDF"); in an
+    // editor, which cannot print, the editor writes it
+    if (typeof acquireVsCodeApi === "function")
+      return deliver(name + ".pdf", "application/pdf", JSON.stringify({ svg: e.text, w: e.w, h: e.h }));
+    let p = document.getElementById("print");
+    if (!p) { p = document.createElement("div"); p.id = "print"; p.style.display = "none"; document.body.appendChild(p); }
+    p.innerHTML = e.text;
+    window.print();
+  };
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(e.text);
+}
 // The explanations: shown by the page itself, since the tooltips of the
 // browser do not show in the webview of an editor.
 (function () {

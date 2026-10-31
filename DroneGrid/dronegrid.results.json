@@ -1,0 +1,132 @@
+{
+  "file": "dronegrid.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Coordinator": {
+      "feasible": {
+        "key": "3b71250e8982b2bf",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "CoordinatorSafe": {
+      "feasible": {
+        "key": "d79b1f34b45b021a",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.01,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Fleet": {
+      "feasible": {
+        "key": "2b980c75bf51b0fe",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Move0": {
+      "feasible": {
+        "key": "16906d436d14f8b0",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Move1": {
+      "feasible": {
+        "key": "317db2826724f2a2",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Plan0": {
+      "feasible": {
+        "key": "523004a96155bf07",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Plan1": {
+      "feasible": {
+        "key": "f81d37c98fef556e",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "dbb472c636e7b76c",
+      "check": "implementation",
+      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/coordinator.c:grant",
+      "contract": "Coordinator",
+      "result": "valid",
+      "tool": "esbmc",
+      "seconds": 0.13,
+      "at": "2026-10-30T23:07:54"
+    },
+    {
+      "key": "e5f45f31592c7ef4",
+      "check": "implementation",
+      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/move.c:move0",
+      "contract": "Move0",
+      "result": "valid",
+      "tool": "esbmc",
+      "seconds": 0.12,
+      "at": "2026-10-30T23:07:54"
+    },
+    {
+      "key": "d77f5bd20fcd2964",
+      "check": "implementation",
+      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/plan.c:plan0",
+      "contract": "Plan0",
+      "result": "valid",
+      "tool": "esbmc",
+      "seconds": 0.11,
+      "at": "2026-10-30T23:07:54"
+    },
+    {
+      "key": "11dd694ce23bd7e6",
+      "check": "implementation",
+      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/plan.c:plan1",
+      "contract": "Plan1",
+      "result": "valid",
+      "tool": "esbmc",
+      "seconds": 0.11,
+      "at": "2026-10-30T23:07:54"
+    },
+    {
+      "key": "9be217ce41780d18",
+      "check": "implementation",
+      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/move.c:move1",
+      "contract": "Move1",
+      "result": "valid",
+      "tool": "esbmc",
+      "seconds": 0.12,
+      "at": "2026-10-30T23:07:55"
+    },
+    {
+      "key": "474cf89fb2232490",
+      "check": "refines",
+      "refined": "Plan0+Plan1+Coordinator+Move0+Move1",
+      "abstract": "Fleet",
+      "result": "invalid",
+      "tool": "z3",
+      "seconds": 0.06,
+      "at": "2026-10-30T23:07:54",
+      "failed": "guarantees"
+    }
+  ]
+}

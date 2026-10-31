@@ -8,7 +8,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "Brake2": {
@@ -17,7 +17,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "BrakePedal": {
@@ -26,7 +26,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "Camera": {
@@ -35,7 +35,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "DelayF": {
@@ -44,7 +44,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "Detection": {
@@ -53,7 +53,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "Link": {
@@ -62,7 +62,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "PedalProcessing": {
@@ -71,7 +71,7 @@
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-30T21:39:27"
+        "at": "2026-10-30T23:07:53"
       }
     },
     "SysB": {
@@ -79,32 +79,32 @@
         "key": "91af307fdd31a327",
         "result": "sat",
         "tool": "z3",
-        "seconds": 0.02,
-        "at": "2026-10-30T21:39:27"
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:53"
       }
     }
   },
   "relations": [
     {
-      "key": "1840a50608064642",
+      "key": "22dc6a26112c906c",
       "check": "refines",
       "refined": "Camera+Detection+Link+Brake2",
       "abstract": "DelayF",
       "result": "invalid",
       "tool": "z3",
-      "seconds": 0.01,
-      "at": "2026-10-30T21:39:48",
+      "seconds": 0.0,
+      "at": "2026-10-30T23:07:53",
       "failed": "guarantees"
     },
     {
-      "key": "8b392d4082c281cc",
+      "key": "ced3c7d810a84294",
       "check": "refines",
       "refined": "BrakePedal+PedalProcessing+Brake1",
       "abstract": "SysB",
       "result": "invalid",
       "tool": "z3",
-      "seconds": 0.01,
-      "at": "2026-10-30T21:39:48",
+      "seconds": 0.0,
+      "at": "2026-10-30T23:07:53",
       "failed": "guarantees"
     }
   ]

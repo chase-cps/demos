@@ -7,8 +7,8 @@
         "key": "de466b868b460238",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-30T21:39:27"
+        "seconds": 0.02,
+        "at": "2026-10-30T23:07:54"
       }
     },
     "Bound": {
@@ -16,17 +16,17 @@
         "key": "1626558f3196023c",
         "result": "sat",
         "tool": "nuxmv/ic3",
-        "seconds": 0.02,
-        "at": "2026-10-30T21:39:27"
+        "seconds": 0.04,
+        "at": "2026-10-30T23:07:54"
       }
     },
     "Client": {
       "feasible": {
         "key": "a032f4cc3fe32147",
         "result": "sat",
-        "tool": "nuxmv/ic3",
-        "seconds": 0.05,
-        "at": "2026-10-30T21:39:27"
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-30T23:07:54"
       }
     },
     "Wait": {
@@ -34,8 +34,8 @@
         "key": "56a448849bdceab5",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-30T21:39:27"
+        "seconds": 0.02,
+        "at": "2026-10-30T23:07:54"
       }
     }
   },
@@ -47,8 +47,8 @@
       "abstract": "Bound",
       "result": "invalid",
       "tool": "nuxmv/ic3",
-      "seconds": 0.06,
-      "at": "2026-10-30T21:39:49",
+      "seconds": 0.03,
+      "at": "2026-10-30T23:07:54",
       "failed": "guarantees"
     }
   ]

@@ -1,0 +1,164 @@
+# view: --refines Plan0+Plan1+Coordinator+Move0+Move1 Fleet
+# view: --implementation plan.c:plan0 Plan0 --implementation plan.c:plan1 Plan1
+# view: --implementation coordinator.c:grant Coordinator
+# view: --implementation move.c:move0 Move0 --implementation move.c:move1 Move1
+NAME: dronegrid;
+
+# Two drones of the fire-suppression federation of ContrACT (MDFS, Xiao et
+# al., MEMOCODE 2026) move on a 10 x 10 grid, one cell per step. Each step:
+# each drone asks for a move toward its target (Plan, GridDroneControl), the
+# coordinator grants the moves (Coordinator, FireCoordinator), and each
+# drone moves as granted (Move, GridDroneSim). The contracts say what one
+# step of each reaction does; plan.c, coordinator.c, and move.c are the
+# reactions in C. A move is 0 stay, 1 right (x + 1), 2 left (x - 1),
+# 3 down (y + 1), 4 up (y - 1).
+
+# The move a drone asks for: toward its target, horizontal first.
+CONTRACT Plan0:
+    input integer (0:9) variable x0;
+    input integer (0:9) variable y0;
+    input integer (0:9) variable tx0;
+    input integer (0:9) variable ty0;
+    output integer (0:4) variable r0;
+    Assumptions:
+        true;
+    Guarantees:
+        x0 < tx0 -> r0 = 1;
+        x0 > tx0 -> r0 = 2;
+        (x0 = tx0 & y0 < ty0) -> r0 = 3;
+        (x0 = tx0 & y0 > ty0) -> r0 = 4;
+        (x0 = tx0 & y0 = ty0) -> r0 = 0;
+
+CONTRACT Plan1:
+    input integer (0:9) variable x1;
+    input integer (0:9) variable y1;
+    input integer (0:9) variable tx1;
+    input integer (0:9) variable ty1;
+    output integer (0:4) variable r1;
+    Assumptions:
+        true;
+    Guarantees:
+        x1 < tx1 -> r1 = 1;
+        x1 > tx1 -> r1 = 2;
+        (x1 = tx1 & y1 < ty1) -> r1 = 3;
+        (x1 = tx1 & y1 > ty1) -> r1 = 4;
+        (x1 = tx1 & y1 = ty1) -> r1 = 0;
+
+# The coordinator as the reaction is written: fx, fy are where each drone
+# would be after its move; when the two would reach the same cell, or swap
+# cells, while both move, drone 1 stays.
+CONTRACT Coordinator:
+    input integer (0:9) variable x0;
+    input integer (0:9) variable y0;
+    input integer (0:4) variable r0;
+    input integer (0:9) variable x1;
+    input integer (0:9) variable y1;
+    input integer (0:4) variable r1;
+    output integer (0:9) variable fx0;
+    output integer (0:9) variable fy0;
+    output integer (0:9) variable fx1;
+    output integer (0:9) variable fy1;
+    output integer (0:4) variable g0;
+    output integer (0:4) variable g1;
+    Assumptions:
+        true;
+    Guarantees:
+        (r0 = 1 & x0 < 9) -> (fx0 = x0 + 1 & fy0 = y0);
+        (r0 = 2 & x0 > 0) -> (fx0 = x0 - 1 & fy0 = y0);
+        (r0 = 3 & y0 < 9) -> (fx0 = x0 & fy0 = y0 + 1);
+        (r0 = 4 & y0 > 0) -> (fx0 = x0 & fy0 = y0 - 1);
+        !((r0 = 1 & x0 < 9) | (r0 = 2 & x0 > 0) | (r0 = 3 & y0 < 9) | (r0 = 4 & y0 > 0)) -> (fx0 = x0 & fy0 = y0);
+        (r1 = 1 & x1 < 9) -> (fx1 = x1 + 1 & fy1 = y1);
+        (r1 = 2 & x1 > 0) -> (fx1 = x1 - 1 & fy1 = y1);
+        (r1 = 3 & y1 < 9) -> (fx1 = x1 & fy1 = y1 + 1);
+        (r1 = 4 & y1 > 0) -> (fx1 = x1 & fy1 = y1 - 1);
+        !((r1 = 1 & x1 < 9) | (r1 = 2 & x1 > 0) | (r1 = 3 & y1 < 9) | (r1 = 4 & y1 > 0)) -> (fx1 = x1 & fy1 = y1);
+        g0 = r0;
+        (((fx0 = fx1 & fy0 = fy1) | (fx0 = x1 & fy0 = y1 & fx1 = x0 & fy1 = y0)) & !(r0 = 0) & !(r1 = 0)) -> g1 = 0;
+        !(((fx0 = fx1 & fy0 = fy1) | (fx0 = x1 & fy0 = y1 & fx1 = x0 & fy1 = y0)) & !(r0 = 0) & !(r1 = 0)) -> g1 = r1;
+
+# The coordinator that grants a move only into a cell that is free after
+# the step: drone 0 does not move into the cell of drone 1, and drone 1
+# moves neither into the cell of drone 0 nor where drone 0 goes.
+CONTRACT CoordinatorSafe:
+    input integer (0:9) variable x0;
+    input integer (0:9) variable y0;
+    input integer (0:4) variable r0;
+    input integer (0:9) variable x1;
+    input integer (0:9) variable y1;
+    input integer (0:4) variable r1;
+    output integer (0:9) variable fx0;
+    output integer (0:9) variable fy0;
+    output integer (0:9) variable fx1;
+    output integer (0:9) variable fy1;
+    output integer (0:4) variable g0;
+    output integer (0:4) variable g1;
+    Assumptions:
+        true;
+    Guarantees:
+        (r0 = 1 & x0 < 9) -> (fx0 = x0 + 1 & fy0 = y0);
+        (r0 = 2 & x0 > 0) -> (fx0 = x0 - 1 & fy0 = y0);
+        (r0 = 3 & y0 < 9) -> (fx0 = x0 & fy0 = y0 + 1);
+        (r0 = 4 & y0 > 0) -> (fx0 = x0 & fy0 = y0 - 1);
+        !((r0 = 1 & x0 < 9) | (r0 = 2 & x0 > 0) | (r0 = 3 & y0 < 9) | (r0 = 4 & y0 > 0)) -> (fx0 = x0 & fy0 = y0);
+        (r1 = 1 & x1 < 9) -> (fx1 = x1 + 1 & fy1 = y1);
+        (r1 = 2 & x1 > 0) -> (fx1 = x1 - 1 & fy1 = y1);
+        (r1 = 3 & y1 < 9) -> (fx1 = x1 & fy1 = y1 + 1);
+        (r1 = 4 & y1 > 0) -> (fx1 = x1 & fy1 = y1 - 1);
+        !((r1 = 1 & x1 < 9) | (r1 = 2 & x1 > 0) | (r1 = 3 & y1 < 9) | (r1 = 4 & y1 > 0)) -> (fx1 = x1 & fy1 = y1);
+        (fx0 = x1 & fy0 = y1) -> g0 = 0;
+        !(fx0 = x1 & fy0 = y1) -> g0 = r0;
+        ((fx1 = x0 & fy1 = y0) | (!(g0 = 0) & fx1 = fx0 & fy1 = fy0)) -> g1 = 0;
+        !((fx1 = x0 & fy1 = y0) | (!(g0 = 0) & fx1 = fx0 & fy1 = fy0)) -> g1 = r1;
+
+# The cell of a drone after the move granted.
+CONTRACT Move0:
+    input integer (0:9) variable x0;
+    input integer (0:9) variable y0;
+    input integer (0:4) variable g0;
+    output integer (0:9) variable nx0;
+    output integer (0:9) variable ny0;
+    Assumptions:
+        true;
+    Guarantees:
+        (g0 = 1 & x0 < 9) -> (nx0 = x0 + 1 & ny0 = y0);
+        (g0 = 2 & x0 > 0) -> (nx0 = x0 - 1 & ny0 = y0);
+        (g0 = 3 & y0 < 9) -> (nx0 = x0 & ny0 = y0 + 1);
+        (g0 = 4 & y0 > 0) -> (nx0 = x0 & ny0 = y0 - 1);
+        !((g0 = 1 & x0 < 9) | (g0 = 2 & x0 > 0) | (g0 = 3 & y0 < 9) | (g0 = 4 & y0 > 0)) -> (nx0 = x0 & ny0 = y0);
+
+CONTRACT Move1:
+    input integer (0:9) variable x1;
+    input integer (0:9) variable y1;
+    input integer (0:4) variable g1;
+    output integer (0:9) variable nx1;
+    output integer (0:9) variable ny1;
+    Assumptions:
+        true;
+    Guarantees:
+        (g1 = 1 & x1 < 9) -> (nx1 = x1 + 1 & ny1 = y1);
+        (g1 = 2 & x1 > 0) -> (nx1 = x1 - 1 & ny1 = y1);
+        (g1 = 3 & y1 < 9) -> (nx1 = x1 & ny1 = y1 + 1);
+        (g1 = 4 & y1 > 0) -> (nx1 = x1 & ny1 = y1 - 1);
+        !((g1 = 1 & x1 < 9) | (g1 = 2 & x1 > 0) | (g1 = 3 & y1 < 9) | (g1 = 4 & y1 > 0)) -> (nx1 = x1 & ny1 = y1);
+
+# The requirement: two drones in different cells are, after the step, in
+# different cells, and do not cross each other.
+CONTRACT Fleet:
+    input integer (0:9) variable x0;
+    input integer (0:9) variable y0;
+    input integer (0:9) variable x1;
+    input integer (0:9) variable y1;
+    input integer (0:9) variable tx0;
+    input integer (0:9) variable ty0;
+    input integer (0:9) variable tx1;
+    input integer (0:9) variable ty1;
+    output integer (0:9) variable nx0;
+    output integer (0:9) variable ny0;
+    output integer (0:9) variable nx1;
+    output integer (0:9) variable ny1;
+    Assumptions:
+        !(x0 = x1 & y0 = y1);
+    Guarantees:
+        !(nx0 = nx1 & ny0 = ny1);
+        !(nx0 = x1 & ny0 = y1 & nx1 = x0 & ny1 = y0);

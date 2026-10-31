@@ -1,0 +1,47 @@
+# view: --refines Plant+Climb Hover --open Hover Climb
+NAME: altitude;
+
+# A drone of the fire-suppression mission of ContrACT (MDFS) climbs to the
+# altitude where it drops its water, r (20 m), in a wind w that blows up or
+# down by at most wmax per step (the updraft of the fire). One step is one
+# period of the controller. The formulas are in signal temporal logic in
+# discrete time: G[a,b] and F[a,b] read the steps a to b.
+
+# The drone: it starts on the ground, and each step its altitude changes by
+# its climb rate and the wind.
+CONTRACT Plant:
+    input real variable v;
+    input real variable w;
+    output real variable h;
+    Assumptions:
+        true;
+    Guarantees:
+        h = 0;
+        G[0,14] (h' = h + v + w);
+
+# The controller: a climb rate proportional to the error r - h (gain 0.5),
+# at most vmax up or down.
+CONTRACT Climb:
+    input real variable h;
+    output real variable v;
+    real constant r 20;
+    real constant vmax 3;
+    Assumptions:
+        true;
+    Guarantees:
+        G[0,15] ((r - h > 2 * vmax -> v = vmax) & (h - r > 2 * vmax -> v + vmax = 0) & ((r - h <= 2 * vmax & h - r <= 2 * vmax) -> v = 0.5 * (r - h)));
+
+# The requirement: in a wind of at most wmax, the drone is within eps of r
+# from some step of the first 10 on, for 5 steps (it can drop its water),
+# and is never higher than r + eps.
+CONTRACT Hover:
+    input real variable w;
+    output real variable h;
+    real constant r 20;
+    real constant eps 2;
+    real constant wmax 1;
+    Assumptions:
+        G[0,15] (w <= wmax & w + wmax >= 0);
+    Guarantees:
+        F[0,10] G[0,5] (h >= r - eps & h <= r + eps);
+        G[0,15] (h <= r + eps);

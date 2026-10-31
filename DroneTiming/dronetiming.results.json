@@ -1,0 +1,145 @@
+{
+  "file": "dronetiming.ltl",
+  "chase": "0.5.0",
+  "contracts": {
+    "Assign": {
+      "feasible": {
+        "key": "2750f5dc7818f8eb",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Available": {
+      "feasible": {
+        "key": "5ee3cc5f17b87de9",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "DroneSim2": {
+      "feasible": {
+        "key": "b01da644b4d36bfd",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "DroneSim3": {
+      "feasible": {
+        "key": "0ee50e9c2eb788c8",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "DroneTick": {
+      "feasible": {
+        "key": "e61e3eb13298fca2",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "FireSpread": {
+      "feasible": {
+        "key": "a1f032c90c0fb916",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "FireStateRx": {
+      "feasible": {
+        "key": "853af0470c57a4c2",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "FireTick": {
+      "feasible": {
+        "key": "28ed21b90c04b64b",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Grant": {
+      "feasible": {
+        "key": "1d6c7d6c1b3001c0",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Mission": {
+      "feasible": {
+        "key": "0782b98da7a3b210",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Move": {
+      "feasible": {
+        "key": "ec1023136667dcbb",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Plan": {
+      "feasible": {
+        "key": "15030cca37a50764",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    },
+    "Target": {
+      "feasible": {
+        "key": "e7e3e32892338431",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-30T23:07:54"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "3ddbca050d722c5c",
+      "check": "refines",
+      "refined": "DroneTick+DroneSim2+Assign+Target+Plan+Grant+Move+DroneSim3",
+      "abstract": "Available",
+      "result": "valid",
+      "tool": "z3",
+      "seconds": 0.0,
+      "at": "2026-10-30T23:07:54"
+    },
+    {
+      "key": "59e264c587408c60",
+      "check": "refines",
+      "refined": "FireTick+FireSpread+FireStateRx",
+      "abstract": "Mission",
+      "result": "valid",
+      "tool": "z3",
+      "seconds": 0.0,
+      "at": "2026-10-30T23:07:54"
+    }
+  ]
+}

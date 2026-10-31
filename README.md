@@ -58,11 +58,25 @@ website and its README show each step with its diagram.
 - [**Deadline**][DEADLINE] (arbiter): the least bound on the waiting time of
     a request (2), repaired by counterexamples from nuXmv and checked
     against every value.
+- [**DroneTiming**][DRONETIMING] (fire-suppression drones, linear
+    constraints): the timing of the drones of ContrACT (MDFS) as a linear
+    program over the reals: the worst case of 280 ms of the paper, and the
+    margins (the least bound, the slowest planner, the largest delay of the
+    mission) by repair.
+- [**DroneGrid**][DRONEGRID] (fire-suppression drones, C): the reactions of
+    two drones in C, checked one function at a time: the contracts find
+    that the coordinator lets a drone move into the cell of the other, and
+    ESBMC checks each function against its contract.
+- [**DroneAltitude**][DRONEALTITUDE] (fire-suppression drones, signal
+    temporal logic): a drone climbs to its drop altitude in the wind; the
+    controller cannot meet the tolerance (impossible), and repair says what
+    the requirement can ask.
 
 The Python scripts use the CHASE Python package, version 0.5.0 or later
 (`pip install chase-cps`; BufferSwap and Escalation with
-`pip install "chase-cps[rtl]"`; Braking, Heater, and Deadline with version
-0.6.0 and `pip install "chase-cps[z3]"`, and Heater with ESBMC or CBMC), and nuXmv and slugs, which `chase-cps
+`pip install "chase-cps[rtl]"`; Braking, Heater, Deadline, DroneTiming,
+DroneGrid, and DroneAltitude with version 0.6.0 and
+`pip install "chase-cps[z3]"`, and Heater and DroneGrid with ESBMC or CBMC), and nuXmv and slugs, which `chase-cps
 install` installs. The console scripts expect `dsl_tool`, `logics_tool`,
 `slugs` (with its compiler, `$SLUGS/tools/StructuredSlugsParser/compiler.py`),
 and `nuXmv` in the `PATH`. The Docker image of CHASE
@@ -86,3 +100,6 @@ all of them but nuXmv, whose license does not allow redistribution:
 [BRAKING]: Braking/Braking.md
 [HEATER]: Heater/Heater.md
 [DEADLINE]: Deadline/Deadline.md
+[DRONETIMING]: DroneTiming/DroneTiming.md
+[DRONEGRID]: DroneGrid/DroneGrid.md
+[DRONEALTITUDE]: DroneAltitude/DroneAltitude.md
