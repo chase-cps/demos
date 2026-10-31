@@ -84,7 +84,7 @@ def main(expect: bool) -> int:
         pairs.append((both, req, refines(both, req)))
         one = step.instantiate({"theta": theta}, name=f"ThermostatStep_{theta}")
         parts.append(Component(f"heater.c, theta = {theta}", one, f,
-                               status=is_implementation(f, one).status))
+                               status=is_implementation(f, one)))
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(*parts, refines=pairs,
                                 open=[b for _, b, _ in pairs] + [k.contract for k in parts] + thermostats,

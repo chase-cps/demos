@@ -74,7 +74,7 @@ def main(expect: bool) -> int:
     for file, function, contract in functions + [("coordinator.c", "grant", "CoordinatorSafe"),
                                                  ("coordinator.c", "grant_safe", "CoordinatorSafe")]:
         r = is_implementation(code(file, function), c[contract])
-        status[(function, contract)] = r.status
+        status[(function, contract)] = r          # the result: the page shows its counterexample
         want = "invalid" if (function, contract) == ("grant", "CoordinatorSafe") else "valid"
         show(4, f"{function} in {file} implements {contract}", r.status, want)
 
