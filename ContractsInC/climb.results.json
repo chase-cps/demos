@@ -1,0 +1,46 @@
+{
+  "file": "climb.c",
+  "chase": "0.5.0",
+  "contracts": {
+    "limit": {
+      "feasible": {
+        "key": "1ddffb4cb85b87bc",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-31T02:30:04"
+      }
+    },
+    "limit_loose": {
+      "feasible": {
+        "key": "375457354a1ebc09",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-31T02:30:04"
+      }
+    }
+  },
+  "relations": [
+    {
+      "key": "e5c1df31547baff5",
+      "check": "implementation",
+      "model": "climb.c:limit",
+      "contract": "limit",
+      "result": "valid",
+      "tool": "esbmc",
+      "seconds": 0.11,
+      "at": "2026-10-31T02:30:04"
+    },
+    {
+      "key": "72b969dce68c7e15",
+      "check": "implementation",
+      "model": "climb.c:limit_loose",
+      "contract": "limit_loose",
+      "result": "invalid",
+      "tool": "esbmc",
+      "seconds": 0.11,
+      "at": "2026-10-31T02:30:04"
+    }
+  ]
+}

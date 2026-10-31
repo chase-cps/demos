@@ -17,8 +17,12 @@ of bounds, or failed assert.
      the edge.
   4. move_fast, without the test at the edge, does not: x = 9, g = 1 gives
      nx = 10.
+  5. limit (climb.c, in ACSL, the language of Frama-C), the climb rate of
+     the drone of DroneAltitude, meets its contract: at most 3 up or down.
+  6. limit_loose, with the test of the top written v > 4, does not: v = 4
+     gives 4.
 
-The pages out/thermostat.html and out/move.html draw each file: each
+The pages out/thermostat.html, out/move.html, and out/climb.html draw each file: each
 function is a component with its code (chase-cps view FILE.c --check).
 
     python contractsinc.py
@@ -31,12 +35,13 @@ import sys
 from chase_cps import is_implementation, load_c, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-WANT = {"thermostat": "valid", "heat_per_area": "invalid", "move": "valid", "move_fast": "invalid"}
+WANT = {"thermostat": "valid", "heat_per_area": "invalid", "move": "valid", "move_fast": "invalid",
+        "limit": "valid", "limit_loose": "invalid"}
 
 
 def main(expect: bool) -> int:
     ok = []
-    for step, file in ((1, "thermostat.c"), (3, "move.c")):
+    for step, file in ((1, "thermostat.c"), (3, "move.c"), (5, "climb.c")):
         functions = load_c(os.path.join(HERE, file))
         for k, (name, (contract, function)) in enumerate(functions.items()):
             r = is_implementation(function, contract)

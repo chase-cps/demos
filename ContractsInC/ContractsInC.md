@@ -1,13 +1,14 @@
 ## Contracts in C: the contract written in the C file, next to the code
 
-**The question.** ESBMC and CBMC read a contract written in the C file:
-`requires` clauses (what a call may assume) and `ensures` clauses (what
-the function must give back). Can CHASE read the same file, draw each
-function as a component, and check it, without a specification file?
+**The question.** ESBMC, CBMC, and Frama-C read a contract written in the
+C file: `requires` clauses (what a call may assume) and `ensures` clauses
+(what the function must give back). Can CHASE read the same file, draw
+each function as a component, and check it, without a specification file?
 
 **What it shows.**
 - C files as input: `chase-cps view FILE.c` draws each function of the file
-  as a component, with the clauses of ESBMC or of CBMC as its contract.
+  as a component, with the clauses of ESBMC, of CBMC, or of ACSL (the
+  language of Frama-C) as its contract.
 - C code against contracts (ESBMC or CBMC): `thermostat` and `move` meet
   their contracts, about 0.2 s per function.
 - A counterexample on the ports: `move_fast` does not meet its contract;
@@ -16,6 +17,9 @@ function as a component, and check it, without a specification file?
   division by zero, access out of bounds, and failed asserts; it overflows
   for `power = INT_MIN`, `area = -1`, with the line.
 - The Code tab: the function as written, with its clauses, next to its box.
+- ACSL: the climb rate of the drone of DroneAltitude, limited to 3, written
+  as a `/*@ ... */` contract; a limit with the test written `v > 4` lets
+  `v = 4` through.
 
 <p align="center">
   <img src="images/overview-move-c-code.png" alt="move.c drawn: move and move_fast are two components; the panel shows the Code tab of move_fast, with its CBMC clauses and the lines of the file">
@@ -94,23 +98,52 @@ values are on the ports.
   <em>Step 4: <code>move_fast</code> does not meet its contract (x = 9, g = 1 gives nx = 10, the term nx &lt;= 9 in red).</em>
 </p>
 
-<!-- Step 5: the same contract in ACSL (Frama-C), when the ACSL file is added. -->
+**Step 5. A contract in ACSL.** `climb.c` limits the climb rate of the
+drone of DroneAltitude to 3 up or down. Its contract is in ACSL, the
+language of Frama-C, in a comment before the function:
+
+```c
+/*@ requires -100 <= v <= 100;
+    ensures -3 <= \result <= 3;
+    ensures (-3 <= v <= 3) ==> \result == v;
+*/
+int limit(int v)
+```
+
+CHASE reads `\result` as the output `limit_out`, `==>` as an implication,
+and splits the chains such as `-3 <= v <= 3`, and checks the function with
+ESBMC (Frama-C itself is not run). `limit` meets its contract.
+
+**Step 6. A limit one too high.** `limit_loose` tests the top with `v > 4`.
+It does not meet its contract: `v = 4` gives 4, and the term
+`limit_loose_out <= 3` is red.
+
+<p align="center">
+  <img src="images/step6-limit-loose-fails.png" alt="climb.c drawn: limit meets its contract; the tag M ⊨ C of limit_loose clicked: v = 4 gives 4, and the term limit_loose_out <= 3 is red">
+  <br>
+  <em>Step 6: <code>limit_loose</code> does not meet its ACSL contract (v = 4 gives 4).</em>
+</p>
 
 ### What CHASE reads in a clause
 
 The operators of C on numbers and Booleans: `&& || ! == != < <= > >= + -
 * /`, and `*p` for an output passed by pointer. A conditional (`a ? b :
-c`) is not read: write it as `(!a || b) && (a || c)`. The clauses are
+c`) is not read: write it as `(!a || b) && (a || c)`. In ACSL, also
+`\result`, `==>`, `<==>`, `\true`, `\false`, and chains such as
+`0 <= x <= 9`; `\old`, `\at`, the quantifiers, and behaviors are not read,
+and `\valid` is not a term (the program CHASE writes passes a valid
+pointer). The clauses are
 about one call; a contract over time (a function called once per step) is
 written in a specification file, as in Heater.
 
 ### Content of the directory
 The directory of the demo contains:
-- `thermostat.c`, `move.c`: the functions, with their clauses;
+- `thermostat.c`, `move.c`, `climb.c`: the functions, with their clauses
+  (ESBMC, CBMC, ACSL);
 - `contractsinc.py`: the steps with the CHASE Python package;
-- `thermostat.results.json`, `move.results.json`: the results of
+- `thermostat.results.json`, `move.results.json`, `climb.results.json`: the results of
   `chase-cps view FILE.c --check`;
-- `out/thermostat.html`, `out/move.html`: the diagrams above, written by
+- `out/thermostat.html`, `out/move.html`, `out/climb.html`: the diagrams above, written by
   `contractsinc.py`.
 
 ### Run it

@@ -35,8 +35,9 @@ They are grouped by what they show; the website has the same groups.
 
 ### Code and agents
 
-- [**ContractsInC**][CONTRACTSINC] (C, ESBMC and CBMC clauses): the
-    contract written in the C file, next to the code. `chase-cps view
+- [**ContractsInC**][CONTRACTSINC] (C): the
+    contract written in the C file (ESBMC, CBMC, or ACSL clauses), next to
+    the code. `chase-cps view
     FILE.c` draws each function as a component and checks it: a
     counterexample on the ports and the broken term in red, and a function
     with no clause checked as code alone (`safe`), with the line of the
