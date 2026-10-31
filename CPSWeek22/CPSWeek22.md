@@ -7,7 +7,7 @@ same as in `../RoboticJoints`, which has the full page, the Python script
 for N joints (`scaling.py`), and the scripts updated to run anywhere.
 
 **What it shows.**
-- Composition and refinement (nuXmv): Joint1 ∥ Joint2 ∥ Joint3 refines
+- Composition and refinement (nuXmv): Joint1 ⊗ Joint2 ⊗ Joint3 refines
   _Joints_, the contract of the arm (the two formulas true, 2 s).
 - Realizability (slugs, GR(1)): each joint contract and the contract of
   the arm are realizable.

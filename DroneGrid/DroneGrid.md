@@ -51,15 +51,17 @@ code against them.
 ### The steps
 
 **Step 1. The contracts do not refine the requirement.** The contracts of
-the parts with `Coordinator`, composed, do not refine `Fleet`. The
-counterexample of the script: drone 0 at (0, 8) goes down, drone 1 at
-(0, 9) goes up. They would swap cells, so drone 1 stays; drone 0 still
-moves, into the cell of drone 1.
+the parts with `Coordinator`, composed, do not refine `Fleet`. The page
+shows one counterexample: drone 0 is at its target (1, 0) and stays, and
+drone 1 at (2, 0) moves left into its cell. The script finds another one:
+drone 0 at (0, 8) goes down, drone 1 at (0, 9) goes up; they would swap
+cells, so drone 1 stays, and drone 0 still moves into the cell of drone 1.
+The coordinator compares only drones that both move.
 
 <p align="center">
   <img src="images/step1-fleet-does-not-refine.png" alt="Step 1: the refinement tag of Fleet is red; the panel shows the counterexample, its values on the ports, and the term of Fleet it breaks in red">
   <br>
-  <em>Step 1: the parts with <code>Coordinator</code> do not refine <code>Fleet</code>. The counterexample of the page is another one: drone 0 at its target (1, 0) stays, and drone 1 at (2, 0) moves left into its cell.</em>
+  <em>Step 1: the parts with <code>Coordinator</code> do not refine <code>Fleet</code>: drone 1 moves into the cell of drone 0, which stays.</em>
 </p>
 
 **Step 2. A drone that stays.** With drone 1 at its target (it stays), the
@@ -76,7 +78,7 @@ before looking at the code.
 No value can fix `Coordinator`: the check reads no named constant, and
 what is wrong is its rule. The quotient of `Fleet` by the other parts
 (`divide`) is the weakest contract the coordinator must meet, computed in
-a few milliseconds: `Coordinator` does not refine it, `CoordinatorSafe`
+0.04 s: `Coordinator` does not refine it, `CoordinatorSafe`
 does. The quotient is long (it is made of the terms of all the parts), so
 it is a check for a candidate rule rather than a rule to read.
 

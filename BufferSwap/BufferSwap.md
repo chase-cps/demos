@@ -11,7 +11,7 @@ any buffer in that place satisfy?
 - Refinement with a counterexample: the new buffer does not refine the old
   one; the counterexample has 4 steps, and the panel marks the guarantee
   it breaks.
-- Quotient: Slot = System / (Producer ∥ Consumer), the weakest contract of
+- Quotient: Slot = System / (Producer ⊗ Consumer), the weakest contract of
   the place of the buffer (3 assumptions, 3 guarantees); the new buffer
   refines it.
 - RTL as models: the RTL of BaseJump STL, read with Yosys and checked with
@@ -64,7 +64,7 @@ can take the place.
 </p>
 
 **Step 3. What the place of the buffer needs.** The quotient Slot = System /
-(Producer ∥ Consumer), drawn as a dashed box, is the weakest contract with
+(Producer ⊗ Consumer), drawn as a dashed box, is the weakest contract with
 which the system meets its requirements. Any buffer that refines it can
 take the place, and _OneFifo_ does: _Slot_ may assume what the consumer
 guarantees, that an offer is taken sooner or later, so a buffer of one

@@ -13,7 +13,7 @@ show it by checking each module on its own?
 - Composition with discharge: the three contracts together refine both
   requirements, _Functional_ and _Integrity_, so the link meets them with
   no check on the whole design. Each check takes under a second.
-- Quotient: SenderSlot = Functional / (Channel ∥ Receiver), what any sender
+- Quotient: SenderSlot = Functional / (Channel ⊗ Receiver), what any sender
   must do in this link; the contract of the sender refines it.
 - A counterexample on the RTL: a faster sender does not implement the
   contract of the sender; the panel shows the 4 steps and the guarantee it
@@ -56,7 +56,7 @@ and its state machine of 4 states, read from the RTL.
   <em>Step 1: each RTL implements its contract (M ⊨ C); the receiver with its four states.</em>
 </p>
 
-**Step 2. The composition.** _Sender_ ∥ _Channel_ ∥ _Receiver_ refines
+**Step 2. The composition.** _Sender_ ⊗ _Channel_ ⊗ _Receiver_ refines
 _Functional_ and _Integrity_. So the three modules together meet the
 requirements, with no check on the whole design.
 
@@ -70,7 +70,7 @@ requirements, with no check on the whole design.
 _Functional_ and _Integrity_ too.
 
 **Step 4. What any sender must do.** The quotient SenderSlot = Functional
-/ (Channel ∥ Receiver) is the contract that any sender must meet in this
+/ (Channel ⊗ Receiver) is the contract that any sender must meet in this
 link; the contract of the sender refines it.
 
 **Step 5. A faster sender.** A sender that pings at every cycle of a ping

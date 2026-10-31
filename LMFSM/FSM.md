@@ -70,9 +70,9 @@ The counterexample: at step 1 the limits are exceeded, the pilot is not in
 control, and there is no pullup, since the autopilot is still in NOMINAL.
 
 <p align="center">
-  <img src="images/step2-does-not-refine-system.png" alt="Step 2: Autopilot ∥ Sensor does not refine System; the panel shows the counterexample, and the diagram its values at step 1">
+  <img src="images/step2-does-not-refine-system.png" alt="Step 2: Autopilot ⊗ Sensor does not refine System; the panel shows the counterexample, and the diagram its values at step 1">
   <br>
-  <em>Step 2: Autopilot ∥ Sensor does not refine System; the values of the counterexample at step 1.</em>
+  <em>Step 2: Autopilot ⊗ Sensor does not refine System; the values of the counterexample at step 1.</em>
 </p>
 
 **Step 3. The system, with time.** The sensor and the autopilot each take a
@@ -84,7 +84,7 @@ failure, the pullup comes at the fifth step. The composition refines it.
 <p align="center">
   <img src="images/step3-refines-systemtimed.png" alt="Step 3: Autopilot and Sensor inside SystemTimed; the refinement holds">
   <br>
-  <em>Step 3: Autopilot ∥ Sensor refines SystemTimed (⪯ green).</em>
+  <em>Step 3: Autopilot ⊗ Sensor refines SystemTimed (⪯ green).</em>
 </p>
 
 ### Content of the directory

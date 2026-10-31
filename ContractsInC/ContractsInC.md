@@ -126,15 +126,17 @@ It does not meet its contract: `v = 4` gives 4, and the term
 
 ### What CHASE reads in a clause
 
-The operators of C on numbers and Booleans: `&& || ! == != < <= > >= + -
-* /`, and `*p` for an output passed by pointer. A conditional (`a ? b :
-c`) is not read: write it as `(!a || b) && (a || c)`. In ACSL, also
-`\result`, `==>`, `<==>`, `\true`, `\false`, and chains such as
-`0 <= x <= 9`; `\old`, `\at`, the quantifiers, and behaviors are not read,
-and `\valid` is not a term (the program CHASE writes passes a valid
-pointer). The clauses are
-about one call; a contract over time (a function called once per step) is
-written in a specification file, as in Heater.
+- The operators of C on numbers and Booleans: `&&`, `||`, `!`, `==`, `!=`,
+  `<`, `<=`, `>`, `>=`, `+`, `-`, `*`, `/`; and `*p` for an output passed
+  by pointer.
+- In ACSL, also `\result`, `==>`, `<==>`, `\true`, `\false`, and chains
+  such as `0 <= x <= 9`.
+- Not read: a conditional (`a ? b : c`; write it as
+  `(!a || b) && (a || c)`), and in ACSL `\old`, `\at`, the quantifiers,
+  and behaviors. `\valid` is not a term: the program CHASE writes passes a
+  valid pointer.
+- The clauses are about one call; a contract over time (a function called
+  once per step) is written in a specification file, as in Heater.
 
 ### Content of the directory
 The directory of the demo contains:

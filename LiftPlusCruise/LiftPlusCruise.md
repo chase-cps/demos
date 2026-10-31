@@ -55,7 +55,7 @@ cannot fall from 120 to 30 by step 6. No pilot can hover within 6 steps.
 </p>
 
 **Step 2. The split.** The vehicle is split into the mode logic and the
-pilot, and _ModeLogic_ ∥ _Pilot_ refines _Vehicle_, without the deadline.
+pilot, and _ModeLogic_ ⊗ _Pilot_ refines _Vehicle_, without the deadline.
 
 <p align="center">
   <img src="images/step2-mode-logic-and-pilot.png" alt="Step 2: Vehicle with Pilot and ModeLogic inside; the refinement tag is green">
@@ -86,7 +86,7 @@ the vehicle never reaches the hover.
 
 **Step 5. A pilot that slows down and turns on the hover control.**
 _Decel_ also turns the hover control mode on when `kgs` is below 20. It
-refines Q12, so every flight hovers within 12 steps: _ModeLogic_ ∥ _Decel_
+refines Q12, so every flight hovers within 12 steps: _ModeLogic_ ⊗ _Decel_
 refines _Reach12_.
 
 <p align="center">

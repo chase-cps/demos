@@ -5,7 +5,7 @@ designer while perception and localization stay as they are. What must the
 controller satisfy for the robot to meet the requirements of the system?
 
 **What it shows.**
-- Quotient on reals: Q = System / (Perception ∥ Localization), the weakest
+- Quotient on reals: Q = System / (Perception ⊗ Localization), the weakest
   contract of the controller, the one to give to the designer; it asks for
   `|w| <= 0.8`, what perception assumes.
 - Refinement on reals (nuXmv, SMT): the requirements written for the
@@ -42,7 +42,7 @@ _Fixed_ in the diagrams.
 ### The steps
 
 **Step 1. The contract of the controller.** The quotient Q = System /
-(Perception ∥ Localization), drawn as a dashed box, is the weakest contract
+(Perception ⊗ Localization), drawn as a dashed box, is the weakest contract
 of the controller with which the robot meets the requirements: the contract
 to give to the designer. It guarantees the requirements of the system, and
 what perception assumes of the controller: `|w| <= 0.8`.

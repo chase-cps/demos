@@ -9,7 +9,7 @@ and which sub-agent must do it?
 - Refinement (LTL, nuXmv): the plan with the sub-agents as given does not
   refine the parent; the counterexample pays and never sends the text
   (0.5 s).
-- Quotient: Q3 = Parent / (Messages ∥ Payment ∥ Keep), the weakest
+- Quotient: Q3 = Parent / (Messages ⊗ Payment ⊗ Keep), the weakest
   contract of sub-agent 3; it asks for `F text3`.
 - Refinement: _Text_ with `F text3` refines Q3 (0.0 s), and the plan with
   it refines the parent (0.6 s).
@@ -67,8 +67,8 @@ promises `F text3`.
 </p>
 
 **Step 2. What sub-agent 3 must do.** Only sub-agent 3 can send the text
-(`text3`), so the quotient by the others, Q3 = Parent / (Messages ∥ Payment
-∥ Keep), drawn as a dashed box, says what it must do: the weakest contract
+(`text3`), so the quotient by the others, Q3 = Parent / (Messages ⊗ Payment
+⊗ Keep), drawn as a dashed box, says what it must do: the weakest contract
 with which the plan refines the parent. It asks for the rules of its tools
 and `F text3`.
 

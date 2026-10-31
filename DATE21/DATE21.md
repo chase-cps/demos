@@ -207,8 +207,8 @@ sh diagram.sh
 
 `diagram.sh` writes `out/robotic_arm.html`, a page to open in a browser:
 _Mission_ inside _Target_ and _Target_ inside _Mission_, drawn open, with
-the result of each refinement, and the whole system, _Mission_ ∥
-_Coordinator_ ∥ _Move_ ∥ _Turn_ ∥ _Pick_ ∥ _Place_, with the compatibility
+the result of each refinement, and the whole system, _Mission_ ⊗
+_Coordinator_ ⊗ _Move_ ⊗ _Turn_ ⊗ _Pick_ ⊗ _Place_, with the compatibility
 (A), the consistency (G), and the realizability (R) of each contract. A
 click on the red tag opens the counterexample.
 
