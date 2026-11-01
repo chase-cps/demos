@@ -52,9 +52,9 @@ the same answer with ten runs of nuXmv; the repair needs two, and works
 the same on real numbers, where there is nothing to enumerate.
 
 <p align="center">
-  <img src="images/repair-k.png" alt="Find repairs with k picked: k 1 to 2, optimal, change 1; the diagram shows the new value">
+  <img src="images/repair-k.png" alt="Repair with k picked: k 1 to 2, optimal, change 1; the diagram shows the new value">
   <br>
-  <em>Step 2: Find repairs, k picked: 1 to 2, optimal.</em>
+  <em>Step 2: the repair, k picked: 1 to 2, optimal.</em>
 </p>
 
 ### A second question: the arbiter and the client as state machines

@@ -31,7 +31,7 @@ degrees too hot.
 <p align="center">
   <img src="images/repair-theta-or-tmax.png" alt="The counterexample, T from 60 to 77, and the two repairs: theta 76 to 74, or tmax 75 to 77">
   <br>
-  <em>Steps 1 and 2: the counterexample at the top (the slider puts step 8 on the ports), the two repairs at the bottom.</em>
+  <em>Steps 1 and 2: the counterexample at the top (step 8, where it fails, on the ports), the two repairs at the bottom.</em>
 </p>
 
 **Step 2. Repair.** `repair` changes a named constant as little as

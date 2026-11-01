@@ -63,7 +63,7 @@ and 3, the C code with `grant_safe` keeps the drones apart, and the
 whole program is never checked at once.
 
 <p align="center">
-  <img src="images/step4-grant-safe-code.png" alt="Step 3: CoordinatorSafe selected, M ⊨ C green; the Code tab shows grant_safe">
+  <img src="images/step4-grant-safe-code.png" alt="Step 3: CoordinatorSafe selected, M ⊨ C green; the section Code open on grant_safe">
   <br>
   <em>Step 3: <code>grant_safe</code> implements <code>CoordinatorSafe</code>.</em>
 </p>

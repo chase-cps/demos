@@ -46,7 +46,7 @@ down, the error goes as `e' = e/2 + 1`, so it stays above 2 m however
 fast the drone climbs.
 
 <p align="center">
-  <img src="images/repair-vmax-impossible.png" alt="Find repairs with vmax picked: no value in [0, 9] works">
+  <img src="images/repair-vmax-impossible.png" alt="Repair with vmax picked: no value in [0, 9] works">
   <br>
   <em>Step 2: vmax picked, its range widened to [0, 9]: no value works.</em>
 </p>
@@ -56,7 +56,7 @@ fails): the 0.5 m of step 1. Or, keeping `eps = 2`, the strongest wind
 is `wmax = 17/21`, about 0.81 m per step (0.82 fails).
 
 <p align="center">
-  <img src="images/repair-eps-or-wmax.png" alt="Find repairs: eps 2 to 2.5, or wmax 1 to about 0.8095">
+  <img src="images/repair-eps-or-wmax.png" alt="Repair with eps and wmax picked: eps 2 to 2.5, or wmax 1 to about 0.8095">
   <br>
   <em>Step 3: eps 2 to 2.5, or wmax 1 to about 0.8095 (17/21).</em>
 </p>
