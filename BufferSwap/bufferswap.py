@@ -50,7 +50,7 @@ from chase_cps.rtl import yosys
 HERE = os.path.dirname(os.path.abspath(__file__))
 RTL = os.path.join(HERE, "rtl")
 NAMES = {"producer": "Producer", "consumer": "Consumer", "two_fifo": "TwoFifo",
-         "one_fifo": "OneFifo", "system": "System"}
+         "one_fifo": "OneFifo", "pipeline": "Pipeline"}
 
 
 def read(name: str):
@@ -105,7 +105,7 @@ def main() -> int:
         return status
 
     c = {name: read(name) for name in NAMES}
-    producer, consumer, system = c["producer"], c["consumer"], c["system"]
+    producer, consumer, system = c["producer"], c["consumer"], c["pipeline"]
     two, one = c["two_fifo"], c["one_fifo"]
 
     def old_system():
@@ -114,9 +114,9 @@ def main() -> int:
         return r.status, ("   assumptions left after discharge: "
                           + (", ".join(ltl.to_str(f) for f in s.assumptions) or "none"))
     old_fifo, new_fifo = Component("TwoFifo", two), Component("OneFifo", one)
-    old = System("Buffer", [Component("Producer", producer), old_fifo,
+    old = System("Pipeline", [Component("Producer", producer), old_fifo,
                             Component("Consumer", consumer)], contract=system)
-    old.status = step("1. Producer, TwoFifo, Consumer refine System", "valid", old_system)
+    old.status = step("1. Producer, TwoFifo, Consumer refine Pipeline", "valid", old_system)
 
     found = {}
 
@@ -133,7 +133,7 @@ def main() -> int:
 
     def quotient():
         r = found["slot"] = refines(one, slot)
-        return r.status, ("   Slot = System / (Producer, Consumer)"
+        return r.status, ("   Slot = Pipeline / (Producer, Consumer)"
                           "\n   assume: " + "; ".join(ltl.to_str(f) for f in slot.assumptions)
                           + "\n   guarantee: " + "; ".join(ltl.to_str(f) for f in slot.guarantees))
     step("3. OneFifo refines Slot", "valid", quotient)
@@ -141,7 +141,7 @@ def main() -> int:
     def new_system():
         s = producer.compose(one, discharge=True).compose(consumer, discharge=True)
         return refines(s, system).status, ""
-    step("   Producer, OneFifo, Consumer refine System", "valid", new_system)
+    step("   Producer, OneFifo, Consumer refine Pipeline", "valid", new_system)
 
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     out = os.path.join(HERE, "out", "slot.sv")

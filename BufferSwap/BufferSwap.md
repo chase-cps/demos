@@ -27,13 +27,13 @@ contracts are written in SystemVerilog Assertions.
 ### The steps
 
 **Step 1. The old system.** _Producer_, _TwoFifo_, and _Consumer_,
-composed, refine _System_, and the RTL of `bsg_two_fifo` implements
+composed, refine _Pipeline_, and the RTL of `bsg_two_fifo` implements
 _TwoFifo_.
 
 <p align="center">
-  <img src="images/step1-old-system.png" alt="Step 1: Producer, TwoFifo, and Consumer refine System; TwoFifo M ⊨ C green">
+  <img src="images/step1-old-system.png" alt="Step 1: Producer, TwoFifo, and Consumer refine Pipeline; TwoFifo M ⊨ C green">
   <br>
-  <em>Step 1: the old system refines System; the RTL implements TwoFifo.</em>
+  <em>Step 1: the old system refines Pipeline; the RTL implements TwoFifo.</em>
 </p>
 
 **Step 2. The new buffer against the old one.** _OneFifo_ does not refine
@@ -47,11 +47,11 @@ that it is.
   <em>Step 2: OneFifo does not refine TwoFifo; the guarantee it breaks in red.</em>
 </p>
 
-**Step 3. What the place needs.** The quotient Slot = System / (Producer
+**Step 3. What the place needs.** The quotient Slot = Pipeline / (Producer
 ⊗ Consumer), the dashed box, has 3 assumptions and 3 guarantees. _Slot_
 may assume what the consumer guarantees, that an offer is taken sooner or
 later, so one entry is enough: _OneFifo_ refines _Slot_, and the system
-with _OneFifo_ refines _System_.
+with _OneFifo_ refines _Pipeline_.
 
 <p align="center">
   <img src="images/step3-slot.png" alt="Step 3: Slot, the quotient, with OneFifo inside; the tag ⪯ green">

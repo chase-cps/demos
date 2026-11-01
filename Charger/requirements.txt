@@ -31,7 +31,7 @@ Arbiter
     A4    (Polite; assumption) After robot 1 is given the station it asked
           for, it does not ask for it at the next step.
 
-System
+ChargingStation
     S1.i  Robot i is given the station, or does not ask for it, infinitely
           often.
     S2    The station is never given to both robots.

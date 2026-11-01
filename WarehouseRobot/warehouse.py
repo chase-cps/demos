@@ -14,7 +14,7 @@ only as perception and localization report them (c_rep, e_est). This script
 follows the delegation with the CHASE Python package (pip install
 chase-cps):
 
-  1. Q = System / (Perception || Localization) is the contract of the
+  1. Q = SafeMission / (Perception || Localization) is the contract of the
      controller: the weakest one with which the system meets its
      requirements. With discharge it keeps the terms: it guarantees the
      requirements of the system and the assumption of perception on the yaw
@@ -26,7 +26,7 @@ chase-cps):
      bounds, does not refine Q either: the counterexample turns faster than
      perception allows, and perception no longer bounds its error.
   4. Dispatched, Margins with |w| <= 0.8, refines Q, so Perception ||
-     Localization || Dispatched refines System.
+     Localization || Dispatched refines SafeMission.
 
     python warehouse.py
     python warehouse.py --expect     # exit code 1 when a result is not the expected one
@@ -57,8 +57,8 @@ LOCALIZATION = Contract.from_strings(
     name="Localization", inputs={"w": REAL, "e_true": REAL}, outputs={"e_est": REAL},
     assumptions=["G (w <= 1.0 & w >= -1.0)"],                  # LA1
     guarantees=["G (e_true <= e_est + 0.05)"])                   # LG1
-SYSTEM = Contract.from_strings(
-    name="System", inputs={"c_true": REAL, "e_true": REAL},
+SAFE_MISSION = Contract.from_strings(
+    name="SafeMission", inputs={"c_true": REAL, "e_true": REAL},
     outputs={"w": REAL, "rest": "bool", "c_rep": REAL, "e_est": REAL},
     guarantees=["G (c_true >= 0.4)",                             # SG1
                 "F (rest & e_true <= 0.1)"])                     # SG2
@@ -106,8 +106,8 @@ def main() -> int:
         return r
 
     fixed = PERCEPTION.compose(LOCALIZATION, name="Fixed", discharge=True, timeout=t)
-    q = SYSTEM.divide(fixed, name="Q", discharge=True, timeout=t)
-    print("1. Q = System / (Perception || Localization)")
+    q = SAFE_MISSION.divide(fixed, name="Q", discharge=True, timeout=t)
+    print("1. Q = SafeMission / (Perception || Localization)")
     print("   assumes:")
     for a in q.assumptions:
         print("      " + ltl.to_str(a))
@@ -121,9 +121,9 @@ def main() -> int:
                    counterexample=True)
     dispatched = step("4. Dispatched refines Q", "valid",
                       lambda: refines(DISPATCHED, q, timeout=t))
-    step("   Perception || Localization || Dispatched refines System", "valid",
+    step("   Perception || Localization || Dispatched refines SafeMission", "valid",
          lambda: refines(fixed.compose(DISPATCHED, name="Robot", discharge=True, timeout=t),
-                         SYSTEM, timeout=t))
+                         SAFE_MISSION, timeout=t))
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

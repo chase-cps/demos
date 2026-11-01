@@ -7,23 +7,24 @@ link with the inconsistency kappa (10). braking.ltl has the timing
 contracts that ContrACT builds for each node (t: timestamp, d: start, T:
 completion), and two system contracts:
 
-- SysB: Brake 1 starts at most lam_b (4) after its timestamp, given
+- PedalDeadline: Brake 1 starts at most lam_b (4) after its timestamp, given
   the delay of 1 that the camera path can cause it (the offset of
   ContrACT);
-- DelayF: the camera path delays Brake 1 by at most y_f (0.95, what Brake 1
-  can absorb: 4 - 3.05).
+- CameraDelay: the camera path delays Brake 1 by at most y_f (0.95, what
+  Brake 1 can absorb: 4 - 3.05).
 
 The contracts compare reals without temporal operators, so z3 checks them,
 and repair computes the values that fail at once (projection). This script
 uses the CHASE Python package (pip install chase-cps[z3]):
 
-  1. The pedal path does not refine SysB: Brake 1 can start 4.05 late.
+  1. The pedal path does not refine PedalDeadline: Brake 1 can start 4.05
+     late.
   2. Repair the bound: lam_b = 4.05 (option A of the paper).
   3. Repair the link so that the camera path never delays Brake 1 (y_f = 0):
      kappa = 11 (option B of the paper).
   4. Repair the link so that it delays Brake 1 by at most what Brake 1 can
      absorb (y_f = 0.95): kappa = 10.05, a smaller change. With 10.05 the
-     camera path refines DelayF; with 10.04 it does not.
+     camera path refines CameraDelay; with 10.04 it does not.
 
 The page out/braking.html draws each requirement with the path that must
 refine it, before the repair (red) and after it (green).
@@ -55,35 +56,38 @@ def main(expect: bool) -> int:
     def number(v):
         return float(v) if isinstance(v, Fraction) else v
 
-    show(1, "the pedal path refines SysB (lam_b = 4)", refines(pedal, c["SysB"]).status,
-         "invalid")
-    r = repair("refines", pedal, c["SysB"], parameters={"lam_b": (0, 10)})
+    show(1, "the pedal path refines PedalDeadline (lam_b = 4)",
+         refines(pedal, c["PedalDeadline"]).status, "invalid")
+    r = repair("refines", pedal, c["PedalDeadline"], parameters={"lam_b": (0, 10)})
     show(2, "repair lam_b", number(r.values["lam_b"]), 4.05)
     print(f"   optimal {r.optimal}, {r.method}, {r.seconds:.2f} s")
 
-    none = c["DelayF"].instantiate({"y_f": 0})
+    none = c["CameraDelay"].instantiate({"y_f": 0})
     r = repair("refines", camera, none, parameters={"kappa": (0, 20)})
     show(3, "repair kappa, no delay to Brake 1", number(r.values["kappa"]), 11)
 
-    r = repair("refines", camera, c["DelayF"], parameters={"kappa": (0, 20)})
+    r = repair("refines", camera, c["CameraDelay"], parameters={"kappa": (0, 20)})
     show(4, "repair kappa, a delay of at most 0.95", number(r.values["kappa"]), 10.05)
-    show(4, "kappa = 10.05 refines DelayF", refines(
-        camera.instantiate({"kappa": Fraction(201, 20)}), c["DelayF"]).status, "valid")
-    show(4, "kappa = 10.04 refines DelayF", refines(
-        camera.instantiate({"kappa": Fraction(251, 25)}), c["DelayF"]).status, "invalid")
+    show(4, "kappa = 10.05 refines CameraDelay", refines(
+        camera.instantiate({"kappa": Fraction(201, 20)}), c["CameraDelay"]).status, "valid")
+    show(4, "kappa = 10.04 refines CameraDelay", refines(
+        camera.instantiate({"kappa": Fraction(251, 25)}), c["CameraDelay"]).status, "invalid")
     # the page: before and after each repair
     def paths(lam=None, kappa=None):
-        sys_b = c["SysB"] if lam is None else c["SysB"].instantiate({"lam_b": lam}, name="SysB_repaired")
+        deadline = c["PedalDeadline"] if lam is None else \
+            c["PedalDeadline"].instantiate({"lam_b": lam}, name="PedalDeadline_repaired")
         link = c["Link"] if kappa is None else c["Link"].instantiate({"kappa": kappa})
         pedal = c["BrakePedal"].compose(c["PedalProcessing"]).compose(c["Brake1"])
         camera = c["Camera"].compose(c["Detection"]).compose(link).compose(c["Brake2"])
-        return pedal, sys_b, camera, link
+        return pedal, deadline, camera, link
     pairs, links = [], []
     for lam, kappa in ((None, None), (Fraction(81, 20), Fraction(201, 20))):
-        pedal, sys_b, camera, link = paths(lam, kappa)
+        pedal, deadline, camera, link = paths(lam, kappa)
         links.append(link)
-        delay = c["DelayF"] if kappa is None else c["DelayF"].instantiate({}, name="DelayF_repaired")
-        pairs += [(pedal, sys_b, refines(pedal, sys_b)), (camera, delay, refines(camera, delay))]
+        delay = c["CameraDelay"] if kappa is None else \
+            c["CameraDelay"].instantiate({}, name="CameraDelay_repaired")
+        pairs += [(pedal, deadline, refines(pedal, deadline)),
+                  (camera, delay, refines(camera, delay))]
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(refines=pairs, open=[b for _, b, _ in pairs] + links,
                                 title="Braking: before and after the repair"),

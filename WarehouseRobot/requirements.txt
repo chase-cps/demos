@@ -26,7 +26,7 @@ Localization (inputs w, e_true; output e_est)
     LG1     guarantees that the true distance to the dock is at most 0.05
             more than the estimate: e_true <= e_est + 0.05.
 
-System (inputs c_true, e_true)
+SafeMission (inputs c_true, e_true)
     SG1     the robot keeps 0.40 from the worker: c_true >= 0.4.
     SG2     the robot rests at the dock, within 0.10 of it, sooner or later.
 

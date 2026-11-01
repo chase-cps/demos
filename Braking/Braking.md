@@ -22,18 +22,19 @@ This is the braking system of ContrACT (Xiao, Lutz, Castillo-Effen,
 Nuzzo, MEMOCODE 2026). On the camera path, the network `Link` schedules
 Brake 2 `kappa` (10 ms) after the detection. Brake 1 and Brake 2 are
 reactions of the same reactor: when Brake 2 waits for late data, Brake 1
-waits too, up to 1 ms. The requirement _SysB_ bounds the start of Brake 1
-by `lam_b`; _DelayF_ bounds the wait of Brake 2 by `y_f`. A repair is the
-least change of a named constant that makes a check pass.
+waits too, up to 1 ms. The requirement _PedalDeadline_ bounds the start
+of Brake 1 by `lam_b`; _CameraDelay_ bounds the wait of Brake 2 by `y_f`.
+A repair is the least change of a named constant that makes a check pass.
 
 ### The steps
 
 **Step 1. The bound is violated.** The pedal path does not refine
-_SysB_. The pedal event is released 1 ms late, the pedal takes 0.05 ms
-and the processing 3 ms: Brake 1 starts 4.05 ms after its timestamp.
+_PedalDeadline_. The pedal event is released 1 ms late, the pedal takes
+0.05 ms and the processing 3 ms: Brake 1 starts 4.05 ms after its
+timestamp.
 
 <p align="center">
-  <img src="images/pedal-path-counterexample.png" alt="The counterexample, the guarantee of SysB in red">
+  <img src="images/pedal-path-counterexample.png" alt="The counterexample, the guarantee of PedalDeadline in red">
   <br>
   <em>Step 1: the counterexample on the ports of the pedal path.</em>
 </p>

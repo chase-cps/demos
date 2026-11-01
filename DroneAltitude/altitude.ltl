@@ -1,4 +1,4 @@
-# view: --refines Plant+Climb Hover --open Hover Climb
+# view: --refines Drone+Climb Hover --open Hover Climb
 NAME: altitude;
 
 # A drone of the fire-suppression mission of ContrACT (MDFS) climbs to the
@@ -9,7 +9,7 @@ NAME: altitude;
 
 # The drone: it starts on the ground, and each step its altitude changes by
 # its climb rate and the wind.
-CONTRACT Plant:
+CONTRACT Drone:
     input real variable v;
     input real variable w;
     output real variable h;

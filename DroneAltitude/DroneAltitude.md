@@ -19,7 +19,7 @@ long enough? If not, is it the controller to change, or the requirement?
 
 The drone is part of the fire-suppression mission of ContrACT (Xiao, Lutz,
 Castillo-Effen, Nuzzo, MEMOCODE 2026). `altitude.ltl` has its contracts
-in signal temporal logic in discrete time, so z3 checks them. _Plant_
+in signal temporal logic in discrete time, so z3 checks them. _Drone_
 starts on the ground and moves by `v + w` each step. _Climb_ sets `v` to
 half the error to `r` (20 m), at most `vmax`. _Hover_ asks, in a wind
 `w` of at most `wmax`, for 5 steps within `eps` of `r` (18 to 22 m),
@@ -27,7 +27,7 @@ starting at one of the first 10 steps.
 
 ### The steps
 
-**Step 1. The wind of the fire.** _Plant_ and _Climb_ composed refine
+**Step 1. The wind of the fire.** _Drone_ and _Climb_ composed refine
 _Hover_ in a wind of 0.5, not of 1. The worst case of _Hover_ (its
 robustness: the margin by which it holds) is 0.75 m in a wind of 0.5. In
 a wind of 1 it is -0.5 m: with the wind always down, the drone is at

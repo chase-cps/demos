@@ -20,7 +20,7 @@
         "at": "2026-10-30T23:07:55"
       }
     },
-    "Plant": {
+    "Drone": {
       "feasible": {
         "key": "56c7467b1e285bc2",
         "result": "sat",
@@ -34,7 +34,7 @@
     {
       "key": "f3d9000b9ce23f84",
       "check": "refines",
-      "refined": "Plant+Climb",
+      "refined": "Drone+Climb",
       "abstract": "Hover",
       "result": "invalid",
       "tool": "z3",

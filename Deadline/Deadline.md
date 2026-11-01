@@ -19,19 +19,19 @@ more than `k` steps?
 
 The contracts are in `deadline.ltl`. _Client_ keeps asking (`req`) until
 it is granted. _Arbiter_ counts `c` = 0, 1, 2, 0, ... and grants when
-`c = 2`. _Wait_ counts in `w` the steps a request has waited. _Bound_ is
+`c = 2`. _Wait_ counts in `w` the steps a request has waited. _MaxWait_ is
 the requirement `G (w <= k)`, with the named constant `k` at 1. The
 formulas are LTL over an infinite run, so nuXmv checks them.
 
 ### The steps
 
 **Step 1. The bound is too small.** _Client_, _Arbiter_, and _Wait_
-composed do not refine _Bound_. In the counterexample, a request at
+composed do not refine _MaxWait_. In the counterexample, a request at
 `c = 0` is granted at `c = 2`: it waits 2 steps (`w = 2`), and the run
 goes back to step 0.
 
 <p align="center">
-  <img src="images/wait-counterexample.png" alt="The panel of the check of Bound: the counterexample, w = 0, 1, 2 while c = 0, 1, 2, step 2 on the ports; the guarantee G (w <= k) in red">
+  <img src="images/wait-counterexample.png" alt="The panel of the check of MaxWait: the counterexample, w = 0, 1, 2 while c = 0, 1, 2, step 2 on the ports; the guarantee G (w <= k) in red">
   <br>
   <em>Step 1: w reaches 2 at step 2, when the grant comes.</em>
 </p>

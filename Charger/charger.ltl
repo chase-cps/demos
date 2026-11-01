@@ -83,7 +83,7 @@ CONTRACT Polite:
         G(!(grant1 & grant2));  # R5
 
 # What the whole system must do.
-CONTRACT System:
+CONTRACT ChargingStation:
     input boolean variable low1;
     input boolean variable low2;
     output boolean variable req1;

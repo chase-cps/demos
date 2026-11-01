@@ -1,5 +1,5 @@
-# view: --refines BrakePedal+PedalProcessing+Brake1 SysB
-# view: --refines Camera+Detection+Link+Brake2 DelayF --open SysB DelayF Link
+# view: --refines BrakePedal+PedalProcessing+Brake1 PedalDeadline
+# view: --refines Camera+Detection+Link+Brake2 CameraDelay --open PedalDeadline CameraDelay Link
 NAME: braking;
 
 # The automatic emergency braking system of ContrACT (Xiao, Lutz,
@@ -132,7 +132,7 @@ CONTRACT Brake2:
 # released at most offset after its timestamp (the delay that the camera
 # path can cause, 1 for the original design), Brake 1 starts at most lam_b
 # after its timestamp.
-CONTRACT SysB:
+CONTRACT PedalDeadline:
     input real variable t_p;
     input real variable d_p;
     output real variable t_b;
@@ -148,7 +148,7 @@ CONTRACT SysB:
 # What the camera path may delay Brake 1 by: Brake 2 starts at most y_f
 # after its timestamp, its inputs released on time. Brake 1 absorbs
 # 4 - 3.05 = 0.95; y_f = 0 asks for no delay at all.
-CONTRACT DelayF:
+CONTRACT CameraDelay:
     input real variable t_c;
     input real variable d_c;
     input real variable t_e;

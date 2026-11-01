@@ -92,7 +92,7 @@ CONTRACT Sensor:
 
 # The system: a pullup when the limits are exceeded, at once or with the time
 # it takes.
-CONTRACT System:
+CONTRACT Pullup:
     input boolean variable standby;
     input boolean variable apfail;
     input boolean variable supported;
@@ -103,7 +103,7 @@ CONTRACT System:
     Guarantees:
         G((limits & !standby & !apfail & supported) -> pullup);  # FSM-001
 
-CONTRACT SystemTimed:
+CONTRACT PullupTimed:
     input boolean variable standby;
     input boolean variable apfail;
     input boolean variable supported;

@@ -21,7 +21,7 @@ Variables
 The autopilot reads the sensor (good) of the previous step; the sensor reads
 the autopilot (MODE, REQUEST) of the same step.
 
-System
+Pullup
     FSM-001     Exceeding sensor limits shall latch an autopilot pullup when
                 the pilot is not in control (not standby) and the system is
                 supported without failures (not apfail).

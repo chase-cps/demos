@@ -11,7 +11,7 @@
         "at": "2026-10-31T00:21:14"
       }
     },
-    "Bound": {
+    "MaxWait": {
       "feasible": {
         "key": "1626558f3196023c",
         "result": "sat",
@@ -44,7 +44,7 @@
       "key": "28cc8f758bd4d91b",
       "check": "refines",
       "refined": "Client+Arbiter+Wait",
-      "abstract": "Bound",
+      "abstract": "MaxWait",
       "result": "invalid",
       "tool": "nuxmv/ic3",
       "seconds": 0.03,

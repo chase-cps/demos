@@ -36,7 +36,7 @@ perception composed with localization.
 
 ### The steps
 
-**Step 1. The contract of the controller.** Q = System / (Perception ⊗
+**Step 1. The contract of the controller.** Q = SafeMission / (Perception ⊗
 Localization), drawn as a dashed box, guarantees the requirements of the
 system (`c_true >= 0.4`, and a rest at the dock) and what perception
 assumes: `|w| <= 0.8`.

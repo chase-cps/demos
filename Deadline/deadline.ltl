@@ -1,4 +1,4 @@
-# view: --refines Client+Arbiter+Wait Bound --open Bound
+# view: --refines Client+Arbiter+Wait MaxWait --open MaxWait
 NAME: deadline;
 
 # A client asks for a resource and keeps asking until it is granted; the
@@ -37,7 +37,7 @@ CONTRACT Wait:
         G ((req & !grant) -> (w' = w + 1));
         G (!(req & !grant) -> (w' = 0));
 
-CONTRACT Bound:
+CONTRACT MaxWait:
     input boolean variable req;
     input boolean variable grant;
     input integer (0:9) variable w;

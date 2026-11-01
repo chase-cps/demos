@@ -8,16 +8,16 @@ which, and which arbiter works with the robots?
 - Refinement does not see the conflict, realizability does: _Greedy_ is
   unrealizable, with 3 of its 5 guarantees in the unrealizable core (the
   smallest set of requirements in conflict), yet with the robots it refines
-  _System_.
+  _ChargingStation_.
 - _Pushy_ is not well separated, and _Trusting_ is vacuous: each wins for
   a bad reason.
 - _Fair_ is realizable, with a controller of 18 states. With the robots, it
-  refines _System_ with no assumption left.
+  refines _ChargingStation_ with no assumption left.
 
 <p align="center">
-  <img src="images/overview-all-checks.png" alt="The five arbiters, and Fair with the robots inside System">
+  <img src="images/overview-all-checks.png" alt="The five arbiters, and Fair with the robots inside ChargingStation">
   <br>
-  <em>The five arbiters, and Fair with the robots inside System.</em>
+  <em>The five arbiters, and Fair with the robots inside ChargingStation.</em>
 </p>
 
 Each robot asks for the station (`req`) when its battery is low, and
@@ -29,7 +29,8 @@ Every arbiter guarantees that the station never goes to both robots
 
 **Step 1. Greedy: unrealizable.** _Greedy_ grants each request at the next
 step (R6.1, R6.2). When both robots ask at once, it cannot serve both: the
-core is R5, R6.1, and R6.2. Yet _Greedy_ with the robots refines _System_.
+core is R5, R6.1, and R6.2. Yet _Greedy_ with the robots refines
+_ChargingStation_.
 
 <p align="center">
   <img src="images/step1-greedy-unrealizable.png" alt="Step 1: Greedy, unrealizable, with its core in red">
@@ -74,12 +75,12 @@ assumptions and the guarantees they make true.
 
 **Step 5. The arbiter with the robots.** _Fair_ (without R8) and the robots
 feed each other. Composed with discharge, they leave no assumption, and
-refine _System_.
+refine _ChargingStation_.
 
 <p align="center">
-  <img src="images/step5-arbiter-and-robots.png" alt="Step 5: Fair, Robot1, and Robot2 inside System">
+  <img src="images/step5-arbiter-and-robots.png" alt="Step 5: Fair, Robot1, and Robot2 inside ChargingStation">
   <br>
-  <em>Step 5: the composition refines System.</em>
+  <em>Step 5: the composition refines ChargingStation.</em>
 </p>
 
 ### Run it

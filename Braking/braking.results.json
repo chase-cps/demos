@@ -38,7 +38,7 @@
         "at": "2026-10-31T00:21:13"
       }
     },
-    "DelayF": {
+    "CameraDelay": {
       "feasible": {
         "key": "85d8540eb2d18dbd",
         "result": "sat",
@@ -74,7 +74,7 @@
         "at": "2026-10-31T00:21:13"
       }
     },
-    "SysB": {
+    "PedalDeadline": {
       "feasible": {
         "key": "91af307fdd31a327",
         "result": "sat",
@@ -89,7 +89,7 @@
       "key": "22dc6a26112c906c",
       "check": "refines",
       "refined": "Camera+Detection+Link+Brake2",
-      "abstract": "DelayF",
+      "abstract": "CameraDelay",
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.0,
@@ -100,7 +100,7 @@
       "key": "ced3c7d810a84294",
       "check": "refines",
       "refined": "BrakePedal+PedalProcessing+Brake1",
-      "abstract": "SysB",
+      "abstract": "PedalDeadline",
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.0,

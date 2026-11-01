@@ -141,31 +141,31 @@ def main() -> int:
     fsm = c["Autopilot"].compose(c["Sensor"], discharge=True)
 
     def system():
-        r = refines(fsm, c["System"], timeout=t)
+        r = refines(fsm, c["Pullup"], timeout=t)
         part = getattr(r, r.failed) if r.failed else None
         text = ""
         if part is not None and part.trace is not None:
             text = (f"   assumptions left after discharge: {len(fsm.assumptions)}\n"
                     f"   the {r.failed} fail; a counterexample:\n" + trace(part))
         return r, text
-    untimed = step("3. Autopilot, Sensor refine System (FSM-001)", "invalid", system)
+    untimed = step("3. Autopilot, Sensor refine Pullup (FSM-001)", "invalid", system)
 
-    timed = step("4. Autopilot, Sensor refine SystemTimed (FSM-001t)", "valid",
-                 lambda: (refines(fsm, c["SystemTimed"], timeout=t), ""))
+    timed = step("4. Autopilot, Sensor refine PullupTimed (FSM-001t)", "valid",
+                 lambda: (refines(fsm, c["PullupTimed"], timeout=t), ""))
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))
 
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(c["AutopilotFirst"], c["SensorFirst"],
-                                refines=[(fsm, c["System"], untimed),
-                                         (fsm, c["SystemTimed"], timed)],
+                                refines=[(fsm, c["Pullup"], untimed),
+                                         (fsm, c["PullupTimed"], timed)],
                                 checks=[(c[k], "realizable", r) for k, r in
                                         [("AutopilotFirst", cores["AutopilotFirst"]),
                                          ("SensorFirst", cores["SensorFirst"]),
                                          ("Autopilot", autopilot), ("Sensor", sensor)]],
-                                open=[c["AutopilotFirst"], c["SensorFirst"], c["System"],
-                                      c["SystemTimed"]],
+                                open=[c["AutopilotFirst"], c["SensorFirst"], c["Pullup"],
+                                      c["PullupTimed"]],
                                 title="Finite state machine: conflicting requirements"),
                     os.path.join(HERE, "out", "fsm.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")

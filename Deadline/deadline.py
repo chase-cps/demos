@@ -2,11 +2,11 @@
 
 A client asks for a resource and keeps asking until it is granted; the
 arbiter grants every third step; Wait counts the steps a request has waited
-(deadline.ltl). The requirement Bound says that no request waits more than
+(deadline.ltl). The requirement MaxWait says that no request waits more than
 the constant k (1). The formulas are LTL, so nuXmv checks them. This script
 uses the CHASE Python package (pip install chase-cps):
 
-  1. Client, Arbiter, and Wait composed do not refine Bound: a request can
+  1. Client, Arbiter, and Wait composed do not refine MaxWait: a request can
      wait 2 steps.
   2. repair finds the least k: 2. Each round optimizes k under the
      conditions that the counterexamples found so far are no longer
@@ -14,7 +14,7 @@ uses the CHASE Python package (pip install chase-cps):
   3. Every k from 0 to 9, checked one by one, gives the same answer: 2 is
      the least that passes.
 
-The page out/deadline.html draws the system inside Bound with k = 1 (red)
+The page out/deadline.html draws the system inside MaxWait with k = 1 (red)
 and k = 2 (green).
 
     python deadline.py
@@ -34,7 +34,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 def main(expect: bool) -> int:
     c = load_spec(os.path.join(HERE, "deadline.ltl"))
     system = c["Client"].compose(c["Arbiter"]).compose(c["Wait"])
-    bound = c["Bound"]
+    bound = c["MaxWait"]
     results = []
 
     def show(step, text, got, want):
@@ -43,7 +43,7 @@ def main(expect: bool) -> int:
         print(f"{step}. {text}: {got}{mark}")
 
     r = refines(system, bound)
-    show(1, "the system refines Bound with k = 1", r.status, "invalid")
+    show(1, "the system refines MaxWait with k = 1", r.status, "invalid")
     if r.guarantees.trace is not None:
         print("   counterexample:")
         print("\n".join("   " + line for line in str(r.guarantees.trace).splitlines()))
@@ -60,7 +60,7 @@ def main(expect: bool) -> int:
     pairs = []
     for k in (1, 2):
         both = c["Client"].compose(c["Arbiter"]).compose(c["Wait"])
-        b = bound.instantiate({"k": k}, name="Bound" if k == 1 else "Bound_repaired")
+        b = bound.instantiate({"k": k}, name="MaxWait" if k == 1 else "MaxWait_repaired")
         pairs.append((both, b, refines(both, b)))
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(refines=pairs, open=[b for _, b, _ in pairs],

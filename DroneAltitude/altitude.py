@@ -3,7 +3,7 @@
 A drone of the fire-suppression mission of ContrACT (MDFS) climbs to the
 altitude r (20 m) where it drops its water, in a wind of at most wmax per
 step (the updraft of the fire). altitude.ltl has the contracts, in signal
-temporal logic in discrete time: Plant (h' = h + v + w), Climb (a climb
+temporal logic in discrete time: Drone (h' = h + v + w), Climb (a climb
 rate proportional to the error, at most vmax), and the requirement Hover:
 within eps of r from some step of the first 10 on, for 5 steps, and never
 above r + eps. z3 checks them (pip install chase-cps[z3]):
@@ -37,7 +37,7 @@ HOVER = "F[0,10] G[0,5] (h >= 20 - 2 & h <= 20 + 2) & G[0,15] (h <= 20 + 2)"
 
 def main(expect: bool) -> int:
     c = load_spec(os.path.join(HERE, "altitude.ltl"))
-    drone = c["Plant"].compose(c["Climb"])
+    drone = c["Drone"].compose(c["Climb"])
     hover = c["Hover"]
     results = []
 

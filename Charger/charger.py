@@ -9,7 +9,8 @@ the cores by the numbers of the requirements:
   1. The Greedy arbiter grants each request at the next step and never
      grants both robots: it is unrealizable, and the unrealizable core gives
      the three guarantees in conflict. Its composition with the robots
-     refines System all the same: refinement does not see the conflict.
+     refines ChargingStation all the same: refinement does not see the
+     conflict.
   2. The Fair arbiter grants each request eventually: it is realizable, and
      a controller is synthesized.
   3. The Pushy arbiter is realizable for a bad reason: it can win by making
@@ -24,11 +25,11 @@ the cores by the numbers of the requirements:
   5. The arbiter and the robots feed each other (req and grant). Composed
      with discharge, the assumptions of the robots on the grants are
      discharged by the arbiter: no assumption is left, and the composition
-     refines System. (The exact composition refines System too, but its
-     assumption is the closed form (A1 & A2) | !(G1 & G2).)
+     refines ChargingStation. (The exact composition refines it too, but
+     its assumption is the closed form (A1 & A2) | !(G1 & G2).)
 
 The page out/charger.html draws the arbiters with the results of the
-checks and their cores, and the composition inside System.
+checks and their cores, and the composition inside ChargingStation.
 
     python charger.py
     python charger.py --expect     # exit code 1 when a result is not the expected one
@@ -112,8 +113,8 @@ def main() -> int:
 
     def greedy_system():
         g = c["Greedy"].compose(c["Robot1"]).compose(c["Robot2"])
-        return refines(g, c["System"], timeout=t).status, ""
-    step("   Greedy, Robot1, Robot2 refine System", "valid", greedy_system)
+        return refines(g, c["ChargingStation"], timeout=t).status, ""
+    step("   Greedy, Robot1, Robot2 refine ChargingStation", "valid", greedy_system)
 
     def fair():
         r = found["Fair"] = synthesize(c["Fair"], timeout=t)
@@ -168,13 +169,13 @@ def main() -> int:
         fair = remove_redundant(c["Fair"], synth=True, timeout=t).contract
         charging = fair.compose(c["Robot1"], discharge=True, timeout=t)
         charging = charging.compose(c["Robot2"], name="Charging", discharge=True, timeout=t)
-        r = refines(charging, c["System"], timeout=t)
+        r = refines(charging, c["ChargingStation"], timeout=t)
         found["Charging"] = charging, r
         text = ("   composition with discharge:\n   assumptions:\n"
                 + (terms(charging.assumptions, "Charging") or "      (none)")
                 + f"\n   {len(charging.guarantees)} guarantees")
         return r.status, text
-    step("5. Fair, Robot1, Robot2 refine System", "valid", composition)
+    step("5. Fair, Robot1, Robot2 refine ChargingStation", "valid", composition)
 
     trust, vacuity = found["Trusting"]
     charging, r = found["Charging"]
@@ -183,7 +184,7 @@ def main() -> int:
               (c["Polite"], found["Polite"]), (trust, vacuity)]
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(c["Greedy"], c["Fair"], c["Pushy"], c["Polite"], trust,
-                                refines=[(charging, c["System"], r)], checks=checks,
+                                refines=[(charging, c["ChargingStation"], r)], checks=checks,
                                 open=[c["Greedy"], c["Pushy"], trust],
                                 title="Charging station"),
                     os.path.join(HERE, "out", "charger.html"))

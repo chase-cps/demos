@@ -38,7 +38,7 @@
         "at": "2026-10-31T02:13:38"
       }
     },
-    "System": {
+    "Pullup": {
       "feasible": {
         "key": "82368f23509038b4",
         "result": "sat",
@@ -47,7 +47,7 @@
         "at": "2026-10-31T02:13:38"
       }
     },
-    "SystemTimed": {
+    "PullupTimed": {
       "feasible": {
         "key": "6744004f2141874c",
         "result": "sat",
@@ -62,7 +62,7 @@
       "key": "b3cfa2edfe319760",
       "check": "refines",
       "refined": "Autopilot+Sensor",
-      "abstract": "System",
+      "abstract": "Pullup",
       "result": "invalid",
       "tool": "nuxmv/ic3",
       "seconds": 0.05,

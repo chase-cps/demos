@@ -14,9 +14,9 @@ corrected, does the pullup come when its requirement says?
 - They refine FSM-001t, its timed version.
 
 <p align="center">
-  <img src="images/overview-all-checks.png" alt="The first requirements, unrealizable; the corrected ones inside System (red) and SystemTimed (green)">
+  <img src="images/overview-all-checks.png" alt="The first requirements, unrealizable; the corrected ones inside Pullup (red) and PullupTimed (green)">
   <br>
-  <em>The first requirements (R red), and the corrected ones inside System (⪯ red) and SystemTimed (⪯ green).</em>
+  <em>The first requirements (R red), and the corrected ones inside Pullup (⪯ red) and PullupTimed (⪯ green).</em>
 </p>
 
 The requirements come from the Ten Lockheed Martin Cyber-Physical
@@ -43,27 +43,27 @@ realizable: four conflicts in the autopilot, one in the sensor.
 
 **Step 2. The system.** The corrected _Autopilot_ and _Sensor_ are
 realizable; composed with discharge, they leave no assumption. They do not
-refine _System_ (FSM-001: a pullup when the limits are exceeded, with the
+refine _Pullup_ (FSM-001: a pullup when the limits are exceeded, with the
 pilot not in control, the system supported, and no failure). At step 1 of
 the counterexample the limits are exceeded, but the autopilot is still in
 NOMINAL: no pullup.
 
 <p align="center">
-  <img src="images/step2-does-not-refine-system.png" alt="Step 2: the counterexample, in the panel and on the wires">
+  <img src="images/step2-does-not-refine-pullup.png" alt="Step 2: the counterexample, in the panel and on the wires">
   <br>
-  <em>Step 2: the composition does not refine System; the values at step 1.</em>
+  <em>Step 2: the composition does not refine Pullup; the values at step 1.</em>
 </p>
 
 **Step 3. The system, with time.** The sensor and the autopilot each take a
-step to react, and the autopilot must first reach NOMINAL. _SystemTimed_
+step to react, and the autopilot must first reach NOMINAL. _PullupTimed_
 (FSM-001t) gives the pullup that time: after three steps within the limits
 and one beyond, with the pilot not in control and no failure, the pullup
 comes at the fifth step. The composition refines it.
 
 <p align="center">
-  <img src="images/step3-refines-systemtimed.png" alt="Step 3: Autopilot and Sensor inside SystemTimed; the refinement holds">
+  <img src="images/step3-refines-pulluptimed.png" alt="Step 3: Autopilot and Sensor inside PullupTimed; the refinement holds">
   <br>
-  <em>Step 3: the composition refines SystemTimed.</em>
+  <em>Step 3: the composition refines PullupTimed.</em>
 </p>
 
 ### Run it
