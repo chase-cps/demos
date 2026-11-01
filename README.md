@@ -40,6 +40,9 @@ They are grouped by the kind of system; the website has the same groups.
   (ESBMC, CBMC, or ACSL clauses), checked function by function.
 - [**DroneGrid**][DRONEGRID]: a collision of two drones found and fixed on
   the contracts, then each C function checked against its contract.
+- [**Heater**][HEATER]: a room thermostat: repair finds the threshold,
+  ESBMC checks its C code, and the check between the samples holds in
+  continuous time.
 
 ### Drones and robots
 
@@ -55,12 +58,6 @@ They are grouped by the kind of system; the website has the same groups.
 - [**DroneTiming**][DRONETIMING]: the timing of fire-suppression drones as a
   linear program: a faster timer fails, and repair finds the least bound or
   a faster planner.
-
-### Buildings
-
-- [**Heater**][HEATER]: a room thermostat: repair finds the threshold,
-  ESBMC checks its C code, and the check between the samples holds in
-  continuous time.
 
 The Python scripts use the CHASE Python package, version 0.5.0 or later
 (`pip install chase-cps`; BufferSwap and Escalation with

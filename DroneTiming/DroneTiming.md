@@ -68,9 +68,9 @@ drone timer starts 59 ms late and the move starts 251 ms after its
 timestamp.
 
 <p align="center">
-  <img src="images/fast-counterexample.png" alt="The panel of the check of Fast: the counterexample, d_s3 - t_s3 = 251, the guarantee in red">
+  <img src="images/repair-deadline-or-plan.png" alt="The counterexample of Fast, and the two repairs: deadline 250 to 280, or x_plan 72 to 42">
   <br>
-  <em>Step 3: the counterexample of Fast.</em>
+  <em>Steps 3 and 4: the counterexample of Fast at the top, the two repairs at the bottom.</em>
 </p>
 
 **Step 4. Repair.** `repair` changes one named constant as little as
@@ -79,11 +79,6 @@ works. On the requirement: `deadline = 280`, 30 ms more. On the planner:
 `x_plan = 42`, 30 ms less, since planning is on the longest path. The
 pipeline with `x_plan = 42` refines _Fast_.
 
-<p align="center">
-  <img src="images/repair-deadline-or-plan.png" alt="Find repairs: deadline 250 to 280, or x_plan 72 to 42, both optimal">
-  <br>
-  <em>Step 4: deadline 250 to 280, or x_plan 72 to 42, both optimal.</em>
-</p>
 
 **Step 5. The margins.** Under the bound of 400 ms, repair as an
 optimization gives the slowest planner, `x_plan = 192` ms, and the
