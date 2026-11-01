@@ -1,36 +1,38 @@
 ## Robot charging station: refinement does not see the conflict, realizability does
 
-**The question.** Two robots share a charging station through an arbiter.
-Each first contract of the arbiter is flawed. Which check catches
-which, and which arbiter works with the robots?
+**The system.** Two robots share one charging station, and an arbiter
+decides who charges. This is a teaching example, made for these pages;
+its requirements are numbered in `requirements.txt`. Robot _i_ asks for
+the station (`req_i`) when its battery is low (`low_i`), and assumes
+that it gets it (`grant_i`), or stops asking, infinitely often. The
+arbiter reads the requests and sets the grants; it must never give the
+station to both robots, `G !(grant1 & grant2)`. The contracts are in
+LTL over Booleans, in the GR(1) form of the synthesis tool slugs, so
+CHASE can ask whether a controller can be built from a contract
+(realizable) and build it. _ChargingStation_ is the contract of
+the whole system.
 
-**The result.**
-- Refinement does not see the conflict, realizability does: _Greedy_ is
-  unrealizable, with 3 of its 5 guarantees in the unrealizable core (the
-  smallest set of requirements in conflict), yet with the robots it refines
-  _ChargingStation_.
-- _Pushy_ is not well separated, and _Trusting_ is vacuous: each wins for
-  a bad reason.
-- _Fair_ is realizable, with a controller of 18 states. With the robots, it
-  refines _ChargingStation_ with no assumption left.
+**The question.** Five candidate arbiters are written: _Greedy_,
+_Fair_, _Pushy_, _Polite_, and _Trusting_. Four of them are flawed in a
+different way. Which check catches which flaw, and which arbiter works
+with the robots?
 
 <p align="center">
-  <img src="images/overview-all-checks.png" alt="The five arbiters, and Fair with the robots inside ChargingStation" width="723">
+  <img src="images/system.png" alt="Fair, Robot1, and Robot2 inside ChargingStation, with their terms" width="707">
   <br>
-  <em>The five arbiters, and Fair with the robots inside ChargingStation.</em>
+  <em>The system: an arbiter (here Fair) between the two robots, inside ChargingStation.</em>
 </p>
-
-Each robot asks for the station (`req`) when its battery is low, and
-assumes that it gets it (`grant`), or stops asking, infinitely often.
-Every arbiter guarantees that the station never goes to both robots
-(R5, numbered as in `requirements.txt`).
 
 ### The steps
 
-**Step 1. Greedy: unrealizable.** _Greedy_ grants each request at the next
-step (R6.1, R6.2). When both robots ask at once, it cannot serve both: the
-core is R5, R6.1, and R6.2. Yet _Greedy_ with the robots refines
-_ChargingStation_.
+**Step 1. Greedy: unrealizable, yet it refines.** _Greedy_ grants each
+request at the next step, `G (req1 -> X grant1)` and the same for robot
+2. When both robots ask at once it cannot serve both without breaking
+`G !(grant1 & grant2)`: it is unrealizable, no arbiter can do it. The
+unrealizable core, the smallest set of guarantees in conflict, is these
+three formulas. Yet _Greedy_ with the robots refines _ChargingStation_:
+refinement only compares formulas (every behavior allowed by the parts
+is allowed by the system) and does not ask whether a part can exist.
 
 <p align="center">
   <img src="images/step1-greedy-unrealizable.png" alt="Step 1: Greedy, unrealizable, with its core in red">
@@ -39,9 +41,11 @@ _ChargingStation_.
 </p>
 
 **Step 2. Fair: realizable.** _Fair_ gives the station to each robot, or
-the robot stops asking, infinitely often (R7.1, R7.2): it is realizable,
-with a controller of 18 states, and not vacuous (¬V: it cannot win without
-setting its outputs). `remove_redundant` removes R8, implied by R7.1.
+the robot stops asking, infinitely often, `G F (grant1 | !req1)` and the
+same for robot 2. It is realizable, and slugs builds a controller of 18
+states. It is not vacuous: it cannot meet its guarantees without setting
+its outputs (¬V). `remove_redundant` removes its last guarantee,
+`G F (grant1 | !req1 | grant2)`, implied by the first one.
 
 <p align="center">
   <img src="images/step2-fair-realizable.png" alt="Step 2: Fair, open, realizable and not vacuous" width="192">
@@ -49,12 +53,13 @@ setting its outputs). `remove_redundant` removes R8, implied by R7.1.
   <em>Step 2: Fair is realizable (R) and not vacuous (¬V).</em>
 </p>
 
-**Step 3. Realizable for a bad reason.** _Pushy_ assumes that robot 1 asks
-infinitely often (A2), but never right after a grant (A3). Granting robot
-1 at every step breaks A2, so the arbiter wins. _Pushy_ is not well
-separated (WS: the arbiter cannot win by forcing the robots to break its
-assumptions); the core is A2 and A3. _Polite_, with A4 (only after a grant it asked for)
-instead of A3, is well separated.
+**Step 3. Realizable for a bad reason.** _Pushy_ assumes that robot 1
+asks infinitely often, `G F req1`, but never right after a grant,
+`G (grant1 -> X !req1)`. By granting robot 1 at every step, the arbiter
+makes the robot break the first assumption, and then owes nothing. A
+contract is well separated (WS) when the component cannot win this way;
+_Pushy_ is not, and the core is the two assumptions. _Polite_, which
+assumes `G ((req1 & grant1) -> X !req1)` instead, is well separated.
 
 <p align="center">
   <img src="images/step3-pushy-not-well-separated.png" alt="Step 3: Pushy, with its core in red, and Polite">
@@ -63,9 +68,10 @@ instead of A3, is well separated.
 </p>
 
 **Step 4. An arbiter that never grants.** _Trusting_ is _Fair_ with two
-more assumptions: each robot stops asking infinitely often. Its guarantees
-then hold without any grant: it is vacuous. The core: the two
-assumptions and the guarantees they make true.
+more assumptions, `G F !req1` and `G F !req2`: each robot stops asking
+infinitely often. Its guarantees then hold with no grant at all: it is
+vacuous. The core is the two assumptions and the guarantees they make
+true.
 
 <p align="center">
   <img src="images/step4-trusting-vacuous.png" alt="Step 4: Trusting, vacuous, with its core in red">
@@ -73,15 +79,21 @@ assumptions and the guarantees they make true.
   <em>Step 4: Trusting is vacuous (¬V red).</em>
 </p>
 
-**Step 5. The arbiter with the robots.** _Fair_ (without R8) and the robots
-feed each other. Composed with discharge, they leave no assumption, and
-refine _ChargingStation_.
+**Step 5. The arbiter with the robots.** _Fair_ and the robots feed each
+other. Composed with discharge (an assumption of one part that another
+part guarantees is dropped), they leave no assumption, and refine
+_ChargingStation_.
 
 <p align="center">
   <img src="images/step5-arbiter-and-robots.png" alt="Step 5: Fair, Robot1, and Robot2 inside ChargingStation" width="532">
   <br>
   <em>Step 5: the composition refines ChargingStation.</em>
 </p>
+
+Each check of steps 1 to 4 is one call; by hand, each flaw means
+reasoning about every strategy of the robots. The checks are in [GR(1) synthesis](https://chase-cps.github.io/tools/synthesis/),
+the tags of the pictures in
+[Diagrams](https://chase-cps.github.io/interfaces/diagrams/#what-is-drawn).
 
 ### Run it
 
@@ -99,4 +111,5 @@ python charger.py --expect
 - `charger.results.json`: the results of `chase-cps view --check`;
 - `charger.chase`: steps 1, 2, and 5 with `logics_tool`;
 - `charger.py`: the steps with the CHASE Python package;
-- `out/charger.html`: the diagrams above, written by `charger.py`.
+- `out/charger.html`: the diagrams above, written by `charger.py`;
+  `out/charger-system.html`: the system, with no check.

@@ -1,57 +1,70 @@
-## Fire-suppression drone timing: the bound, a faster timer, and its repair
+## Drone timing: the bound, a faster timer, and its repair
 
-**The question.** Three drones put out fires; each must move within
-400 ms of its timer. Is the bound met? With a faster timer of 250 ms,
-what fails, and what is the least change that fixes it?
+**The system.** Three drones put out fires on a grid, coordinated over a
+network. The software is written in Lingua Franca, where each component
+runs reactions (pieces of code triggered by an event). This is the
+multi-drone fire suppression of ContrACT (Xiao, Lutz, Castillo-Effen,
+Nuzzo, MEMOCODE 2026), with the worst-case times of each reaction of its
+Table III. Each event `v` has three times: its timestamp `t_v` (when it
+is due, on the logical clock), its start `d_v`, and its completion
+`T_v`. In the pictures, `T_c3` is the completion of the planner and
+`d_s3 - t_s3` the delay of the move of a drone.
 
-**The result.**
-- The bound of 400 ms holds. The worst case of a drone, found by one
-  optimization, is 280 ms.
-- A timer of 250 ms fails: the counterexample is a drone that moves
-  251 ms after its timestamp.
-- Repair: the least bound that holds is `deadline = 280` ms; or, keeping
-  250 ms, the planner must take at most `x_plan = 42` ms instead of 72.
-  Both changes are optimal.
-- The margins under 400 ms: the planner may take up to 192 ms, and the
-  mission may delay the drones by up to 179 ms.
+The mission subgraph (the fire spreads, the coordinator reads it)
+delays the timer of the drones by an offset, at most `y0`. The pipeline
+of a drone goes from its timer to a move: report the cell, get a target,
+plan, have the move granted, move. The drones do not wait for each
+other, so one pipeline gives the bound of each. Each reaction is a
+contract over these times (it starts when its inputs complete and takes
+at most its latency), on real numbers, checked by z3. _Available_ asks
+the move within `lam` of the timestamp, given the offset.
 
-<p align="center">
-  <img src="images/before-and-after-repair.png" alt="The end of the pipeline of a drone inside Fast: Plan with x_plan = 72, red; with x_plan = 42, green" width="870">
-  <br>
-  <em>The end of the pipeline of a drone inside Fast (250 ms): with <code>x_plan = 72</code> (⪯ red), and with the faster planner, <code>x_plan = 42</code> (⪯ green).</em>
-</p>
+**The question.** Each drone must move within 400 ms of its timer. Is
+the bound met, and by how much? With a faster timer of 250 ms, what
+fails, and what is the least change that fixes it? The answer says how
+fast the timer of the drones can run.
 
-This is the multi-drone fire suppression of ContrACT (Xiao, Lutz,
-Castillo-Effen, Nuzzo, MEMOCODE 2026). `dronetiming.ltl` has the timing
-contracts of each reaction, linear constraints over the reals: z3 checks
-and optimizes them, in place of the Gurobi MILP of the paper. _Mission_
-bounds the delay that the fire simulation causes to the drone timer.
-_Available_: given that delay (`offset`), the drone moves at most `lam`
-after its timestamp. _Fast_ is the same with `deadline = 250`. The three
-drones run the same pipeline and do not wait for each other, so one
-pipeline gives the bound of each.
+```mermaid
+flowchart TB
+  subgraph Mission["Mission: the offset, y0 = 59 ms"]
+    direction LR
+    FireTick --> FireSpread["FireSpread 59 ms"] --> FireStateRx["FireStateRx 0.4 ms"]
+  end
+  subgraph Available["Available: delay at most lam = 400 ms, given the offset"]
+    direction LR
+    DroneTick --> DroneSim2["DroneSim2 55 ms"] --> Assign["Assign 33 ms"] --> Target["Target 8 ms"] --> Plan["Plan x_plan = 72 ms"]
+    DroneSim2 --> Plan
+    Plan --> Grant["Grant 0 ms"]
+    Assign --> Grant
+    Grant --> Move["Move 53 ms"]
+    Plan --> Move
+    Move --> DroneSim3["DroneSim3 0.4 ms"]
+  end
+  Mission ~~~ Available
+```
+_The system: the reactions of the mission and of a drone with their latencies, inside their requirements. A reaction with two arrows in waits for both._
 
 ### The steps
 
-**Step 1. The mission.** The mission subgraph (the timer, the fire
-spreading, the coordinator reading the fire) refines _Mission_. Its worst
-case is 59 ms: the offset of the drones.
+**Step 1. The mission.** The mission subgraph refines _Mission_ (every
+behavior of the three reactions meets it): it delays the drones by at
+most 59 ms, its worst case. This is the offset of step 2.
 
 <p align="center">
   <img src="images/mission-refines-mission.png" alt="The mission subgraph inside Mission, the refinement green" width="786">
   <br>
-  <em>Step 1: the mission subgraph inside Mission (y0 = 59): ⪯ green.</em>
+  <em>Step 1: the mission subgraph inside Mission (y0 = 59).</em>
 </p>
 
-**Step 2. The bound holds.** The pipeline of a drone refines _Available_
-with `lam = 400`. One optimization over its behaviors gives the worst
-case, 280 ms: 59 ms of offset, 55 ms for the drone to report its cell,
-33 ms for the coordinator to assign a target and 8 ms for the controller
-to take it, 72 ms to plan, and 53 ms to send the move.
+**Step 2. The bound holds.** The pipeline refines _Available_ with
+`lam = 400`. One optimization over all its behaviors gives the worst
+case, 280 ms: 59 ms of offset, 55 to report the cell, 33 to assign a
+target and 8 to take it, 72 to plan, and 53 to send the move. By hand
+this means following the longest path through the waits.
 
-**Step 3. A faster timer fails.** The pipeline does not refine _Fast_.
-The counterexample gives each event a time; on the ports, the drone
-timer is released 59 ms late and the move starts 251 ms after its
+**Step 3. A faster timer fails.** The pipeline does not refine _Fast_,
+which asks for 250 ms. The counterexample gives each event a time: the
+drone timer starts 59 ms late and the move starts 251 ms after its
 timestamp.
 
 <p align="center">
@@ -61,10 +74,10 @@ timestamp.
 </p>
 
 **Step 4. Repair.** `repair` changes one named constant as little as
-possible. On the requirement: `deadline = 280`, a change of 30 ms. On
-the planner: `x_plan = 42`, also 30 ms less, since planning is on the
-longest path. The script checks that the pipeline with `x_plan = 42`
-refines _Fast_.
+possible so that the check passes, and proves that no smaller change
+works. On the requirement: `deadline = 280`, 30 ms more. On the planner:
+`x_plan = 42`, 30 ms less, since planning is on the longest path. The
+pipeline with `x_plan = 42` refines _Fast_.
 
 <p align="center">
   <img src="images/repair-deadline-or-plan.png" alt="Find repairs: deadline 250 to 280, or x_plan 72 to 42, both optimal">
@@ -72,10 +85,13 @@ refines _Fast_.
   <em>Step 4: deadline 250 to 280, or x_plan 72 to 42, both optimal.</em>
 </p>
 
-**Step 5. The margins.** Under the bound of 400 ms, repair as
+**Step 5. The margins.** Under the bound of 400 ms, repair as an
 optimization gives the slowest planner, `x_plan = 192` ms, and the
-largest delay of the mission, `offset = 179` ms: both 120 ms more than
+largest delay of the mission, `offset = 179` ms: each 120 ms more than
 now, the slack of step 2.
+
+The tags of the pictures are explained on the page
+[Diagrams](https://chase-cps.github.io/interfaces/diagrams/#what-is-drawn).
 
 ### Run it
 
