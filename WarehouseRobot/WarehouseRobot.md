@@ -55,7 +55,7 @@ the counterexample the reported clearance is 0.4 while the true one is
 <p align="center">
   <img src="images/step2-missiononly-does-not-refine-q.png" alt="Step 2: MissionOnly inside Q, red, with the counterexample">
   <br>
-  <em>Step 2: <em>MissionOnly</em> does not refine Q; the counterexample on the wires.</em>
+  <em>Step 2: MissionOnly does not refine Q; the counterexample on the wires.</em>
 </p>
 
 **Step 3. With margins for the errors.** _Margins_ adds the errors of
@@ -65,7 +65,7 @@ it turns at `|w| = 1.2`, and the robot reaches the worker.
 <p align="center">
   <img src="images/step3-margins-does-not-refine-q.png" alt="Step 3: Margins inside Q, red, with the counterexample">
   <br>
-  <em>Step 3: <em>Margins</em> does not refine Q.</em>
+  <em>Step 3: Margins does not refine Q.</em>
 </p>
 
 **Step 4. With the yaw rate.** _Dispatched_ is _Margins_ with the bound
@@ -76,7 +76,7 @@ simulation.
 <p align="center">
   <img src="images/step4-dispatched-refines-q.png" alt="Step 4: Dispatched inside Q, green">
   <br>
-  <em>Step 4: <em>Dispatched</em> refines Q.</em>
+  <em>Step 4: Dispatched refines Q.</em>
 </p>
 
 ### Run it

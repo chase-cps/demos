@@ -108,6 +108,26 @@
         }
       }
     },
+    "Fast": {
+      "feasible": {
+        "key": "47e349a8d502a097",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.0,
+        "at": "2026-10-31T20:47:50",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "d_dk": 0,
+              "d_s3": 0,
+              "t_dk": 0,
+              "t_s3": 0
+            }
+          ]
+        }
+      }
+    },
     "FireSpread": {
       "feasible": {
         "key": "740f2bc9638103cf",
@@ -293,6 +313,48 @@
       "tool": "z3",
       "seconds": 0.0,
       "at": "2026-10-31T20:14:34"
+    },
+    {
+      "key": "a49bb752d75525f3",
+      "check": "refines",
+      "refined": "DroneTick+DroneSim2+Assign+Target+Plan+Grant+Move+DroneSim3",
+      "abstract": "Fast",
+      "result": "invalid",
+      "tool": "z3",
+      "seconds": 0.0,
+      "at": "2026-10-31T20:47:50",
+      "failed": "guarantees",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "T_a3": -104,
+            "T_a4": -53,
+            "T_c2": -96,
+            "T_c3": -53,
+            "T_c4": 0,
+            "T_dk": -192,
+            "T_s2": -137,
+            "T_s3": 0,
+            "d_a3": -137,
+            "d_a4": -53,
+            "d_c2": -104,
+            "d_c3": -96,
+            "d_c4": -53,
+            "d_dk": -192,
+            "d_s2": -192,
+            "d_s3": 0,
+            "t_a3": -251,
+            "t_a4": -251,
+            "t_c2": -251,
+            "t_c3": -251,
+            "t_c4": -251,
+            "t_dk": -251,
+            "t_s2": -251,
+            "t_s3": -251
+          }
+        ]
+      }
     },
     {
       "key": "59fe1a3b06f94496",

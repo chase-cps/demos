@@ -1,14 +1,14 @@
 {
-  "file": "thermostat.c",
+  "file": "tank.c",
   "chase": "0.6.2",
   "contracts": {
-    "heat_per_area": {
+    "flow": {
       "feasible": {
-        "key": "fd86c2469fac04a3",
+        "key": "0573f4013c86213a",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T20:14:32",
+        "at": "2026-10-31T20:57:38",
         "trace": {
           "prefix": [],
           "loop": [
@@ -17,19 +17,19 @@
         }
       }
     },
-    "thermostat": {
+    "pump": {
       "feasible": {
-        "key": "c44fa483b084beba",
+        "key": "83cd3fa1cc9245a8",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T20:14:32",
+        "at": "2026-10-31T20:57:38",
         "trace": {
           "prefix": [],
           "loop": [
             {
-              "T": 0,
-              "thermostat_out": 3
+              "level": 0,
+              "pump_out": 0
             }
           ]
         }
@@ -38,34 +38,34 @@
   },
   "relations": [
     {
-      "key": "97eda6e63ef333d6",
+      "key": "47ebb334321e3e01",
       "check": "implementation",
-      "model": "thermostat.c:heat_per_area",
-      "contract": "heat_per_area",
+      "model": "tank.c:flow",
+      "contract": "flow",
       "result": "invalid",
       "tool": "esbmc",
       "seconds": 0.11,
-      "at": "2026-10-31T20:14:33",
+      "at": "2026-10-31T20:57:38",
       "trace": {
         "prefix": [],
         "loop": [
           {
-            "power": -2147483648,
-            "area": -1
+            "liters": -2147483648,
+            "seconds": -1
           }
         ]
       },
-      "reason": "heat_per_area: arithmetic overflow on div (file thermostat.c line 20 column 5 function heat_per_area)"
+      "reason": "flow: arithmetic overflow on div (file tank.c line 25 column 5 function flow)"
     },
     {
-      "key": "c95bb2f7789e6d6f",
+      "key": "73d3c081c90faa68",
       "check": "implementation",
-      "model": "thermostat.c:thermostat",
-      "contract": "thermostat",
+      "model": "tank.c:pump",
+      "contract": "pump",
       "result": "valid",
       "tool": "esbmc",
       "seconds": 0.11,
-      "at": "2026-10-31T20:14:33"
+      "at": "2026-10-31T20:57:38"
     }
   ]
 }

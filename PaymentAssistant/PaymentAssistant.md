@@ -14,9 +14,9 @@ refine the contract of the parent? If not, which sub-agent must do what?
   also says "never pay" is inconsistent; the core is two clauses.
 
 <p align="center">
-  <img src="images/overview-plan-and-quotient.png" alt="The plan (⪯ red), the quotient Q3 with Text inside (⪯ green), and the parent with the slip">
+  <img src="images/overview-plan-and-quotient.png" alt="The plan (⪯ red), and the parent with the quotient Q3 and Text inside (⪯ green)">
   <br>
-  <em>The plan of the sub-agents, the quotient Q3 with <em>Text</em> inside it, and the parent with the slip.</em>
+  <em>The plan of the sub-agents (⪯ red), and the parent with the quotient Q3, Text inside it (⪯ green).</em>
 </p>
 
 The task is 530b157_1 of [AppWorld](https://arxiv.org/abs/2407.18901): pay
@@ -48,7 +48,7 @@ refines Q3, so the plan refines the parent.
 <p align="center">
   <img src="images/step3-text-refines-q3.png" alt="Step 2: Text inside Q3, with F paid and F text3; the tag ⪯ of Q3 green">
   <br>
-  <em>Step 2: <em>Text</em>, with <code>F text3</code> and the assumption <code>F paid</code>, refines Q3.</em>
+  <em>Step 2: Text, with <code>F text3</code> and the assumption <code>F paid</code>, refines Q3.</em>
 </p>
 
 **Step 3. A clause against the request.** If the parent also says "never

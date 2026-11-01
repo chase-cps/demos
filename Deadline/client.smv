@@ -1,0 +1,9 @@
+-- A client as a state machine: it may ask at any step, and once it asks it
+-- keeps asking until it is granted.
+MODULE main
+IVAR
+  grant : boolean;
+VAR
+  req : boolean;
+ASSIGN
+  next(req) := (req & !grant) ? TRUE : {TRUE, FALSE};

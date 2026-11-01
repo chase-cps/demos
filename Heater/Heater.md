@@ -11,6 +11,8 @@ threshold works, and does the C code of the thermostat implement it?
   case is then 0. If the requirement may change instead: `tmax = 77`.
 - C code: checked by ESBMC one call at a time, it implements the
   repaired thermostat, not the original one.
+- Between the samples: with 20 s a step, `theta = 74` is not shown to
+  hold at every instant; `theta = 71` is.
 
 <p align="center">
   <img src="images/before-and-after-repair.png" alt="Before the repair (red) and after it (green)">
@@ -19,7 +21,8 @@ threshold works, and does the C code of the thermostat implement it?
 </p>
 
 The contracts in `heater.ltl` cover 10 steps, in signal temporal logic in
-discrete time, so z3 checks them. _Room_ starts at 60 degrees and, at
+discrete time, so z3 checks them (the room and the thermostat run one
+step more, for step 5). _Room_ starts at 60 degrees and, at
 each step, gains the heat `u` and loses 1. _Thermostat_ heats (`u = 3`)
 while `T < theta`. _Comfort_ requires `T <= tmax` at every step.
 
@@ -67,6 +70,19 @@ the threshold that the code implements: 74.
   <br>
   <em>Step 4: M ⊨ C fails on T = 75.</em>
 </p>
+
+**Step 5. Between the samples.** A step is a sample taken every 20 s, and
+the temperature changes at most 0.1 degree per second. Between two
+samples it can then move by 2 degrees, so CHASE checks `T + 2 < 75` at
+the samples (Fainekos and Pappas): if that holds, `T <= 75` holds at
+every instant. With `theta = 74` the samples reach 75: the answer is
+unknown, not a counterexample, since the margin is a sufficient
+condition. With `theta = 71` the samples stay at 72 or below, and the
+refinement holds in continuous time.
+
+```
+$> chase-cps check heater.ltl --period 20 --lipschitz T=0.1 theta=0 tmax=0 --refines Room+Thermostat Comfort
+```
 
 ### Run it
 

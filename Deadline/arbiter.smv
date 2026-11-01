@@ -1,0 +1,12 @@
+-- The arbiter of deadline.ltl as a state machine: it counts c = 0, 1, 2,
+-- 0, ... and grants when c = 2, whatever the client asks.
+MODULE main
+IVAR
+  req : boolean;
+VAR
+  c : 0..2;
+  grant : boolean;
+ASSIGN
+  init(c) := 0;
+  next(c) := c = 2 ? 0 : c + 1;
+  grant := c = 2;

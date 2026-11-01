@@ -1,44 +1,38 @@
 {
-  "file": "move.c",
+  "file": "ring.c",
   "chase": "0.6.2",
   "contracts": {
-    "move": {
+    "advance": {
       "feasible": {
-        "key": "78a28e430771a5be",
+        "key": "2be95d1957d4e0bd",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T20:14:32",
+        "at": "2026-10-31T20:57:38",
         "trace": {
           "prefix": [],
           "loop": [
             {
-              "g": 0,
-              "nx": 0,
-              "ny": 0,
-              "x": 0,
-              "y": 0
+              "i": 7,
+              "ni": 0
             }
           ]
         }
       }
     },
-    "move_fast": {
+    "advance_fast": {
       "feasible": {
-        "key": "a36ff084f469f433",
+        "key": "7e460c3815dd7a5a",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T20:14:32",
+        "at": "2026-10-31T20:57:38",
         "trace": {
           "prefix": [],
           "loop": [
             {
-              "g": 0,
-              "nx": 0,
-              "ny": 0,
-              "x": 0,
-              "y": 0
+              "i": 0,
+              "ni": 0
             }
           ]
         }
@@ -47,33 +41,30 @@
   },
   "relations": [
     {
-      "key": "88020219c30dd8f7",
+      "key": "b97d1b0c16aa6b35",
       "check": "implementation",
-      "model": "move.c:move",
-      "contract": "move",
+      "model": "ring.c:advance",
+      "contract": "advance",
       "result": "valid",
       "tool": "esbmc",
-      "seconds": 0.12,
-      "at": "2026-10-31T20:14:32"
+      "seconds": 0.11,
+      "at": "2026-10-31T20:57:38"
     },
     {
-      "key": "d4e93b552c178504",
+      "key": "086cbb97f56384a9",
       "check": "implementation",
-      "model": "move.c:move_fast",
-      "contract": "move_fast",
+      "model": "ring.c:advance_fast",
+      "contract": "advance_fast",
       "result": "invalid",
       "tool": "esbmc",
       "seconds": 0.11,
-      "at": "2026-10-31T20:14:32",
+      "at": "2026-10-31T20:57:39",
       "trace": {
         "prefix": [],
         "loop": [
           {
-            "x": 9,
-            "y": 8,
-            "g": 1,
-            "nx": 10,
-            "ny": 8
+            "i": 7,
+            "ni": 8
           }
         ]
       }

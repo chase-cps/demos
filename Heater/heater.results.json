@@ -7,8 +7,8 @@
         "key": "f0781624961495a5",
         "result": "sat",
         "tool": "z3",
-        "seconds": 0.02,
-        "at": "2026-10-31T20:14:55",
+        "seconds": 0.0,
+        "at": "2026-10-31T20:57:39",
         "trace": {
           "prefix": [
             {
@@ -52,11 +52,11 @@
     },
     "Room": {
       "feasible": {
-        "key": "d592dcdfd466e45f",
+        "key": "b025202cd10e5b03",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T20:14:55",
+        "at": "2026-10-31T20:57:39",
         "trace": {
           "prefix": [
             {
@@ -98,11 +98,15 @@
             {
               "T": 51,
               "u": 0
+            },
+            {
+              "T": 50,
+              "u": 0
             }
           ],
           "loop": [
             {
-              "T": 50,
+              "T": 49,
               "u": 0
             }
           ]
@@ -111,13 +115,17 @@
     },
     "Thermostat": {
       "feasible": {
-        "key": "a04e3d5fe1e6cd4e",
+        "key": "e4853964532ebccd",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T20:14:55",
+        "at": "2026-10-31T20:57:39",
         "trace": {
           "prefix": [
+            {
+              "T": 0,
+              "u": 3
+            },
             {
               "T": 0,
               "u": 3
@@ -167,14 +175,14 @@
   },
   "relations": [
     {
-      "key": "e311cb9d55420246",
+      "key": "062547e3e7a1345e",
       "check": "implementation",
       "model": "heater.c:thermostat",
       "contract": "Thermostat",
       "result": "invalid",
       "tool": "esbmc",
-      "seconds": 0.32,
-      "at": "2026-10-31T20:14:55",
+      "seconds": 0.11,
+      "at": "2026-10-31T20:57:39",
       "trace": {
         "prefix": [],
         "loop": [
@@ -186,14 +194,14 @@
       }
     },
     {
-      "key": "a331f2a4a114a658",
+      "key": "d15d9ba15e0e25de",
       "check": "refines",
       "refined": "Room+Thermostat",
       "abstract": "Comfort",
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.01,
-      "at": "2026-10-31T20:14:55",
+      "at": "2026-10-31T20:57:39",
       "failed": "guarantees",
       "trace": {
         "prefix": [
@@ -236,11 +244,15 @@
           {
             "T": 75,
             "u": 3
+          },
+          {
+            "T": 77,
+            "u": 0
           }
         ],
         "loop": [
           {
-            "T": 77,
+            "T": 76,
             "u": 0
           }
         ]

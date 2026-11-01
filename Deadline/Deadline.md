@@ -10,6 +10,9 @@ more than `k` steps?
 - Repair by counterexamples: `k = 2`, the least value, in 2 rounds, each
   candidate checked by nuXmv.
 - The same answer by brute force, checking each `k` from 0 to 9.
+- The arbiter written as a state machine in SMV implements its contract
+  and takes every request (receptive); a client in SMV is checked as its
+  environment.
 
 <p align="center">
   <img src="images/before-and-after-repair.png" alt="Before the repair (k = 1, red) and after it (k = 2, green)">
@@ -50,6 +53,23 @@ with nuXmv gives the same answer.
   <em>Step 2: Find repairs, k picked: 1 to 2, optimal.</em>
 </p>
 
+**Step 3. The arbiter and the client as state machines.** _Arbiter_
+assumes that a request is held until it is granted. `arbiter.smv` writes
+the arbiter in SMV, with `req` as an input (`IVAR`): it implements
+_Arbiter_ (M ⊨ C) and is receptive: it takes every request the
+assumption allows. `refusing.smv` adds `TRANS c = 0 -> !req`: it still
+implements _Arbiter_, but only because it refuses a request after
+`c = 2`, and the receptiveness check says so. On the other side,
+`client.smv` is an environment of _Arbiter_ (E ⊨ A); `impatient.smv`,
+which may stop asking before the grant, is not: its counterexample asks
+at step 0 and stops at step 1.
+
+<p align="center">
+  <img src="images/step3-arbiter-and-clients.png" alt="The arbiter with its state machine, receptive and M ⊨ C green; client E ⊨ A green, impatient E ⊨ A red">
+  <br>
+  <em>Step 3: the arbiter as a state machine, and the two clients.</em>
+</p>
+
 ### Run it
 
 ```
@@ -57,11 +77,15 @@ pip install "chase-cps[z3]"
 chase-cps install nuxmv --accept-license
 python deadline.py --expect
 chase-cps view deadline.ltl --check --serve
+chase-cps check deadline.ltl --recep refusing.smv Arbiter --env impatient.smv Arbiter
 ```
 
 ### Content of the directory
 - `deadline.ltl`: the contracts of the client, the arbiter, the counter of
   the wait, and the requirement;
+- `arbiter.smv`, `refusing.smv`: the arbiter as a state machine, and one
+  that refuses a request;
+- `client.smv`, `impatient.smv`: two clients as state machines;
 - `deadline.py`: the steps with the CHASE Python package;
 - `deadline.results.json`: the results of `chase-cps view --check`;
 - `out/deadline.html`: the diagram before and after the repair.

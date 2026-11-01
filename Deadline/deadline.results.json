@@ -4,23 +4,26 @@
   "contracts": {
     "Arbiter": {
       "feasible": {
-        "key": "3e7e869b6a667ff5",
+        "key": "d1eab95e46fd323c",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-31T20:14:33",
+        "seconds": 0.04,
+        "at": "2026-10-31T20:48:06",
         "trace": {
           "prefix": [],
           "loop": [
             {
+              "req": true,
               "grant": false,
               "c": 0
             },
             {
+              "req": true,
               "grant": false,
               "c": 1
             },
             {
+              "req": true,
               "grant": true,
               "c": 2
             }
@@ -85,14 +88,34 @@
   },
   "relations": [
     {
-      "key": "f4c3c16951ea3aea",
+      "key": "75e79a78cac7c55b",
+      "check": "environment",
+      "model": "client.smv",
+      "contract": "Arbiter",
+      "result": "valid",
+      "tool": "nuxmv/bdd",
+      "seconds": 0.02,
+      "at": "2026-10-31T20:48:06"
+    },
+    {
+      "key": "16aba2cf92358da6",
+      "check": "implementation",
+      "model": "arbiter.smv",
+      "contract": "Arbiter",
+      "result": "valid",
+      "tool": "nuxmv/bdd",
+      "seconds": 0.02,
+      "at": "2026-10-31T20:48:06"
+    },
+    {
+      "key": "f491d513c6511d26",
       "check": "refines",
       "refined": "Client+Arbiter+Wait",
       "abstract": "MaxWait",
       "result": "invalid",
-      "tool": "nuxmv/ic3",
-      "seconds": 0.03,
-      "at": "2026-10-31T20:14:33",
+      "tool": "nuxmv/bdd",
+      "seconds": 0.04,
+      "at": "2026-10-31T20:48:06",
       "failed": "guarantees",
       "trace": {
         "prefix": [],

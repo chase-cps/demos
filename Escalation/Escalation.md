@@ -13,9 +13,9 @@ we show it by checking each module on its own?
   steps; in the whole link, a ping makes the receiver escalate.
 
 <p align="center">
-  <img src="images/overview-link.png" alt="The link inside Functional, the receiver open, and the fast sender (M ⊨ C red)">
+  <img src="images/overview-link.png" alt="The link: Sender and Channel, M ⊨ C green, and the receiver open on the right">
   <br>
-  <em>The link inside Functional (⪯), each module with its RTL (M ⊨ C), and the fast sender, which fails.</em>
+  <em>The link, the composition of the three modules, with its assumptions and guarantees; each module with its RTL (M ⊨ C).</em>
 </p>
 
 The link is a small version of the escalation link of OpenTitan. To
@@ -33,9 +33,9 @@ the receiver implements its contract. The receiver is drawn open: its
 contract and its state machine of 4 states, read from the RTL.
 
 <p align="center">
-  <img src="images/step1-modules.png" alt="Step 1: each module M ⊨ C green; the receiver open with its four states">
+  <img src="images/step1-modules.png" alt="Step 1: the receiver open, M ⊨ C green, with its contract and its four states">
   <br>
-  <em>Step 1: each RTL implements its contract (M ⊨ C); the receiver with its four states.</em>
+  <em>Step 1: the receiver implements its contract (M ⊨ C); its state machine of four states.</em>
 </p>
 
 **Step 2. The composition.** _Sender_ ⊗ _Channel_ ⊗ _Receiver_ refines
@@ -43,12 +43,7 @@ _Functional_ and _Integrity_. The whole RTL, checked directly, meets both
 too. The quotient SenderSlot = Functional / (Channel ⊗ Receiver), the
 weakest contract any sender must meet in this link, is refined by
 _Sender_.
-
-<p align="center">
-  <img src="images/step2-composition.png" alt="Step 2: the three modules inside Functional, the tag ⪯ green">
-  <br>
-  <em>Step 2: the composition of the three modules refines Functional (⪯).</em>
-</p>
+In the diagram, the tag ⪯ of the link is green.
 
 **Step 3. A faster sender.** A sender that pings at every cycle of a ping
 request does not implement _Sender_. In the counterexample of 4 steps, the

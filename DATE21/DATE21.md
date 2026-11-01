@@ -13,9 +13,9 @@ can the coordinator be synthesized?
   states.
 
 <p align="center">
-  <img src="images/overview-all-checks.png" alt="The page of the demo: Mission inside Target (refinement green), Target inside Mission (refinement red), and the whole system with Mission, Coordinator, Move, Turn, Pick, and Place">
+  <img src="images/overview-all-checks.png" alt="Mission inside Target (refinement green), and Target inside Mission (refinement red)">
   <br>
-  <em>The two refinements and the whole system, with the checks of each contract.</em>
+  <em>The two refinements: Mission refines Target (⪯ green), Target does not refine Mission (⪯ red).</em>
 </p>
 
 The arm is the second part of a tutorial at the DATE 2021 University Booth;

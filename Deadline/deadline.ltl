@@ -1,4 +1,5 @@
 # view: --refines Client+Arbiter+Wait MaxWait --open MaxWait
+# view: --implementation arbiter.smv Arbiter --environment client.smv Arbiter
 NAME: deadline;
 
 # A client asks for a resource and keeps asking until it is granted; the
@@ -14,12 +15,13 @@ CONTRACT Client:
     Guarantees:
         G ((req & !grant) -> X req);
 
+# The arbiter assumes that a request is held until it is granted.
 CONTRACT Arbiter:
     input boolean variable req;
     output boolean variable grant;
     output integer (0:2) variable c;
     Assumptions:
-        true;
+        G ((req & !grant) -> X req);
     Guarantees:
         c = 0;
         G ((c < 2) -> (c' = c + 1));

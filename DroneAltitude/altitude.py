@@ -17,6 +17,10 @@ above r + eps. z3 checks them (pip install chase-cps[z3]):
   3. Repair the requirement (with the consent of whoever wrote it): the
      least tolerance is eps = 2.5; or, with eps = 2, the strongest wind is
      wmax = 17/21 (about 0.81). Both checked on each side of the bound.
+  4. Both constants at once, with a cost that weighs them: (eps - 2) +
+     w (1 - wmax), a change of the wind counting w times a change of the
+     tolerance. With w = 2, the repair lowers the wind (wmax = 17/21, cost
+     8/21); with w = 3, it widens the tolerance (eps = 2.5, cost 1/2).
 
 The page out/altitude.html draws the drone inside Hover in a wind of 1
 (red) and with eps = 2.5 (green).
@@ -64,6 +68,13 @@ def main(expect: bool) -> int:
     for name, value, want in (("eps", Fraction(5, 2), "valid"), ("eps", Fraction(249, 100), "invalid"),
                               ("wmax", Fraction(17, 21), "valid"), ("wmax", Fraction(82, 100), "invalid")):
         show(3, f"{name} = {value}", refines(drone, hover.instantiate({name: value})).status, want)
+
+    for w, want in ((2, {"eps": 2, "wmax": Fraction(17, 21)}), (3, {"eps": Fraction(5, 2), "wmax": 1})):
+        # the cost (eps - 2) + w (1 - wmax), written expanded
+        r = repair("refines", drone, hover, parameters={"eps": (2, 10), "wmax": (0, 1)},
+                   minimize=f"eps - 2 + {w} - {w} * wmax")
+        show(4, f"eps and wmax together, a change of the wind weighing {w}", r.values, want)
+        print(f"   cost {r.cost}, optimal {r.optimal}, {r.method} in {r.rounds} rounds")
 
     loose = hover.instantiate({"eps": Fraction(5, 2)}, name="Hover_eps")
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)

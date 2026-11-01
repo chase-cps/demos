@@ -1,5 +1,6 @@
 # view: --refines FireTick+FireSpread+FireStateRx Mission
 # view: --refines DroneTick+DroneSim2+Assign+Target+Plan+Grant+Move+DroneSim3 Available
+# view: --refines DroneTick+DroneSim2+Assign+Target+Plan+Grant+Move+DroneSim3 Fast --open Fast Plan
 NAME: dronetiming;
 
 # The timing of the multi-drone fire suppression (MDFS) of ContrACT (Xiao,
@@ -234,3 +235,18 @@ CONTRACT Available:
         d_dk - t_dk <= offset;
     Guarantees:
         d_s3 - t_s3 <= lam;
+
+# A faster timer, of 250 ms: the drone must move at most deadline after its
+# timestamp, with the same offset.
+CONTRACT Fast:
+    input real variable t_dk;
+    input real variable d_dk;
+    output real variable t_s3;
+    output real variable d_s3;
+    real constant offset 59;
+    real constant deadline 250;
+    Assumptions:
+        t_dk <= d_dk;
+        d_dk - t_dk <= offset;
+    Guarantees:
+        d_s3 - t_s3 <= deadline;

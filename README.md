@@ -19,9 +19,6 @@ They are grouped by the kind of system; the website has the same groups.
   pilot must do.
 - [**LMFSM**][LMFSM]: the Lockheed Martin autopilot: the unrealizable cores
   find the requirements in conflict, fixed one at a time.
-- [**Braking**][BRAKING]: an emergency braking system misses its bound by
-  0.05 ms; repair finds the least change of the bound or of the network
-  delay.
 - [**DATE18**][DATE18]: an aircraft power system in the domain-specific
   language: the bounds as written conflict; relaxed, they are realizable.
 
@@ -34,7 +31,8 @@ They are grouped by the kind of system; the website has the same groups.
 - [**AHB**][AHB]: the AMBA AHB bus arbiter: two viewpoints that cannot be
   merged, the assumption that fixes them, and the arbiter synthesized.
 - [**Deadline**][DEADLINE]: a resource arbiter: the least bound on the
-  waiting time of a request, repaired from counterexamples.
+  waiting time of a request, repaired from counterexamples; the arbiter and
+  its client as state machines in SMV.
 
 ### Software
 
@@ -46,25 +44,23 @@ They are grouped by the kind of system; the website has the same groups.
 ### Drones and robots
 
 - [**DroneAltitude**][DRONEALTITUDE]: a drone climbs in the wind; no climb
-  rate is enough, and repair says what the requirement can ask.
-- [**WarehouseRobot**][WAREHOUSE]: the contract of a controller to delegate,
-  as the quotient by perception and localization.
+  rate is enough, and repair says what the requirement can ask, one
+  constant or two.
 - [**Charger**][CHARGER]: a robot charging station: refinement does not see
   the conflict, realizability does.
 - [**RoboticJoints**][ROBOTICJOINTS]: three joints of a robotic arm, checked
   and synthesized one at a time; the check scales to 8 joints.
-  [**CPSWeek22**][CPSWEEK22] is the same arm as shown at CPS-IoT Week 2022.
 - [**DATE21**][DATE21]: a pick-and-place arm: the mission refines the
   target, and the coordinator is synthesized.
 - [**DroneTiming**][DRONETIMING]: the timing of fire-suppression drones as a
-  linear program: the worst case and the margins.
+  linear program: a faster timer fails, and repair finds the least bound or
+  a faster planner.
 
-### Buildings and factories
+### Buildings
 
-- [**Heater**][HEATER]: a room thermostat: repair finds the threshold, and
-  ESBMC checks its C code.
-- [**FDL2024**][FDL2024]: a factory gate controller: the bays keep their
-  supply when the main conveyors fail.
+- [**Heater**][HEATER]: a room thermostat: repair finds the threshold,
+  ESBMC checks its C code, and the check between the samples holds in
+  continuous time.
 
 The Python scripts use the CHASE Python package, version 0.5.0 or later
 (`pip install chase-cps`; BufferSwap and Escalation with
@@ -77,6 +73,15 @@ and `nuXmv` in the `PATH`. The Docker image of CHASE
 (`ghcr.io/chase-cps/chase`, built from the [chase][CHASE] repository) has
 all of them but nuXmv, whose license does not allow redistribution:
 `chase-cps install nuxmv --accept-license` adds it in a container.
+
+### Other folders
+
+Four folders are in the repository but not on the website: [**Braking**][BRAKING] and
+[**WarehouseRobot**][WAREHOUSE] (their steps are shown by DroneTiming and LiftPlusCruise),
+and FDL2024 and CPSWeek22, added by other authors: [**FDL2024**][FDL2024]
+is a factory gate controller in the domain-specific language, and
+[**CPSWeek22**][CPSWEEK22] the robotic arm as shown at CPS-IoT Week 2022.
+They still run.
 
 [WEB]: https://chase-cps.github.io
 [DATE21]: DATE21/DATE21.md

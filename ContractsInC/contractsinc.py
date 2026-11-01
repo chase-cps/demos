@@ -1,28 +1,29 @@
 """ContractsInC: contracts written in the C file, next to the code.
 
-thermostat.c has the clauses of ESBMC (__ESBMC_requires, __ESBMC_ensures),
-move.c those of CBMC (__CPROVER_requires, __CPROVER_ensures). load_c reads
+tank.c has the clauses of ESBMC (__ESBMC_requires, __ESBMC_ensures),
+ring.c those of CBMC (__CPROVER_requires, __CPROVER_ensures). load_c reads
 each function of a file as a contract (the requires clauses are its
 assumptions, the ensures clauses its guarantees) and the function as its
 implementation; ESBMC (or CBMC) checks the function against it. A function
 with no clause is checked alone: no overflow, division by zero, access out
 of bounds, or failed assert.
 
-  1. thermostat (thermostat.c) meets its contract: it heats while T < 74.
-  2. heat_per_area has no clause; the code alone fails: power / area
-     overflows for power = INT_MIN and area = -1 (and area = 0 divides by
+  1. pump (tank.c) meets its contract: full speed from a level of 80, off
+     below 20.
+  2. flow has no clause; the code alone fails: liters / seconds overflows
+     for liters = INT_MIN and seconds = -1 (and seconds = 0 divides by
      zero).
-  3. move (move.c), the move of a drone of DroneGrid, meets its contract:
-     the drone stays on the grid, and moves right when asked and not at
-     the edge.
-  4. move_fast, without the test at the edge, does not: x = 9, g = 1 gives
-     nx = 10.
+  3. advance (ring.c), the next slot of a ring buffer of 8 slots, meets its
+     contract: the slot stays in the buffer, and is the next one but at the
+     end.
+  4. advance_fast, without the wrap at the end, does not: i = 7 gives
+     ni = 8.
   5. limit (climb.c, in ACSL, the language of Frama-C), the climb rate of
      the drone of DroneAltitude, meets its contract: at most 3 up or down.
   6. limit_loose, with the test of the top written v > 4, does not: v = 4
      gives 4.
 
-The pages out/thermostat.html, out/move.html, and out/climb.html draw each file: each
+The pages out/tank.html, out/ring.html, and out/climb.html draw each file: each
 function is a component with its code (chase-cps view FILE.c --check).
 
     python contractsinc.py
@@ -35,13 +36,13 @@ import sys
 from chase_cps import is_implementation, load_c, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-WANT = {"thermostat": "valid", "heat_per_area": "invalid", "move": "valid", "move_fast": "invalid",
+WANT = {"pump": "valid", "flow": "invalid", "advance": "valid", "advance_fast": "invalid",
         "limit": "valid", "limit_loose": "invalid"}
 
 
 def main(expect: bool) -> int:
     ok = []
-    for step, file in ((1, "thermostat.c"), (3, "move.c"), (5, "climb.c")):
+    for step, file in ((1, "tank.c"), (3, "ring.c"), (5, "climb.c")):
         functions = load_c(os.path.join(HERE, file))
         for k, (name, (contract, function)) in enumerate(functions.items()):
             r = is_implementation(function, contract)

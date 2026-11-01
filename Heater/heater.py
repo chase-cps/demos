@@ -20,6 +20,12 @@ the design with the CHASE Python package (pip install chase-cps[z3]):
      step is a call, so ESBMC (or CBMC) checks one call against the formula
      of one step of Thermostat. Asked the other way, the repair finds the
      theta that the code implements: 74.
+  5. Between the samples: one step is 20 s, and the temperature changes at
+     most 0.1 degree per second (2 degrees per step). With theta = 74 the
+     samples reach 75, and the check in continuous time does not show the
+     refinement (unknown: the margin of 2 degrees is a sufficient
+     condition, not a counterexample). With theta = 71 the samples stay at
+     72 or below, and the refinement holds at every instant.
 
 The page out/heater.html draws the room and the thermostat inside Comfort,
 the thermostat with its C code, with theta = 76 (red) and theta = 74
@@ -34,10 +40,32 @@ Steps 1 to 3 need z3; step 4 needs ESBMC or CBMC.
 import os
 import sys
 
+import tempfile
+
 from chase_cps import (CFunction, Component, System, is_implementation, load_spec, minimize,
-                       refines, repair, viz)
+                       refines, repair, sampled, viz)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+PERIOD, RATES = 20, {"T": 0.1, "theta": 0, "tmax": 0}     # 20 s a step; T changes at most 0.1 degree/s
+
+
+def continuous(theta):
+    """Room and Thermostat refine Comfort at every instant between the
+    samples, with theta (as chase-cps check heater.ltl --period 20
+    --lipschitz T=0.1 tmax=0 --refines Room+Thermostat Comfort)."""
+    with open(os.path.join(HERE, "heater.ltl"), encoding="utf-8") as f:
+        text = f.read().replace("integer constant theta 76;", f"integer constant theta {theta};")
+    read = []
+    for a, g, used in (("show", "known", ("Room", "Thermostat")), ("known", "show", ("Comfort",))):
+        changed, refused = sampled.spec(text, RATES, PERIOD, a, g)    # the parts know their guarantees,
+        assert not set(used) & set(refused), refused                  # the requirement shows its own
+        with tempfile.TemporaryDirectory() as tmp:
+            copy = os.path.join(tmp, "heater.ltl")
+            with open(copy, "w", encoding="utf-8") as f:
+                f.write(changed)
+            read.append(load_spec(copy))
+    parts, req = read
+    return sampled.not_shown(refines(parts["Room"].compose(parts["Thermostat"]), req["Comfort"])).status
 
 
 def main(expect: bool) -> int:
@@ -75,6 +103,8 @@ def main(expect: bool) -> int:
          is_implementation(f, thermostat).status, "invalid")
     r = repair("impl", f, thermostat, parameters={"theta": (0, 200, "int")})
     show(4, "the theta that the code implements", r.values, {"theta": 74})
+    show(5, "with theta = 74, the refinement between the samples (20 s, 0.1 degree/s)", continuous(74), "unknown")
+    show(5, "with theta = 71, the refinement between the samples", continuous(71), "valid")
     # the page: before and after the repair, the thermostat with its code
     pairs = []
     for theta in (76, 74):

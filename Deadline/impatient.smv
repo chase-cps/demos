@@ -1,0 +1,8 @@
+-- A client that may give up: it can stop asking before it is granted.
+MODULE main
+IVAR
+  grant : boolean;
+VAR
+  req : boolean;
+ASSIGN
+  next(req) := {TRUE, FALSE};

@@ -12,9 +12,9 @@ steps. What must the pilot do so that every flight does?
 - _Decel_, which also turns on the hover control, refines Q12.
 
 <p align="center">
-  <img src="images/overview-requirements-and-pilots.png" alt="The requirements, the split of the vehicle, and the pilots inside Q12 and Q06">
+  <img src="images/overview-requirements-and-pilots.png" alt="Reach12: ModeLogic, and the quotient Q12 with the pilot Pilot in it">
   <br>
-  <em>The two deadlines, the split of the vehicle, the three pilots in Q12, and Decel in Q06.</em>
+  <em>The split of the vehicle: ModeLogic, and the quotient Q12, what the pilot must do, with a candidate pilot in it.</em>
 </p>
 
 Lift-Plus-Cruise is a NASA aircraft that hovers on lift rotors and
@@ -54,7 +54,7 @@ in time. _Pilot_ does not refine it: `kias` may stay at 120.
 <p align="center">
   <img src="images/step3-pilot-does-not-refine-q12.png" alt="Step 3: Pilot inside Q12; red, with the counterexample">
   <br>
-  <em>Step 3: <em>Pilot</em> does not refine Q12: <code>kias</code> stays at 120.</em>
+  <em>Step 3: Pilot does not refine Q12: <code>kias</code> stays at 120.</em>
 </p>
 
 **Step 4. A pilot that slows down.** _Slow_ lowers `kias` by 10 per step, but
@@ -63,7 +63,7 @@ never turns the hover control on: it does not refine Q12.
 <p align="center">
   <img src="images/step4-slow-does-not-refine-q12.png" alt="Step 4: Slow inside Q12; red, with the counterexample">
   <br>
-  <em>Step 4: <em>Slow</em> slows down, but never turns the hover control on.</em>
+  <em>Step 4: Slow slows down, but never turns the hover control on.</em>
 </p>
 
 **Step 5. A pilot that turns on the hover control.** _Decel_ also turns
@@ -74,13 +74,13 @@ borne.
 <p align="center">
   <img src="images/step5-decel-refines-q12.png" alt="Step 5: Decel inside Q12; the refinement holds">
   <br>
-  <em>Step 5: <em>Decel</em> refines Q12.</em>
+  <em>Step 5: Decel refines Q12.</em>
 </p>
 
 <p align="center">
   <img src="images/step6-decel-does-not-refine-q06.png" alt="Step 5: Decel inside Q06; red, with the counterexample">
   <br>
-  <em>Step 5: <em>Decel</em> does not refine Q06.</em>
+  <em>Step 5: Decel does not refine Q06.</em>
 </p>
 
 ### Run it

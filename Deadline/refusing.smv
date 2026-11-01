@@ -1,0 +1,15 @@
+-- The same arbiter, written with a constraint on its input: it refuses a
+-- request when c = 0. It still implements the contract (no behavior it
+-- allows breaks it), but only because it refuses inputs.
+MODULE main
+IVAR
+  req : boolean;
+VAR
+  c : 0..2;
+  grant : boolean;
+ASSIGN
+  init(c) := 0;
+  next(c) := c = 2 ? 0 : c + 1;
+  grant := c = 2;
+TRANS
+  c = 0 -> !req;
