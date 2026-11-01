@@ -17,7 +17,7 @@ function be checked alone, not the whole program?
   _CoordinatorSafe_, and `grant_safe` does.
 
 <p align="center">
-  <img src="images/overview-step-before-and-after.png" alt="The step before the fix (Fleet, ⪯ red) and after it (Fleet_safe, ⪯ green)">
+  <img src="images/overview-step-before-and-after.png" alt="The step before the fix (Fleet, ⪯ red) and after it (Fleet_safe, ⪯ green)" width="870">
   <br>
   <em>The step before the fix (⪯ red) and after it (green); each function implements its contract (M ⊨ C).</em>
 </p>
@@ -48,7 +48,7 @@ step; it refines the quotient, and the parts with it refine _Fleet_. The
 code is not looked at yet.
 
 <p align="center">
-  <img src="images/step3-coordinator-safe-refines.png" alt="Step 2: Fleet_safe, the parts with CoordinatorSafe, the tag ⪯ green">
+  <img src="images/step3-coordinator-safe-refines.png" alt="Step 2: Fleet_safe, the parts with CoordinatorSafe, the tag ⪯ green" width="870">
   <br>
   <em>Step 2: the parts with <code>CoordinatorSafe</code> refine <code>Fleet</code>.</em>
 </p>

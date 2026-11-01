@@ -15,7 +15,7 @@ the number of joints?
   counterexample for every number of joints.
 
 <p align="center">
-  <img src="images/overview-three-joints.png" alt="The arm: Joint1, Joint2, and Joint3 inside Joints, each joint with its own ports; every check green">
+  <img src="images/overview-three-joints.png" alt="The arm: Joint1, Joint2, and Joint3 inside Joints, each joint with its own ports; every check green" width="764">
   <br>
   <em>The three joints inside the contract of the arm: each one's assumptions and guarantees can hold together (A∧G), and it is realizable (R); together they refine Joints (⪯).</em>
 </p>
@@ -35,7 +35,7 @@ much). nuXmv proves both formulas. `diagram.sh` draws the same check: all
 green.
 
 <p align="center">
-  <img src="images/step1-joints-refine-arm.png" alt="Step 1: Joints and Joint1 open: the assumptions and the guarantees of one joint and of the arm; the refinement holds">
+  <img src="images/step1-joints-refine-arm.png" alt="Step 1: Joints and Joint1 open: the assumptions and the guarantees of one joint and of the arm; the refinement holds" width="518">
   <br>
   <em>Step 1: Joint1 and Joints open: what one joint and the arm assume and guarantee.</em>
 </p>

@@ -15,7 +15,7 @@ more than `k` steps?
   environment.
 
 <p align="center">
-  <img src="images/before-and-after-repair.png" alt="Before the repair (k = 1, red) and after it (k = 2, green)">
+  <img src="images/before-and-after-repair.png" alt="Before the repair (k = 1, red) and after it (k = 2, green)" width="634">
   <br>
   <em>Before the repair (k = 1, ⪯ red) and after it (k = 2, green).</em>
 </p>
@@ -65,7 +65,7 @@ which may stop asking before the grant, is not: its counterexample asks
 at step 0 and stops at step 1.
 
 <p align="center">
-  <img src="images/step3-arbiter-and-clients.png" alt="The arbiter with its state machine, receptive and M ⊨ C green; client E ⊨ A green, impatient E ⊨ A red">
+  <img src="images/step3-arbiter-and-clients.png" alt="The arbiter with its state machine, receptive and M ⊨ C green; client E ⊨ A green, impatient E ⊨ A red" width="681">
   <br>
   <em>Step 3: the arbiter as a state machine, and the two clients.</em>
 </p>

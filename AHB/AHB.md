@@ -13,7 +13,7 @@ there an arbiter that meets both, and what must it assume of the masters?
 - The controller implements the merge (M ⊨ C).
 
 <p align="center">
-  <img src="images/overview-arbiter.png" alt="Arbiter, the merge of Grant and Lock, realizable; the merge without LA2, unrealizable, with its core in red; and the controller">
+  <img src="images/overview-arbiter.png" alt="Arbiter, the merge of Grant and Lock, realizable; the merge without LA2, unrealizable, with its core in red; and the controller" width="757">
   <br>
   <em>The merge with LA2 (R green), the merge without it (R red, its core in red), and the controller (M ⊨ C).</em>
 </p>
@@ -30,7 +30,7 @@ puts together two viewpoints of one component.
 SystemVerilog Assertions (SVA) of `sva/`, are each realizable.
 
 <p align="center">
-  <img src="images/step1-viewpoints.png" alt="Step 1: Grant and Lock, open inside Arbiter, each realizable">
+  <img src="images/step1-viewpoints.png" alt="Step 1: Grant and Lock, open inside Arbiter, each realizable" width="508">
   <br>
   <em>Step 1: Grant and Lock, each realizable (R).</em>
 </p>
@@ -52,7 +52,7 @@ _Arbiter_ is realizable, and slugs synthesizes a controller. _Arbiter_ is
 also written as SVA in `out/arbiter.sv`.
 
 <p align="center">
-  <img src="images/step3-arbiter.png" alt="Step 3: Arbiter, the merge with LA2, open: its assumptions and guarantees, realizable">
+  <img src="images/step3-arbiter.png" alt="Step 3: Arbiter, the merge with LA2, open: its assumptions and guarantees, realizable" width="465">
   <br>
   <em>Step 3: Arbiter, the merge with LA2, is realizable.</em>
 </p>
@@ -61,7 +61,7 @@ also written as SVA in `out/arbiter.sv`.
 implements _Arbiter_ (M ⊨ C).
 
 <p align="center">
-  <img src="images/step4-controller.png" alt="Step 4: Arbiter and the synthesized controller, which implements it">
+  <img src="images/step4-controller.png" alt="Step 4: Arbiter and the synthesized controller, which implements it" width="268">
   <br>
   <em>Step 4: the controller implements Arbiter (M ⊨ C).</em>
 </p>

@@ -15,7 +15,7 @@ are in conflict?
   contract is realizable, and slugs synthesizes a controller of 97 states.
 
 <p align="center">
-  <img src="images/overview-two-versions.png" alt="The page of the demo: EPS_15ms, open, unrealizable with its core in red; EPS_30ms, realizable">
+  <img src="images/overview-two-versions.png" alt="The page of the demo: EPS_15ms, open, unrealizable with its core in red; EPS_30ms, realizable" width="870">
   <br>
   <em>The two versions of the requirements: as written (R red, the core in red) and relaxed (R green).</em>
 </p>
@@ -52,7 +52,7 @@ guarantees) is realizable, and with `solution.sh` slugs synthesizes a
 controller of 97 states.
 
 <p align="center">
-  <img src="images/step2-relaxed-realizable.png" alt="Step 2: EPS_30ms, realizable, with the states of the generators and contactors as inputs and the commands of the contactors as outputs">
+  <img src="images/step2-relaxed-realizable.png" alt="Step 2: EPS_30ms, realizable, with the states of the generators and contactors as inputs and the commands of the contactors as outputs" width="521">
   <br>
   <em>Step 2: the relaxed requirements are realizable (R).</em>
 </p>

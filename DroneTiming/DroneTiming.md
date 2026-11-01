@@ -16,7 +16,7 @@ what fails, and what is the least change that fixes it?
   mission may delay the drones by up to 179 ms.
 
 <p align="center">
-  <img src="images/before-and-after-repair.png" alt="The end of the pipeline of a drone inside Fast: Plan with x_plan = 72, red; with x_plan = 42, green">
+  <img src="images/before-and-after-repair.png" alt="The end of the pipeline of a drone inside Fast: Plan with x_plan = 72, red; with x_plan = 42, green" width="870">
   <br>
   <em>The end of the pipeline of a drone inside Fast (250 ms): with <code>x_plan = 72</code> (⪯ red), and with the faster planner, <code>x_plan = 42</code> (⪯ green).</em>
 </p>
@@ -38,7 +38,7 @@ spreading, the coordinator reading the fire) refines _Mission_. Its worst
 case is 59 ms: the offset of the drones.
 
 <p align="center">
-  <img src="images/mission-refines-mission.png" alt="The mission subgraph inside Mission, the refinement green">
+  <img src="images/mission-refines-mission.png" alt="The mission subgraph inside Mission, the refinement green" width="786">
   <br>
   <em>Step 1: the mission subgraph inside Mission (y0 = 59): ⪯ green.</em>
 </p>

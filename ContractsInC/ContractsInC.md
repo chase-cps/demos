@@ -32,7 +32,7 @@ pump of a water tank for one call, runs at full speed from a level of 80
 and is off below 20. It meets its contract.
 
 <p align="center">
-  <img src="images/step1-pump-meets-contract.png" alt="pump open, its tag M ⊨ C green">
+  <img src="images/step1-pump-meets-contract.png" alt="pump open, its tag M ⊨ C green" width="322">
   <br>
   <em>Step 1: <code>pump</code> meets the contract read from its clauses.</em>
 </p>

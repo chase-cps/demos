@@ -12,7 +12,7 @@ steps. What must the pilot do so that every flight does?
 - _Decel_, which also turns on the hover control, refines Q12.
 
 <p align="center">
-  <img src="images/overview-requirements-and-pilots.png" alt="Reach12: ModeLogic, and the quotient Q12 with the pilot Pilot in it">
+  <img src="images/overview-requirements-and-pilots.png" alt="Reach12: ModeLogic, and the quotient Q12 with the pilot Pilot in it" width="870">
   <br>
   <em>The split of the vehicle: ModeLogic, and the quotient Q12, what the pilot must do, with a candidate pilot in it.</em>
 </p>
@@ -33,7 +33,7 @@ stays wing borne above 90, then semi wing borne above 30: it cannot hover
 by step 6.
 
 <p align="center">
-  <img src="images/step1-reach06-inconsistent-core.png" alt="Step 1: Vehicle_Reach12, green; Vehicle_Reach06, red, with the terms of the core">
+  <img src="images/step1-reach06-inconsistent-core.png" alt="Step 1: Vehicle_Reach12, green; Vehicle_Reach06, red, with the terms of the core" width="733">
   <br>
   <em>Step 1: consistent with 12 steps, not with 6; the core in red.</em>
 </p>
@@ -42,7 +42,7 @@ by step 6.
 requirements without a deadline.
 
 <p align="center">
-  <img src="images/step2-mode-logic-and-pilot.png" alt="Step 2: Vehicle with Pilot and ModeLogic inside; the refinement holds">
+  <img src="images/step2-mode-logic-and-pilot.png" alt="Step 2: Vehicle with Pilot and ModeLogic inside; the refinement holds" width="661">
   <br>
   <em>Step 2: the split refines the vehicle.</em>
 </p>
@@ -72,7 +72,7 @@ refine Q06 = Reach06 / ModeLogic: at step 6 the vehicle is still semi wing
 borne.
 
 <p align="center">
-  <img src="images/step5-decel-refines-q12.png" alt="Step 5: Decel inside Q12; the refinement holds">
+  <img src="images/step5-decel-refines-q12.png" alt="Step 5: Decel inside Q12; the refinement holds" width="598">
   <br>
   <em>Step 5: Decel refines Q12.</em>
 </p>

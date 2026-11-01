@@ -15,7 +15,7 @@ which, and which arbiter works with the robots?
   refines _ChargingStation_ with no assumption left.
 
 <p align="center">
-  <img src="images/overview-all-checks.png" alt="The five arbiters, and Fair with the robots inside ChargingStation">
+  <img src="images/overview-all-checks.png" alt="The five arbiters, and Fair with the robots inside ChargingStation" width="723">
   <br>
   <em>The five arbiters, and Fair with the robots inside ChargingStation.</em>
 </p>
@@ -44,7 +44,7 @@ with a controller of 18 states, and not vacuous (¬V: it cannot win without
 setting its outputs). `remove_redundant` removes R8, implied by R7.1.
 
 <p align="center">
-  <img src="images/step2-fair-realizable.png" alt="Step 2: Fair, open, realizable and not vacuous">
+  <img src="images/step2-fair-realizable.png" alt="Step 2: Fair, open, realizable and not vacuous" width="192">
   <br>
   <em>Step 2: Fair is realizable (R) and not vacuous (¬V).</em>
 </p>
@@ -78,7 +78,7 @@ feed each other. Composed with discharge, they leave no assumption, and
 refine _ChargingStation_.
 
 <p align="center">
-  <img src="images/step5-arbiter-and-robots.png" alt="Step 5: Fair, Robot1, and Robot2 inside ChargingStation">
+  <img src="images/step5-arbiter-and-robots.png" alt="Step 5: Fair, Robot1, and Robot2 inside ChargingStation" width="532">
   <br>
   <em>Step 5: the composition refines ChargingStation.</em>
 </p>

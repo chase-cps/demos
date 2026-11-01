@@ -14,7 +14,7 @@ what must any buffer in that place satisfy?
   implements _OneFifo_ and _Slot_, not _TwoFifo_.
 
 <p align="center">
-  <img src="images/overview-buffer-swap.png" alt="The old system (⪯ green), OneFifo against TwoFifo (⪯ red), and OneFifo in Slot (⪯ green)">
+  <img src="images/overview-buffer-swap.png" alt="The old system (⪯ green), OneFifo against TwoFifo (⪯ red), and OneFifo in Slot (⪯ green)" width="839">
   <br>
   <em>The old system, OneFifo against TwoFifo, and OneFifo in Slot, the place of the buffer.</em>
 </p>
@@ -31,7 +31,7 @@ composed, refine _Pipeline_, and the RTL of `bsg_two_fifo` implements
 _TwoFifo_.
 
 <p align="center">
-  <img src="images/step1-old-system.png" alt="Step 1: Producer, TwoFifo, and Consumer refine Pipeline; TwoFifo M ⊨ C green">
+  <img src="images/step1-old-system.png" alt="Step 1: Producer, TwoFifo, and Consumer refine Pipeline; TwoFifo M ⊨ C green" width="834">
   <br>
   <em>Step 1: the old system refines Pipeline; the RTL implements TwoFifo.</em>
 </p>
@@ -54,7 +54,7 @@ later, so one entry is enough: _OneFifo_ refines _Slot_, and the system
 with _OneFifo_ refines _Pipeline_.
 
 <p align="center">
-  <img src="images/step3-slot.png" alt="Step 3: Slot, the quotient, with OneFifo inside; the tag ⪯ green">
+  <img src="images/step3-slot.png" alt="Step 3: Slot, the quotient, with OneFifo inside; the tag ⪯ green" width="823">
   <br>
   <em>Step 3: OneFifo refines Slot, the contract of the place.</em>
 </p>
@@ -65,7 +65,7 @@ _TwoFifo_. The script also writes _Slot_ as SVA (`out/slot.sv`), for
 Jasper (`jasper/run.tcl`, not run by the script).
 
 <p align="center">
-  <img src="images/step4-rtl-onefifo.png" alt="Step 4: the RTL of bsg_one_fifo in Slot, M ⊨ C green">
+  <img src="images/step4-rtl-onefifo.png" alt="Step 4: the RTL of bsg_one_fifo in Slot, M ⊨ C green" width="463">
   <br>
   <em>Step 4: the RTL of bsg_one_fifo implements its contract (M ⊨ C).</em>
 </p>

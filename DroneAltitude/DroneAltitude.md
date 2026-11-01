@@ -13,7 +13,7 @@ long enough? If not, is it the controller to change, or the requirement?
 - Both constants at once: a cost that weighs the two changes picks one.
 
 <p align="center">
-  <img src="images/climb-before-and-after.png" alt="The drone inside Hover, before and after the repair">
+  <img src="images/climb-before-and-after.png" alt="The drone inside Hover, before and after the repair" width="844">
   <br>
   <em>The drone inside Hover in a wind of 1 (red), and with eps = 2.5 (green).</em>
 </p>

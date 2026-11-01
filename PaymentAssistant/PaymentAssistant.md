@@ -14,7 +14,7 @@ refine the contract of the parent? If not, which sub-agent must do what?
   also says "never pay" is inconsistent; the core is two clauses.
 
 <p align="center">
-  <img src="images/overview-plan-and-quotient.png" alt="The plan (⪯ red), and the parent with the quotient Q3 and Text inside (⪯ green)">
+  <img src="images/overview-plan-and-quotient.png" alt="The plan (⪯ red), and the parent with the quotient Q3 and Text inside (⪯ green)" width="657">
   <br>
   <em>The plan of the sub-agents (⪯ red), and the parent with the quotient Q3, Text inside it (⪯ green).</em>
 </p>
@@ -46,7 +46,7 @@ asks for the rules of its tools and `F text3`. _Text_ with `F text3`
 refines Q3, so the plan refines the parent.
 
 <p align="center">
-  <img src="images/step3-text-refines-q3.png" alt="Step 2: Text inside Q3, with F paid and F text3; the tag ⪯ of Q3 green">
+  <img src="images/step3-text-refines-q3.png" alt="Step 2: Text inside Q3, with F paid and F text3; the tag ⪯ of Q3 green" width="664">
   <br>
   <em>Step 2: Text, with <code>F text3</code> and the assumption <code>F paid</code>, refines Q3.</em>
 </p>
@@ -56,7 +56,7 @@ pay" (`G !tx2`, _ParentWithSlip_), its contract is inconsistent, and the
 unsat core is the two clauses in conflict: `F tx2` and `G !tx2`.
 
 <p align="center">
-  <img src="images/step4-parent-inconsistent-core.png" alt="Step 3: ParentWithSlip, its tag G red, the clauses F tx2 and G !tx2 in red">
+  <img src="images/step4-parent-inconsistent-core.png" alt="Step 3: ParentWithSlip, its tag G red, the clauses F tx2 and G !tx2 in red" width="223">
   <br>
   <em>Step 3: the inconsistent parent, with the core in red.</em>
 </p>

@@ -14,7 +14,7 @@ corrected, does the pullup come when its requirement says?
 - They refine FSM-001t, its timed version.
 
 <p align="center">
-  <img src="images/overview-all-checks.png" alt="The first requirements, unrealizable; the corrected ones inside Pullup (red) and PullupTimed (green)">
+  <img src="images/overview-all-checks.png" alt="The first requirements, unrealizable; the corrected ones inside Pullup (red) and PullupTimed (green)" width="870">
   <br>
   <em>The first requirements (R red), and the corrected ones inside Pullup (⪯ red) and PullupTimed (⪯ green).</em>
 </p>
@@ -61,7 +61,7 @@ and one beyond, with the pilot not in control and no failure, the pullup
 comes at the fifth step. The composition refines it.
 
 <p align="center">
-  <img src="images/step3-refines-pulluptimed.png" alt="Step 3: Autopilot and Sensor inside PullupTimed; the refinement holds">
+  <img src="images/step3-refines-pulluptimed.png" alt="Step 3: Autopilot and Sensor inside PullupTimed; the refinement holds" width="662">
   <br>
   <em>Step 3: the composition refines PullupTimed.</em>
 </p>

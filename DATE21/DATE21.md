@@ -13,7 +13,7 @@ can the coordinator be synthesized?
   states.
 
 <p align="center">
-  <img src="images/overview-all-checks.png" alt="Mission inside Target (refinement green), and Target inside Mission (refinement red)">
+  <img src="images/overview-all-checks.png" alt="Mission inside Target (refinement green), and Target inside Mission (refinement red)" width="870">
   <br>
   <em>The two refinements: Mission refines Target (⪯ green), Target does not refine Mission (⪯ red).</em>
 </p>
@@ -39,7 +39,7 @@ Both formulas are true: _Mission_ refines _Target_ (it assumes no more
 and guarantees at least as much).
 
 <p align="center">
-  <img src="images/step3-mission-refines-target.png" alt="Step 1: Mission inside Target; Mission refines Target">
+  <img src="images/step3-mission-refines-target.png" alt="Step 1: Mission inside Target; Mission refines Target" width="578">
   <br>
   <em>Step 1: Mission refines Target (⪯ green).</em>
 </p>
@@ -61,7 +61,7 @@ guarantees, and of both. `nuXmv -bmc /tmp/system.smv` finds a run for
 each: the system is compatible and consistent.
 
 <p align="center">
-  <img src="images/step4-whole-system.png" alt="Step 3: Mission, Coordinator, Move, Turn, Pick, and Place wired by their variables, with their checks">
+  <img src="images/step4-whole-system.png" alt="Step 3: Mission, Coordinator, Move, Turn, Pick, and Place wired by their variables, with their checks" width="870">
   <br>
   <em>Step 3: the whole system; the coordinator and the four actions are compatible (A), consistent (G), and realizable (R).</em>
 </p>

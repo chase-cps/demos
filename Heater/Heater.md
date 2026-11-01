@@ -15,7 +15,7 @@ threshold works, and does the C code of the thermostat implement it?
   hold at every instant; `theta = 71` is.
 
 <p align="center">
-  <img src="images/before-and-after-repair.png" alt="Before the repair (red) and after it (green)">
+  <img src="images/before-and-after-repair.png" alt="Before the repair (red) and after it (green)" width="650">
   <br>
   <em>Before the repair (red) and after it (green): the thermostat with its C code.</em>
 </p>

@@ -13,7 +13,7 @@ we show it by checking each module on its own?
   steps; in the whole link, a ping makes the receiver escalate.
 
 <p align="center">
-  <img src="images/overview-link.png" alt="The link: Sender and Channel, M ⊨ C green, and the receiver open on the right">
+  <img src="images/overview-link.png" alt="The link: Sender and Channel, M ⊨ C green, and the receiver open on the right" width="870">
   <br>
   <em>The link, the composition of the three modules, with its assumptions and guarantees; each module with its RTL (M ⊨ C).</em>
 </p>
@@ -33,7 +33,7 @@ the receiver implements its contract. The receiver is drawn open: its
 contract and its state machine of 4 states, read from the RTL.
 
 <p align="center">
-  <img src="images/step1-modules.png" alt="Step 1: the receiver open, M ⊨ C green, with its contract and its four states">
+  <img src="images/step1-modules.png" alt="Step 1: the receiver open, M ⊨ C green, with its contract and its four states" width="870">
   <br>
   <em>Step 1: the receiver implements its contract (M ⊨ C); its state machine of four states.</em>
 </p>
