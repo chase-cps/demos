@@ -48,7 +48,7 @@ import re
 import sys
 import time
 
-from chase_cps import Contract, load_spec, is_consistent, refines, viz
+from chase_cps import Component, Contract, System, load_spec, is_consistent, refines, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "lpc.ltl")
@@ -191,6 +191,13 @@ def main() -> int:
                                 open=[vehicle06, q12, decel],
                                 title="Lift-Plus-Cruise: what the pilot must do"),
                     os.path.join(HERE, "out", "lpc.html"))
+    # the system alone, without the results: the mode logic and the pilot, in
+    # the requirements with the deadline of 12 steps
+    system = System("LiftPlusCruise", [Component("ModeLogic", mode), Component("Pilot", pilot)],
+                    contract=vehicle12)
+    viz.save(viz.diagram(system, open=[vehicle12], results=False,
+                         title="Lift-Plus-Cruise: the mode logic and the pilot"),
+             os.path.join(HERE, "out", "lpc-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 

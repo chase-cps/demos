@@ -167,6 +167,13 @@ def main() -> int:
                                 open=[PARENT, TEXT_FROM_TOOLS, q3, TEXT, slip],
                                 title="Payment assistant agent: decomposing a task"),
                     os.path.join(HERE, "out", "assistant.html"))
+    # the system alone, without the results: the parent and the plan of the sub-agents
+    system = System("Plan", [Component("Messages", MESSAGES), Component("Payment", PAYMENT),
+                             Component("Text", TEXT_FROM_TOOLS), Component("Keep", KEEP)],
+                    contract=PARENT)
+    viz.save(viz.diagram(system, open=[PARENT], results=False,
+                         title="Payment assistant agent: the parent and its sub-agents"),
+             os.path.join(HERE, "out", "assistant-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 

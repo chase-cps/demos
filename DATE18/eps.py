@@ -73,6 +73,11 @@ def main() -> int:
                                 checks=[(eps15, first), (eps30, second)],
                                 open=[eps15], title="Power systems: requirements from patterns"),
                     os.path.join(HERE, "out", "eps.html"))
+    # the system alone, without the results: the controller of the contactors,
+    # its inputs and its outputs
+    viz.save(viz.diagram(eps15, results=False,
+                         title="Aircraft power system: the controller of the contactors"),
+             os.path.join(HERE, "out", "eps-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 

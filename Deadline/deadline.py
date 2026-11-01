@@ -36,7 +36,7 @@ import os
 import sys
 
 from chase_cps import (Component, Model, is_environment, is_implementation, is_receptive, load_spec,
-                       refines, repair, viz)
+                       System, refines, repair, viz)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -100,6 +100,13 @@ def main(expect: bool) -> int:
                                 environments=[(e, box, r) for e, r in envs],
                                 title="Deadline: before and after the repair; the arbiter as a state machine"),
                     os.path.join(HERE, "out", "deadline.html"))
+    # the system alone, without the results: the client, the arbiter, and the
+    # counter of the wait, in the requirement
+    alone = System("Arbitration", [Component(n, c[n]) for n in ("Client", "Arbiter", "Wait")],
+                   contract=bound)
+    viz.save(viz.diagram(alone, open=[bound], results=False,
+                         title="Resource arbiter: the client, the arbiter, and the wait"),
+             os.path.join(HERE, "out", "deadline-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 0 if all(results) or not expect else 1
 

@@ -135,6 +135,11 @@ def main() -> int:
               (merged, r)]
     page = viz.save(viz.diagram(*shown, checks=checks, open=[merged], title="AHB arbiter"),
                     os.path.join(HERE, "out", "arbiter.html"))
+    # the system alone, without the results: the arbiter, the merge of its two
+    # viewpoints, open
+    viz.save(viz.diagram(arbiter, open=[grant, lock], results=False,
+                         title="AHB arbiter: the two viewpoints"),
+             os.path.join(HERE, "out", "arbiter-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 
     if wrong:

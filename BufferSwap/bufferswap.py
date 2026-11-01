@@ -172,6 +172,14 @@ def main() -> int:
                                               (new_fifo, slot, found["slot"])],
                                 open=[slot], title="Buffer swap"),
                     os.path.join(HERE, "out", "bufferswap.html"))
+    # the system alone, without the results: the producer, the two-entry FIFO,
+    # and the consumer, in the requirements of the pipeline
+    alone = System("Pipeline", [Component("Producer", producer),
+                                Component("TwoFifo", two, old_fifo.implementation),
+                                Component("Consumer", consumer)], contract=system)
+    viz.save(viz.diagram(alone, open=[system], results=False,
+                         title="Buffer swap: the producer, the buffer, and the consumer"),
+             os.path.join(HERE, "out", "bufferswap-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 
     if wrong:

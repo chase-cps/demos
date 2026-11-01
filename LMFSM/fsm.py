@@ -35,7 +35,7 @@ import re
 import sys
 import time
 
-from chase_cps import Contract, load_spec, is_realizable, refines, ltl, viz
+from chase_cps import Component, Contract, System, load_spec, is_realizable, refines, ltl, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPEC = os.path.join(HERE, "fsm.ltl")
@@ -168,6 +168,13 @@ def main() -> int:
                                       c["PullupTimed"]],
                                 title="Finite state machine: conflicting requirements"),
                     os.path.join(HERE, "out", "fsm.html"))
+    # the system alone, without the results: the autopilot and the sensor, in
+    # the system requirement
+    system = System("FlightControl", [Component("Autopilot", c["Autopilot"]),
+                                      Component("Sensor", c["Sensor"])], contract=c["Pullup"])
+    viz.save(viz.diagram(system, open=[c["Pullup"]], results=False,
+                         title="Lockheed Martin autopilot: the autopilot and the sensor"),
+             os.path.join(HERE, "out", "fsm-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 1 if args.expect and wrong else 0
 

@@ -145,6 +145,18 @@ def main() -> int:
                                 open=[functional, link.components[2]],
                                 why=[(faster, "M ⊨ C", in_fast, sender)]),
                     os.path.join(HERE, "out", "escalation.html"))
+    # the link with the results of steps 1 and 2, the modules closed
+    viz.save(viz.diagram(link, open=[functional], title="Escalation link: the modules and the link"),
+             os.path.join(HERE, "out", "escalation-link.html"))
+    # the system alone, without the results: the three modules with their RTL,
+    # in the requirement Functional
+    system = System("Link", [Component("Sender", sender, models["Sender"]),
+                             Component("Channel", channel, models["Channel"]),
+                             Component("Receiver", receiver, models["Receiver"])],
+                    contract=functional)
+    viz.save(viz.diagram(system, open=[functional], results=False,
+                         title="Escalation link: the sender, the channel, and the receiver"),
+             os.path.join(HERE, "out", "escalation-system.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
 
     if wrong:
