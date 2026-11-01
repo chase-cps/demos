@@ -1,46 +1,82 @@
 {
   "file": "move.c",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "move": {
       "feasible": {
-        "key": "40eb7f5d430c40d3",
+        "key": "78a28e430771a5be",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T01:02:35"
+        "at": "2026-10-31T20:14:32",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "g": 0,
+              "nx": 0,
+              "ny": 0,
+              "x": 0,
+              "y": 0
+            }
+          ]
+        }
       }
     },
     "move_fast": {
       "feasible": {
-        "key": "7b300b9b73c8d647",
+        "key": "a36ff084f469f433",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T01:02:35"
+        "at": "2026-10-31T20:14:32",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "g": 0,
+              "nx": 0,
+              "ny": 0,
+              "x": 0,
+              "y": 0
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "0a225ae995df9545",
+      "key": "88020219c30dd8f7",
       "check": "implementation",
       "model": "move.c:move",
       "contract": "move",
       "result": "valid",
       "tool": "esbmc",
       "seconds": 0.12,
-      "at": "2026-10-31T01:02:36"
+      "at": "2026-10-31T20:14:32"
     },
     {
-      "key": "dcdd5c3b5fed181b",
+      "key": "d4e93b552c178504",
       "check": "implementation",
       "model": "move.c:move_fast",
       "contract": "move_fast",
       "result": "invalid",
       "tool": "esbmc",
       "seconds": 0.11,
-      "at": "2026-10-31T01:02:36"
+      "at": "2026-10-31T20:14:32",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "x": 9,
+            "y": 8,
+            "g": 1,
+            "nx": 10,
+            "ny": 8
+          }
+        ]
+      }
     }
   ]
 }

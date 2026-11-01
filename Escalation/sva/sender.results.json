@@ -1,14 +1,39 @@
 {
   "file": "sender.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "sender": {
       "feasible": {
-        "key": "dd47fb09d6ff3bd0",
+        "key": "65e436df65c4e9c5",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:04:51"
+        "seconds": 0.03,
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "esc_req": true,
+              "ping_req": false,
+              "resp_n_tx": true,
+              "resp_p_tx": true,
+              "esc_n_tx": true,
+              "esc_p_tx": false,
+              "integ_fail": false,
+              "ping_ok": false
+            },
+            {
+              "esc_req": false,
+              "ping_req": false,
+              "resp_n_tx": true,
+              "resp_p_tx": false,
+              "esc_n_tx": false,
+              "esc_p_tx": true,
+              "integ_fail": true,
+              "ping_ok": false
+            }
+          ]
+        }
       }
     }
   },

@@ -1,14 +1,33 @@
 {
   "file": "pipeline.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "pipeline": {
       "feasible": {
-        "key": "0fc608f7a2550940",
+        "key": "d5eed88b88e1ddd5",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:44"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "data_o": 0,
+              "ready_o": true,
+              "v_i": false,
+              "v_o": true,
+              "yumi_i": true
+            },
+            {
+              "data_o": 0,
+              "ready_o": false,
+              "v_i": false,
+              "v_o": false,
+              "yumi_i": false
+            }
+          ]
+        }
       }
     }
   },

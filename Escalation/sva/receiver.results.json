@@ -1,14 +1,48 @@
 {
   "file": "receiver.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "receiver": {
       "feasible": {
-        "key": "cf09f4b67d73622b",
+        "key": "680835b2781592fc",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:51"
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [
+            {
+              "esc_n_rx": true,
+              "esc_p_rx": true,
+              "esc_req_o": false,
+              "resp_n_rx": false,
+              "resp_p_rx": false
+            }
+          ],
+          "loop": [
+            {
+              "esc_n_rx": false,
+              "esc_p_rx": true,
+              "esc_req_o": false,
+              "resp_n_rx": true,
+              "resp_p_rx": true
+            },
+            {
+              "esc_n_rx": false,
+              "esc_p_rx": true,
+              "esc_req_o": true,
+              "resp_n_rx": true,
+              "resp_p_rx": false
+            },
+            {
+              "esc_n_rx": true,
+              "esc_p_rx": true,
+              "esc_req_o": true,
+              "resp_n_rx": true,
+              "resp_p_rx": false
+            }
+          ]
+        }
       }
     }
   },

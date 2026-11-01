@@ -1,92 +1,232 @@
 {
   "file": "robotic_arm.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Coordinator": {
       "feasible": {
-        "key": "354c438aa9f10f50",
+        "key": "b7415202a2572253",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:50"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "rpick": false,
+              "rplace": false,
+              "picked": false,
+              "placed": false,
+              "adone": false,
+              "pdone": false,
+              "grip": false,
+              "cmd_pick": false,
+              "cmd_place": false
+            },
+            {
+              "rpick": true,
+              "rplace": false,
+              "picked": true,
+              "placed": true,
+              "adone": true,
+              "pdone": true,
+              "grip": true,
+              "cmd_pick": false,
+              "cmd_place": false
+            },
+            {
+              "rpick": true,
+              "rplace": false,
+              "picked": false,
+              "placed": true,
+              "adone": true,
+              "pdone": true,
+              "grip": true,
+              "cmd_pick": false,
+              "cmd_place": false
+            }
+          ]
+        }
       }
     },
     "Mission": {
       "feasible": {
-        "key": "1d268af2e249e722",
+        "key": "aef36f8207b22283",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-30T00:04:50"
+        "seconds": 0.02,
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "picked": false,
+              "placed": false,
+              "rpick": false,
+              "rplace": false,
+              "xtarget": 0,
+              "ytarget": 0,
+              "desired_angle": 0
+            },
+            {
+              "picked": false,
+              "placed": true,
+              "rpick": true,
+              "rplace": false,
+              "xtarget": 0,
+              "ytarget": 0,
+              "desired_angle": 0
+            },
+            {
+              "picked": true,
+              "placed": true,
+              "rpick": false,
+              "rplace": false,
+              "xtarget": 0,
+              "ytarget": 0,
+              "desired_angle": 0
+            }
+          ]
+        }
       }
     },
     "Move": {
       "feasible": {
-        "key": "5e566add34757e8c",
+        "key": "19e620746e7af856",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:50"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "xpos": 0,
+              "ypos": 0,
+              "xtarget": 0,
+              "ytarget": 0,
+              "pdone": true,
+              "move_command": 0
+            }
+          ]
+        }
       }
     },
     "Pick": {
       "feasible": {
-        "key": "6dad2ddc60e97170",
+        "key": "a16915e3c6b66fc2",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:50"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [
+            {
+              "cmd_pick": false,
+              "picked": false,
+              "pick_requested": false,
+              "grip": false
+            },
+            {
+              "cmd_pick": false,
+              "picked": false,
+              "pick_requested": true,
+              "grip": false
+            }
+          ],
+          "loop": [
+            {
+              "cmd_pick": false,
+              "picked": true,
+              "pick_requested": true,
+              "grip": true
+            }
+          ]
+        }
       }
     },
     "Place": {
       "feasible": {
-        "key": "e8b4a0ff5b5ec97a",
+        "key": "3bb6af254050509c",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-30T00:04:50"
+        "seconds": 0.02,
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [
+            {
+              "cmd_place": false,
+              "placed": false,
+              "place_requested": false
+            },
+            {
+              "cmd_place": false,
+              "placed": false,
+              "place_requested": true
+            }
+          ],
+          "loop": [
+            {
+              "cmd_place": false,
+              "placed": true,
+              "place_requested": true
+            }
+          ]
+        }
       }
     },
     "Target": {
       "feasible": {
-        "key": "b88d1952a8f2bda6",
+        "key": "800ab970ce44431c",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:50"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "picked": false,
+              "placed": false,
+              "rpick": false,
+              "rplace": false
+            },
+            {
+              "picked": false,
+              "placed": true,
+              "rpick": true,
+              "rplace": false
+            },
+            {
+              "picked": true,
+              "placed": true,
+              "rpick": false,
+              "rplace": false
+            }
+          ]
+        }
       }
     },
     "Turn": {
       "feasible": {
-        "key": "dd3cd7b9ba586880",
+        "key": "a7a22f49b01f8fcb",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:50"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "desired_angle": 15,
+              "angle": 15,
+              "adone": true,
+              "turn_command": 0
+            }
+          ]
+        }
       }
     }
   },
-  "relations": [
-    {
-      "key": "02179576348c0675",
-      "check": "refines",
-      "refined": "Target",
-      "abstract": "Mission",
-      "result": "invalid",
-      "tool": "nuxmv/ic3",
-      "seconds": 0.04,
-      "at": "2026-10-31T02:03:30",
-      "failed": "guarantees"
-    },
-    {
-      "key": "65c78a6ee200acf7",
-      "check": "refines",
-      "refined": "Mission",
-      "abstract": "Target",
-      "result": "valid",
-      "tool": "nuxmv/ic3",
-      "seconds": 0.04,
-      "at": "2026-10-31T02:03:30"
-    }
-  ]
+  "relations": []
 }

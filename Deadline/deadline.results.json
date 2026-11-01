@@ -1,55 +1,122 @@
 {
   "file": "deadline.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Arbiter": {
       "feasible": {
-        "key": "de466b868b460238",
+        "key": "3e7e869b6a667ff5",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-31T00:21:14"
-      }
-    },
-    "MaxWait": {
-      "feasible": {
-        "key": "1626558f3196023c",
-        "result": "sat",
-        "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-31T00:21:14"
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "grant": false,
+              "c": 0
+            },
+            {
+              "grant": false,
+              "c": 1
+            },
+            {
+              "grant": true,
+              "c": 2
+            }
+          ]
+        }
       }
     },
     "Client": {
       "feasible": {
-        "key": "a032f4cc3fe32147",
+        "key": "ed77b63a5cb5df64",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "grant": true,
+              "req": false
+            }
+          ]
+        }
+      }
+    },
+    "MaxWait": {
+      "feasible": {
+        "key": "b298f57d6ebb4e39",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-31T00:21:14"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "w": 0
+            }
+          ]
+        }
       }
     },
     "Wait": {
       "feasible": {
-        "key": "56a448849bdceab5",
+        "key": "ce2a286baaff3b09",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-31T00:21:14"
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "req": false,
+              "grant": false,
+              "w": 0
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "28cc8f758bd4d91b",
+      "key": "f4c3c16951ea3aea",
       "check": "refines",
       "refined": "Client+Arbiter+Wait",
       "abstract": "MaxWait",
       "result": "invalid",
       "tool": "nuxmv/ic3",
       "seconds": 0.03,
-      "at": "2026-10-31T00:21:14",
-      "failed": "guarantees"
+      "at": "2026-10-31T20:14:33",
+      "failed": "guarantees",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "grant": false,
+            "req": true,
+            "c": 0,
+            "w": 0
+          },
+          {
+            "grant": false,
+            "req": true,
+            "c": 1,
+            "w": 1
+          },
+          {
+            "grant": true,
+            "req": true,
+            "c": 2,
+            "w": 2
+          }
+        ]
+      }
     }
   ]
 }

@@ -1,14 +1,59 @@
 {
   "file": "functional.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "functional": {
       "feasible": {
-        "key": "651a8818c59758bc",
+        "key": "4642f0d4539943fd",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:04:50"
+        "seconds": 0.03,
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "err_en": false,
+              "err_ep": false,
+              "err_rn": false,
+              "err_rp": false,
+              "esc_req": true,
+              "ping_req": false,
+              "esc_req_o": false,
+              "ping_ok": false
+            },
+            {
+              "err_en": false,
+              "err_ep": false,
+              "err_rn": false,
+              "err_rp": false,
+              "esc_req": true,
+              "ping_req": false,
+              "esc_req_o": true,
+              "ping_ok": false
+            },
+            {
+              "err_en": false,
+              "err_ep": false,
+              "err_rn": false,
+              "err_rp": false,
+              "esc_req": false,
+              "ping_req": false,
+              "esc_req_o": true,
+              "ping_ok": false
+            },
+            {
+              "err_en": false,
+              "err_ep": false,
+              "err_rn": false,
+              "err_rp": false,
+              "esc_req": true,
+              "ping_req": false,
+              "esc_req_o": true,
+              "ping_ok": false
+            }
+          ]
+        }
       }
     }
   },

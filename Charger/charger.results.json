@@ -1,81 +1,185 @@
 {
   "file": "charger.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
-    "Fair": {
+    "ChargingStation": {
       "feasible": {
-        "key": "e87a69d97343ca69",
+        "key": "fd417e8b9077ff2a",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.01,
-        "at": "2026-10-30T00:33:28"
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "req1": false,
+              "req2": false,
+              "grant1": true,
+              "grant2": false
+            }
+          ]
+        }
+      }
+    },
+    "Fair": {
+      "feasible": {
+        "key": "30a85967e61b33bd",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "req1": false,
+              "req2": false,
+              "grant1": false,
+              "grant2": false
+            }
+          ]
+        }
       }
     },
     "Greedy": {
       "feasible": {
-        "key": "3a13fbeb8c95241e",
+        "key": "dcf5ec244e1991d8",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:33:28"
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "req1": true,
+              "req2": false,
+              "grant1": false,
+              "grant2": false
+            },
+            {
+              "req1": false,
+              "req2": false,
+              "grant1": true,
+              "grant2": false
+            }
+          ]
+        }
       }
     },
     "Polite": {
       "feasible": {
-        "key": "c090f31575d16898",
+        "key": "2f4263288928613f",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-31T02:13:28"
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "req1": true,
+              "grant1": true,
+              "grant2": false
+            },
+            {
+              "req1": false,
+              "grant1": true,
+              "grant2": false
+            }
+          ]
+        }
       }
     },
     "Pushy": {
       "feasible": {
-        "key": "d9bcb0223cf424ee",
+        "key": "765fa3781efc27be",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:33:28"
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "req1": false,
+              "grant1": true,
+              "grant2": false
+            },
+            {
+              "req1": false,
+              "grant1": false,
+              "grant2": false
+            },
+            {
+              "req1": true,
+              "grant1": true,
+              "grant2": false
+            }
+          ]
+        }
       }
     },
     "Robot1": {
       "feasible": {
-        "key": "74b01c57e60dcf8d",
+        "key": "1d2a92b7b58491bf",
         "result": "sat",
         "tool": "nuxmv/bdd",
-        "seconds": 0.02,
-        "at": "2026-10-30T00:33:28"
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "low1": true,
+              "grant1": false,
+              "req1": false
+            },
+            {
+              "low1": false,
+              "grant1": false,
+              "req1": true
+            }
+          ]
+        }
       }
     },
     "Robot2": {
       "feasible": {
-        "key": "a5f35a68b3bc78ff",
+        "key": "70234b4da4fa6096",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:33:28"
-      }
-    },
-    "ChargingStation": {
-      "feasible": {
-        "key": "fa25e6abdbb7fa2a",
-        "result": "sat",
-        "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-30T00:33:28"
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "low2": true,
+              "grant2": false,
+              "req2": false
+            },
+            {
+              "low2": false,
+              "grant2": false,
+              "req2": true
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "b1982baa90f99d91",
+      "key": "0633402c236fc18c",
       "check": "refines",
       "refined": "Robot1+Robot2+Greedy",
       "abstract": "ChargingStation",
       "result": "valid",
       "tool": "nuxmv/bdd",
-      "seconds": 0.06,
-      "at": "2026-10-31T02:13:28"
+      "seconds": 0.03,
+      "at": "2026-10-31T20:14:31"
     }
   ]
 }

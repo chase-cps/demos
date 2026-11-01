@@ -1,111 +1,255 @@
 {
   "file": "braking.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Brake1": {
       "feasible": {
-        "key": "db69f26d82b4c8ac",
+        "key": "f631cb26250d585c",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_a": 0,
+              "T_b": 0,
+              "d_a": 0,
+              "d_b": 0,
+              "t_a": 0,
+              "t_b": 0
+            }
+          ]
+        }
       }
     },
     "Brake2": {
       "feasible": {
-        "key": "1ca26d0cfb4cb41b",
+        "key": "a57141f114a9d646",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_e": -1,
+              "T_f": 0,
+              "d_e": 0,
+              "d_f": 0,
+              "t_e": 0,
+              "t_f": 0
+            }
+          ]
+        }
       }
     },
     "BrakePedal": {
       "feasible": {
-        "key": "959479c8b86e5e1c",
+        "key": "702b48353ea2fe2f",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_p": 0,
+              "d_p": 0,
+              "t_p": 0
+            }
+          ]
+        }
       }
     },
     "Camera": {
       "feasible": {
-        "key": "3fe9171354db2e46",
+        "key": "6e3576117454abda",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_c": 0,
+              "d_c": 0,
+              "t_c": 0
+            }
+          ]
+        }
       }
     },
     "CameraDelay": {
       "feasible": {
-        "key": "85d8540eb2d18dbd",
+        "key": "14cb639b14c7cce2",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "d_c": 0,
+              "d_e": 0,
+              "d_f": 0,
+              "t_c": 0,
+              "t_e": 0,
+              "t_f": 0
+            }
+          ]
+        }
       }
     },
     "Detection": {
       "feasible": {
-        "key": "6b0448632e205218",
+        "key": "e1cf020b6df5df80",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_c": 0,
+              "T_d": 0,
+              "d_c": 0,
+              "d_d": 0,
+              "t_c": 0,
+              "t_d": 0
+            }
+          ]
+        }
       }
     },
     "Link": {
       "feasible": {
-        "key": "5000c145858b8a72",
+        "key": "7122861ddc8eedbd",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
-      }
-    },
-    "PedalProcessing": {
-      "feasible": {
-        "key": "ba04b5aa84217e07",
-        "result": "sat",
-        "tool": "z3",
-        "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_d": 0,
+              "T_e": 0,
+              "d_d": 0,
+              "d_e": 0,
+              "t_d": -10,
+              "t_e": 0
+            }
+          ]
+        }
       }
     },
     "PedalDeadline": {
       "feasible": {
-        "key": "91af307fdd31a327",
+        "key": "22d9b04d9d5a36c9",
+        "result": "sat",
+        "tool": "z3",
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "d_b": 0,
+              "d_p": 0,
+              "t_b": 0,
+              "t_p": 0
+            }
+          ]
+        }
+      }
+    },
+    "PedalProcessing": {
+      "feasible": {
+        "key": "4856b81e361af70c",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_a": 0,
+              "T_p": 0,
+              "d_a": 0,
+              "d_p": 0,
+              "t_a": 0,
+              "t_p": 0
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "22dc6a26112c906c",
+      "key": "77b81dc3e215a80e",
       "check": "refines",
       "refined": "Camera+Detection+Link+Brake2",
       "abstract": "CameraDelay",
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.0,
-      "at": "2026-10-31T00:21:13",
-      "failed": "guarantees"
+      "at": "2026-10-31T20:14:30",
+      "failed": "guarantees",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "T_c": -10,
+            "T_d": -8,
+            "T_e": 1,
+            "T_f": 1,
+            "d_c": -10,
+            "d_d": -10,
+            "d_e": 0,
+            "d_f": 1,
+            "t_c": -10,
+            "t_d": -10,
+            "t_e": 0,
+            "t_f": 0
+          }
+        ]
+      }
     },
     {
-      "key": "ced3c7d810a84294",
+      "key": "772ca7b2a53f7ad4",
       "check": "refines",
       "refined": "BrakePedal+PedalProcessing+Brake1",
       "abstract": "PedalDeadline",
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.0,
-      "at": "2026-10-31T00:21:13",
-      "failed": "guarantees"
+      "at": "2026-10-31T20:14:30",
+      "failed": "guarantees",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "T_a": 0,
+            "T_b": 0,
+            "T_p": -3,
+            "d_a": -3,
+            "d_b": 0,
+            "d_p": -3.05,
+            "t_a": -4.05,
+            "t_b": -4.05,
+            "t_p": -4.05
+          }
+        ]
+      }
     }
   ]
 }

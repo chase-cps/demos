@@ -1,14 +1,46 @@
 {
   "file": "lock.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "lock": {
       "feasible": {
-        "key": "7fe69d89a09ea4c1",
+        "key": "d6d2fe4edc243197",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:44"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "hbusreq1": true,
+              "hbusreq2": true,
+              "hlock1": true,
+              "hlock2": true,
+              "hgrant1": true,
+              "hgrant2": true,
+              "hmastlock": true
+            },
+            {
+              "hbusreq1": true,
+              "hbusreq2": true,
+              "hlock1": false,
+              "hlock2": false,
+              "hgrant1": true,
+              "hgrant2": true,
+              "hmastlock": false
+            },
+            {
+              "hbusreq1": true,
+              "hbusreq2": true,
+              "hlock1": false,
+              "hlock2": false,
+              "hgrant1": false,
+              "hgrant2": false,
+              "hmastlock": false
+            }
+          ]
+        }
       }
     }
   },

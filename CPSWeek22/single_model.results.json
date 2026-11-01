@@ -1,14 +1,71 @@
 {
   "file": "single_model.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Joints": {
       "feasible": {
-        "key": "13d352f2dd859f8d",
+        "key": "7d956efec62301b6",
         "result": "sat",
         "tool": "nuxmv/ic3",
-        "seconds": 0.16,
-        "at": "2026-10-30T00:04:45"
+        "seconds": 0.17,
+        "at": "2026-10-31T20:14:31",
+        "trace": {
+          "prefix": [
+            {
+              "j1_dangle": 4,
+              "j1_angle": 4,
+              "j2_dangle": 4,
+              "j2_angle": 0,
+              "j3_dangle": 4,
+              "j3_angle": 3,
+              "j1_cmd": 0,
+              "j2_cmd": 0,
+              "j3_cmd": 0,
+              "req_j1": false,
+              "req_j2": false,
+              "req_j3": false,
+              "j1_done": true,
+              "j2_done": false,
+              "j3_done": false
+            }
+          ],
+          "loop": [
+            {
+              "j1_dangle": 1,
+              "j1_angle": 1,
+              "j2_dangle": 1,
+              "j2_angle": 1,
+              "j3_dangle": 3,
+              "j3_angle": 3,
+              "j1_cmd": 0,
+              "j2_cmd": 0,
+              "j3_cmd": 0,
+              "req_j1": false,
+              "req_j2": false,
+              "req_j3": true,
+              "j1_done": true,
+              "j2_done": true,
+              "j3_done": true
+            },
+            {
+              "j1_dangle": 1,
+              "j1_angle": 1,
+              "j2_dangle": 1,
+              "j2_angle": 1,
+              "j3_dangle": 3,
+              "j3_angle": 3,
+              "j1_cmd": 0,
+              "j2_cmd": 0,
+              "j3_cmd": 0,
+              "req_j1": true,
+              "req_j2": true,
+              "req_j3": false,
+              "j1_done": true,
+              "j2_done": true,
+              "j3_done": true
+            }
+          ]
+        }
       }
     }
   },

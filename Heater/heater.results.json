@@ -1,56 +1,250 @@
 {
   "file": "heater.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Comfort": {
       "feasible": {
-        "key": "06cf6e8191124bc1",
+        "key": "f0781624961495a5",
         "result": "sat",
         "tool": "z3",
-        "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "seconds": 0.02,
+        "at": "2026-10-31T20:14:55",
+        "trace": {
+          "prefix": [
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            },
+            {
+              "T": 0
+            }
+          ],
+          "loop": [
+            {
+              "T": 0
+            }
+          ]
+        }
       }
     },
     "Room": {
       "feasible": {
-        "key": "7d129e67f471e8b3",
+        "key": "d592dcdfd466e45f",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:55",
+        "trace": {
+          "prefix": [
+            {
+              "T": 60,
+              "u": 0
+            },
+            {
+              "T": 59,
+              "u": 0
+            },
+            {
+              "T": 58,
+              "u": 0
+            },
+            {
+              "T": 57,
+              "u": 0
+            },
+            {
+              "T": 56,
+              "u": 0
+            },
+            {
+              "T": 55,
+              "u": 0
+            },
+            {
+              "T": 54,
+              "u": 0
+            },
+            {
+              "T": 53,
+              "u": 0
+            },
+            {
+              "T": 52,
+              "u": 0
+            },
+            {
+              "T": 51,
+              "u": 0
+            }
+          ],
+          "loop": [
+            {
+              "T": 50,
+              "u": 0
+            }
+          ]
+        }
       }
     },
     "Thermostat": {
       "feasible": {
-        "key": "90a60696e942e57f",
+        "key": "a04e3d5fe1e6cd4e",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:13"
+        "at": "2026-10-31T20:14:55",
+        "trace": {
+          "prefix": [
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            },
+            {
+              "T": 0,
+              "u": 3
+            }
+          ],
+          "loop": [
+            {
+              "T": 0,
+              "u": 3
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "91c3e3149f56973a",
+      "key": "e311cb9d55420246",
       "check": "implementation",
-      "model": "/Users/yifengxiao/Documents/dependencies/demos/Heater/heater.c:thermostat",
+      "model": "heater.c:thermostat",
       "contract": "Thermostat",
       "result": "invalid",
       "tool": "esbmc",
-      "seconds": 0.11,
-      "at": "2026-10-31T00:21:13"
+      "seconds": 0.32,
+      "at": "2026-10-31T20:14:55",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "T": 75,
+            "u": 0
+          }
+        ]
+      }
     },
     {
-      "key": "8b82bc5e177708c1",
+      "key": "a331f2a4a114a658",
       "check": "refines",
       "refined": "Room+Thermostat",
       "abstract": "Comfort",
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.01,
-      "at": "2026-10-31T00:21:13",
-      "failed": "guarantees"
+      "at": "2026-10-31T20:14:55",
+      "failed": "guarantees",
+      "trace": {
+        "prefix": [
+          {
+            "T": 60,
+            "u": 3
+          },
+          {
+            "T": 62,
+            "u": 3
+          },
+          {
+            "T": 64,
+            "u": 3
+          },
+          {
+            "T": 66,
+            "u": 3
+          },
+          {
+            "T": 68,
+            "u": 3
+          },
+          {
+            "T": 70,
+            "u": 3
+          },
+          {
+            "T": 72,
+            "u": 3
+          },
+          {
+            "T": 74,
+            "u": 3
+          },
+          {
+            "T": 76,
+            "u": 0
+          },
+          {
+            "T": 75,
+            "u": 3
+          }
+        ],
+        "loop": [
+          {
+            "T": 77,
+            "u": 0
+          }
+        ]
+      }
     }
   ]
 }

@@ -1,46 +1,73 @@
 {
   "file": "climb.c",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "limit": {
       "feasible": {
-        "key": "1ddffb4cb85b87bc",
+        "key": "97eabcf231758b4e",
         "result": "sat",
         "tool": "z3",
-        "seconds": 0.0,
-        "at": "2026-10-31T02:30:04"
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:32",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "limit_out": 0,
+              "v": 4
+            }
+          ]
+        }
       }
     },
     "limit_loose": {
       "feasible": {
-        "key": "375457354a1ebc09",
+        "key": "79c9dd7588914566",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T02:30:04"
+        "at": "2026-10-31T20:14:32",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "limit_loose_out": 0,
+              "v": 4
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "e5c1df31547baff5",
+      "key": "9a995ca35375e312",
       "check": "implementation",
       "model": "climb.c:limit",
       "contract": "limit",
       "result": "valid",
       "tool": "esbmc",
-      "seconds": 0.11,
-      "at": "2026-10-31T02:30:04"
+      "seconds": 0.31,
+      "at": "2026-10-31T20:14:32"
     },
     {
-      "key": "72b969dce68c7e15",
+      "key": "ca03c78ee4004270",
       "check": "implementation",
       "model": "climb.c:limit_loose",
       "contract": "limit_loose",
       "result": "invalid",
       "tool": "esbmc",
       "seconds": 0.11,
-      "at": "2026-10-31T02:30:04"
+      "at": "2026-10-31T20:14:32",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "v": 4,
+            "limit_loose_out": 4
+          }
+        ]
+      }
     }
   ]
 }

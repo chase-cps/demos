@@ -1,14 +1,28 @@
 {
   "file": "consumer.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "consumer": {
       "feasible": {
-        "key": "72a1c575129d9658",
+        "key": "dfba97dbcd007c20",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:44"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [
+            {
+              "v_o": true,
+              "yumi_i": true
+            }
+          ],
+          "loop": [
+            {
+              "v_o": false,
+              "yumi_i": false
+            }
+          ]
+        }
       }
     }
   },

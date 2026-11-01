@@ -1,14 +1,33 @@
 {
   "file": "channel.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "channel": {
       "feasible": {
-        "key": "d4728b4960a7d4dc",
+        "key": "ea2f4c942048a5dd",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:50"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "err_en": true,
+              "err_ep": true,
+              "err_rn": true,
+              "err_rp": true,
+              "esc_n_tx": true,
+              "esc_p_tx": true,
+              "resp_n_rx": true,
+              "resp_p_rx": true,
+              "esc_n_rx": false,
+              "esc_p_rx": false,
+              "resp_n_tx": false,
+              "resp_p_tx": false
+            }
+          ]
+        }
       }
     }
   },

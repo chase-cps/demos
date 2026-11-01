@@ -1,14 +1,33 @@
 {
   "file": "integrity.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "integrity": {
       "feasible": {
-        "key": "f4824c65290e1076",
+        "key": "bcab8a8531e62810",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:51"
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "err_en": true,
+              "err_ep": true,
+              "err_rn": false,
+              "err_rp": false,
+              "integ_fail": false
+            },
+            {
+              "err_en": true,
+              "err_ep": true,
+              "err_rn": true,
+              "err_rp": true,
+              "integ_fail": false
+            }
+          ]
+        }
       }
     }
   },

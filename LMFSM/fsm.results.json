@@ -1,73 +1,238 @@
 {
   "file": "fsm.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Autopilot": {
       "feasible": {
-        "key": "a0756e88f9a6977c",
+        "key": "09df4637fd78bfc7",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-31T02:13:38"
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "standby": false,
+              "apfail": false,
+              "supported": false,
+              "good": false,
+              "STATE": 0,
+              "MODE": false,
+              "REQUEST": true,
+              "pullup": false
+            }
+          ]
+        }
       }
     },
     "AutopilotFirst": {
       "feasible": {
-        "key": "c0fafdd6bd2a6252",
-        "result": "sat",
-        "tool": "nuxmv/bdd",
-        "seconds": 0.06,
-        "at": "2026-10-31T02:13:38"
-      }
-    },
-    "Sensor": {
-      "feasible": {
-        "key": "a7b2fbe65476fe9c",
+        "key": "c675a4d1976b1e05",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-31T02:13:38"
-      }
-    },
-    "SensorFirst": {
-      "feasible": {
-        "key": "b44845d6256b8b75",
-        "result": "sat",
-        "tool": "nuxmv/bdd",
-        "seconds": 0.01,
-        "at": "2026-10-31T02:13:38"
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "standby": false,
+              "apfail": false,
+              "supported": false,
+              "good": false,
+              "STATE": 0
+            }
+          ]
+        }
       }
     },
     "Pullup": {
       "feasible": {
-        "key": "82368f23509038b4",
+        "key": "2897a28323af6702",
         "result": "sat",
-        "tool": "nuxmv/ic3",
+        "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-31T02:13:38"
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "standby": true,
+              "apfail": false,
+              "supported": false,
+              "limits": false,
+              "pullup": false
+            }
+          ]
+        }
       }
     },
     "PullupTimed": {
       "feasible": {
-        "key": "6744004f2141874c",
+        "key": "82ff901f4dbd5d48",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-31T02:13:38"
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "standby": false,
+              "apfail": false,
+              "supported": false,
+              "limits": true,
+              "pullup": false
+            },
+            {
+              "standby": true,
+              "apfail": false,
+              "supported": false,
+              "limits": false,
+              "pullup": false
+            },
+            {
+              "standby": true,
+              "apfail": false,
+              "supported": false,
+              "limits": false,
+              "pullup": false
+            },
+            {
+              "standby": true,
+              "apfail": false,
+              "supported": false,
+              "limits": false,
+              "pullup": false
+            }
+          ]
+        }
+      }
+    },
+    "Sensor": {
+      "feasible": {
+        "key": "c6ee321e82bcc2c7",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.02,
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [
+            {
+              "limits": false,
+              "MODE": false,
+              "REQUEST": false,
+              "SENSTATE": 0,
+              "good": true
+            }
+          ],
+          "loop": [
+            {
+              "limits": true,
+              "MODE": false,
+              "REQUEST": false,
+              "SENSTATE": 2,
+              "good": false
+            },
+            {
+              "limits": true,
+              "MODE": false,
+              "REQUEST": false,
+              "SENSTATE": 1,
+              "good": true
+            },
+            {
+              "limits": false,
+              "MODE": true,
+              "REQUEST": true,
+              "SENSTATE": 0,
+              "good": true
+            }
+          ]
+        }
+      }
+    },
+    "SensorFirst": {
+      "feasible": {
+        "key": "ed96704377427b4e",
+        "result": "sat",
+        "tool": "nuxmv/bdd",
+        "seconds": 0.01,
+        "at": "2026-10-31T20:14:35",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "limits": false,
+              "MODE": false,
+              "REQUEST": false,
+              "SENSTATE": 0
+            },
+            {
+              "limits": false,
+              "MODE": false,
+              "REQUEST": false,
+              "SENSTATE": 1
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "b3cfa2edfe319760",
+      "key": "b90fa81d59ce2a2b",
       "check": "refines",
       "refined": "Autopilot+Sensor",
       "abstract": "Pullup",
       "result": "invalid",
       "tool": "nuxmv/ic3",
       "seconds": 0.05,
-      "at": "2026-10-31T02:13:38",
-      "failed": "guarantees"
+      "at": "2026-10-31T20:14:35",
+      "failed": "guarantees",
+      "trace": {
+        "prefix": [
+          {
+            "standby": true,
+            "apfail": false,
+            "supported": false,
+            "limits": false,
+            "good": true,
+            "STATE": 0,
+            "MODE": false,
+            "REQUEST": true,
+            "pullup": false,
+            "SENSTATE": 0
+          },
+          {
+            "standby": false,
+            "apfail": false,
+            "supported": true,
+            "limits": true,
+            "good": false,
+            "STATE": 1,
+            "MODE": true,
+            "REQUEST": true,
+            "pullup": false,
+            "SENSTATE": 2
+          }
+        ],
+        "loop": [
+          {
+            "standby": true,
+            "apfail": false,
+            "supported": false,
+            "limits": false,
+            "good": true,
+            "STATE": 3,
+            "MODE": true,
+            "REQUEST": false,
+            "pullup": false,
+            "SENSTATE": 1
+          }
+        ]
+      }
     }
   ]
 }

@@ -1,145 +1,308 @@
 {
   "file": "dronetiming.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Assign": {
       "feasible": {
-        "key": "2750f5dc7818f8eb",
+        "key": "5f6e1c11a8159a98",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_a3": 0,
+              "T_s2": 0,
+              "d_a3": 0,
+              "d_s2": 0,
+              "t_a3": 0,
+              "t_s2": 0
+            }
+          ]
+        }
       }
     },
     "Available": {
       "feasible": {
-        "key": "5ee3cc5f17b87de9",
+        "key": "9172abe49d92889d",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "d_dk": 0,
+              "d_s3": 0,
+              "t_dk": 0,
+              "t_s3": 0
+            }
+          ]
+        }
       }
     },
     "DroneSim2": {
       "feasible": {
-        "key": "b01da644b4d36bfd",
+        "key": "0b19931028bc4e83",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_dk": 0,
+              "T_s2": 0,
+              "d_dk": 0,
+              "d_s2": 0,
+              "t_dk": 0,
+              "t_s2": 0
+            }
+          ]
+        }
       }
     },
     "DroneSim3": {
       "feasible": {
-        "key": "0ee50e9c2eb788c8",
+        "key": "6887a688b0542d9a",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_c4": 0,
+              "T_s2": -1,
+              "T_s3": 0,
+              "d_c4": 0,
+              "d_s3": 0,
+              "t_c4": 0,
+              "t_s3": 0
+            }
+          ]
+        }
       }
     },
     "DroneTick": {
       "feasible": {
-        "key": "e61e3eb13298fca2",
+        "key": "022085d521d784a0",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_dk": 0,
+              "d_dk": 0,
+              "t_dk": 0
+            }
+          ]
+        }
       }
     },
     "FireSpread": {
       "feasible": {
-        "key": "a1f032c90c0fb916",
+        "key": "740f2bc9638103cf",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_fs": 0,
+              "T_ft": 0,
+              "d_fs": 0,
+              "d_ft": 0,
+              "t_fs": 0,
+              "t_ft": 0
+            }
+          ]
+        }
       }
     },
     "FireStateRx": {
       "feasible": {
-        "key": "853af0470c57a4c2",
+        "key": "f25a1bbdfefca9dc",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_fr": 0,
+              "T_fs": 0,
+              "d_fr": 0,
+              "d_fs": 0,
+              "t_fr": 0,
+              "t_fs": 0
+            }
+          ]
+        }
       }
     },
     "FireTick": {
       "feasible": {
-        "key": "28ed21b90c04b64b",
+        "key": "784be3f68e1a61a9",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_ft": 0,
+              "d_ft": 0,
+              "t_ft": 0
+            }
+          ]
+        }
       }
     },
     "Grant": {
       "feasible": {
-        "key": "1d6c7d6c1b3001c0",
+        "key": "d42608d12d27fe86",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_a3": -1,
+              "T_a4": 0,
+              "T_c3": 0,
+              "d_a4": 0,
+              "d_c3": 0,
+              "t_a4": 0,
+              "t_c3": 0
+            }
+          ]
+        }
       }
     },
     "Mission": {
       "feasible": {
-        "key": "0782b98da7a3b210",
+        "key": "81fc01afd7e6c6a3",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "d_fr": 0,
+              "d_ft": 0,
+              "t_fr": 0,
+              "t_ft": 0
+            }
+          ]
+        }
       }
     },
     "Move": {
       "feasible": {
-        "key": "ec1023136667dcbb",
+        "key": "f23fa272d8b5a795",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_a4": 0,
+              "T_c3": -1,
+              "T_c4": 0,
+              "d_a4": 0,
+              "d_c4": 0,
+              "t_a4": 0,
+              "t_c4": 0
+            }
+          ]
+        }
       }
     },
     "Plan": {
       "feasible": {
-        "key": "15030cca37a50764",
+        "key": "13f9d8bd6fc94793",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_c2": 0,
+              "T_c3": 0,
+              "T_s2": -1,
+              "d_c3": 0,
+              "d_s2": 0,
+              "t_c3": 0,
+              "t_s2": 0
+            }
+          ]
+        }
       }
     },
     "Target": {
       "feasible": {
-        "key": "e7e3e32892338431",
+        "key": "65b2649afb69767d",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:15"
+        "at": "2026-10-31T20:14:34",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T_a3": 0,
+              "T_c2": 0,
+              "d_a3": 0,
+              "d_c2": 0,
+              "t_a3": 0,
+              "t_c2": 0
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "3ddbca050d722c5c",
+      "key": "04617b9b081ba074",
       "check": "refines",
       "refined": "DroneTick+DroneSim2+Assign+Target+Plan+Grant+Move+DroneSim3",
       "abstract": "Available",
       "result": "valid",
       "tool": "z3",
       "seconds": 0.0,
-      "at": "2026-10-31T00:21:15"
+      "at": "2026-10-31T20:14:34"
     },
     {
-      "key": "59e264c587408c60",
+      "key": "59fe1a3b06f94496",
       "check": "refines",
       "refined": "FireTick+FireSpread+FireStateRx",
       "abstract": "Mission",
       "result": "valid",
       "tool": "z3",
       "seconds": 0.0,
-      "at": "2026-10-31T00:21:15"
+      "at": "2026-10-31T20:14:34"
     }
   ]
 }

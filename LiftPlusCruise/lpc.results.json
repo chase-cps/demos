@@ -1,32 +1,121 @@
 {
   "file": "lpc.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Reach06": {
       "feasible": {
-        "key": "ff7d6f0e31c4a957",
+        "key": "b2c8ebf6334d42b5",
         "result": "sat",
         "tool": "z3",
-        "seconds": 0.03,
-        "at": "2026-10-31T02:10:39"
+        "seconds": 0.0,
+        "at": "2026-10-31T20:14:36",
+        "trace": {
+          "prefix": [
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            }
+          ],
+          "loop": [
+            {
+              "lift_mode": 0
+            }
+          ]
+        }
       }
     },
     "Reach12": {
       "feasible": {
-        "key": "89555a0f2522e69c",
+        "key": "152bc6288b3db062",
         "result": "sat",
         "tool": "z3",
-        "seconds": 0.01,
-        "at": "2026-10-31T02:10:39"
+        "seconds": 0.0,
+        "at": "2026-10-31T20:14:36",
+        "trace": {
+          "prefix": [
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            },
+            {
+              "lift_mode": 0
+            }
+          ],
+          "loop": [
+            {
+              "lift_mode": 0
+            }
+          ]
+        }
       }
     },
     "Vehicle": {
       "feasible": {
-        "key": "99d9c4131dc531a8",
+        "key": "49cc99aff8bc1793",
         "result": "sat",
-        "tool": "nuxmv/bmc",
-        "seconds": 0.05,
-        "at": "2026-10-31T02:10:39"
+        "tool": "nuxmv/ic3",
+        "seconds": 0.03,
+        "at": "2026-10-31T20:14:36",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "kias": 120,
+              "kgs": 120,
+              "hover_control_mode": false,
+              "lift_mode": 3
+            },
+            {
+              "kias": 120,
+              "kgs": 120,
+              "hover_control_mode": false,
+              "lift_mode": 3
+            }
+          ]
+        }
       }
     }
   },

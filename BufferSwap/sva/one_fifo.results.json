@@ -1,14 +1,34 @@
 {
   "file": "one_fifo.sv",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "one_fifo": {
       "feasible": {
-        "key": "3a5a812e138348ab",
+        "key": "c00b1680f4b95dc6",
         "result": "sat",
         "tool": "nuxmv/bdd",
         "seconds": 0.02,
-        "at": "2026-10-30T00:04:44"
+        "at": "2026-10-31T20:14:30",
+        "trace": {
+          "prefix": [
+            {
+              "v_i": true,
+              "yumi_i": true,
+              "data_o": 0,
+              "ready_o": false,
+              "v_o": true
+            }
+          ],
+          "loop": [
+            {
+              "v_i": false,
+              "yumi_i": false,
+              "data_o": 0,
+              "ready_o": true,
+              "v_o": false
+            }
+          ]
+        }
       }
     }
   },

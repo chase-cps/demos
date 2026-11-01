@@ -1,46 +1,71 @@
 {
   "file": "thermostat.c",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "heat_per_area": {
       "feasible": {
-        "key": "474708cf6fe7f0d4",
+        "key": "fd86c2469fac04a3",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T01:02:35"
+        "at": "2026-10-31T20:14:32",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {}
+          ]
+        }
       }
     },
     "thermostat": {
       "feasible": {
-        "key": "826dd521c37daa95",
+        "key": "c44fa483b084beba",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T01:02:35"
+        "at": "2026-10-31T20:14:32",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "T": 0,
+              "thermostat_out": 3
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "c4dfc3207dec8365",
+      "key": "97eda6e63ef333d6",
       "check": "implementation",
       "model": "thermostat.c:heat_per_area",
       "contract": "heat_per_area",
       "result": "invalid",
       "tool": "esbmc",
       "seconds": 0.11,
-      "at": "2026-10-31T01:02:35"
+      "at": "2026-10-31T20:14:33",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "power": -2147483648,
+            "area": -1
+          }
+        ]
+      },
+      "reason": "heat_per_area: arithmetic overflow on div (file thermostat.c line 20 column 5 function heat_per_area)"
     },
     {
-      "key": "3be2153196358d8a",
+      "key": "c95bb2f7789e6d6f",
       "check": "implementation",
       "model": "thermostat.c:thermostat",
       "contract": "thermostat",
       "result": "valid",
       "tool": "esbmc",
-      "seconds": 0.12,
-      "at": "2026-10-31T01:02:35"
+      "seconds": 0.11,
+      "at": "2026-10-31T20:14:33"
     }
   ]
 }

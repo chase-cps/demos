@@ -1,132 +1,260 @@
 {
   "file": "dronegrid.ltl",
-  "chase": "0.5.0",
+  "chase": "0.6.2",
   "contracts": {
     "Coordinator": {
       "feasible": {
-        "key": "3b71250e8982b2bf",
+        "key": "7fd4c7e473f168ec",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:17"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "fx0": 9,
+              "fx1": 9,
+              "fy0": 0,
+              "fy1": 0,
+              "g0": 1,
+              "g1": 0,
+              "r0": 1,
+              "r1": 1,
+              "x0": 9,
+              "x1": 9,
+              "y0": 0,
+              "y1": 0
+            }
+          ]
+        }
       }
     },
     "CoordinatorSafe": {
       "feasible": {
-        "key": "d79b1f34b45b021a",
+        "key": "eef7bfefc2229f2c",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.01,
-        "at": "2026-10-31T00:21:17"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "fx0": 0,
+              "fx1": 2,
+              "fy0": 1,
+              "fy1": 0,
+              "g0": 3,
+              "g1": 1,
+              "r0": 3,
+              "r1": 1,
+              "x0": 0,
+              "x1": 1,
+              "y0": 0,
+              "y1": 0
+            }
+          ]
+        }
       }
     },
     "Fleet": {
       "feasible": {
-        "key": "2b980c75bf51b0fe",
+        "key": "06fbf90898f09ccf",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:17"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "nx0": 0,
+              "nx1": 0,
+              "ny0": 0,
+              "ny1": 1,
+              "x0": 0,
+              "x1": 0,
+              "y0": 2,
+              "y1": 0
+            }
+          ]
+        }
       }
     },
     "Move0": {
       "feasible": {
-        "key": "16906d436d14f8b0",
+        "key": "d9c8e0d35dce1cd6",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:17"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "g0": 1,
+              "nx0": 1,
+              "ny0": 0,
+              "x0": 0,
+              "y0": 0
+            }
+          ]
+        }
       }
     },
     "Move1": {
       "feasible": {
-        "key": "317db2826724f2a2",
+        "key": "045020b8943e1476",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:17"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "g1": 3,
+              "nx1": 0,
+              "ny1": 1,
+              "x1": 0,
+              "y1": 0
+            }
+          ]
+        }
       }
     },
     "Plan0": {
       "feasible": {
-        "key": "523004a96155bf07",
+        "key": "1e8674243d2542ac",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:17"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "r0": 2,
+              "tx0": 0,
+              "ty0": 0,
+              "x0": 1,
+              "y0": 1
+            }
+          ]
+        }
       }
     },
     "Plan1": {
       "feasible": {
-        "key": "f81d37c98fef556e",
+        "key": "5ce988343d242421",
         "result": "sat",
         "tool": "z3",
         "seconds": 0.0,
-        "at": "2026-10-31T00:21:17"
+        "at": "2026-10-31T20:14:33",
+        "trace": {
+          "prefix": [],
+          "loop": [
+            {
+              "r1": 2,
+              "tx1": 0,
+              "ty1": 0,
+              "x1": 1,
+              "y1": 1
+            }
+          ]
+        }
       }
     }
   },
   "relations": [
     {
-      "key": "dbb472c636e7b76c",
+      "key": "c326ce41861238f5",
       "check": "implementation",
-      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/coordinator.c:grant",
+      "model": "coordinator.c:grant",
       "contract": "Coordinator",
       "result": "valid",
       "tool": "esbmc",
-      "seconds": 0.13,
-      "at": "2026-10-31T00:21:17"
+      "seconds": 0.14,
+      "at": "2026-10-31T20:14:34"
     },
     {
-      "key": "e5f45f31592c7ef4",
+      "key": "3ad11b5fafce093f",
       "check": "implementation",
-      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/move.c:move0",
+      "model": "move.c:move0",
       "contract": "Move0",
       "result": "valid",
       "tool": "esbmc",
       "seconds": 0.12,
-      "at": "2026-10-31T00:21:17"
+      "at": "2026-10-31T20:14:34"
     },
     {
-      "key": "9be217ce41780d18",
+      "key": "54cfb27b3239cf69",
       "check": "implementation",
-      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/move.c:move1",
+      "model": "move.c:move1",
       "contract": "Move1",
       "result": "valid",
       "tool": "esbmc",
       "seconds": 0.12,
-      "at": "2026-10-31T00:21:17"
+      "at": "2026-10-31T20:14:34"
     },
     {
-      "key": "d77f5bd20fcd2964",
+      "key": "9e7a5a8511f98124",
       "check": "implementation",
-      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/plan.c:plan0",
+      "model": "plan.c:plan0",
       "contract": "Plan0",
       "result": "valid",
       "tool": "esbmc",
       "seconds": 0.12,
-      "at": "2026-10-31T00:21:17"
+      "at": "2026-10-31T20:14:34"
     },
     {
-      "key": "11dd694ce23bd7e6",
+      "key": "b235416894115e2d",
       "check": "implementation",
-      "model": "/Users/yifengxiao/Documents/dependencies/demos/DroneGrid/plan.c:plan1",
+      "model": "plan.c:plan1",
       "contract": "Plan1",
       "result": "valid",
       "tool": "esbmc",
       "seconds": 0.11,
-      "at": "2026-10-31T00:21:17"
+      "at": "2026-10-31T20:14:34"
     },
     {
-      "key": "474cf89fb2232490",
+      "key": "3889d0be7da6e66e",
       "check": "refines",
       "refined": "Plan0+Plan1+Coordinator+Move0+Move1",
       "abstract": "Fleet",
       "result": "invalid",
       "tool": "z3",
       "seconds": 0.06,
-      "at": "2026-10-31T00:21:17",
-      "failed": "guarantees"
+      "at": "2026-10-31T20:14:34",
+      "failed": "guarantees",
+      "trace": {
+        "prefix": [],
+        "loop": [
+          {
+            "fx0": 0,
+            "fx1": 0,
+            "fy0": 9,
+            "fy1": 9,
+            "g0": 3,
+            "g1": 0,
+            "nx0": 0,
+            "nx1": 0,
+            "ny0": 9,
+            "ny1": 9,
+            "r0": 3,
+            "r1": 0,
+            "tx0": 0,
+            "tx1": 0,
+            "ty0": 9,
+            "ty1": 9,
+            "x0": 0,
+            "x1": 0,
+            "y0": 8,
+            "y1": 9
+          }
+        ]
+      }
     }
   ]
 }
