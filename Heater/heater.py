@@ -123,4 +123,7 @@ def main(expect: bool) -> int:
 
 
 if __name__ == "__main__":
+    import importlib.util
+    if importlib.util.find_spec("z3") is None:      # the repair and the formulas over reals
+        sys.exit('This demo needs z3: pip install "chase-cps[z3]"')
     sys.exit(main("--expect" in sys.argv))
