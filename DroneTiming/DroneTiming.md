@@ -78,7 +78,7 @@ is too wide to be drawn next to it. The orange chip marks a constant of
 the requirement.
 
 <p align="center">
-  <img src="images/repair-deadline-or-plan.png" alt="The panel of the check of Fast: the counterexample, and the two repairs: x_plan 72 to 42, or deadline 250 to 280" width="360">
+  <img src="images/repair-deadline-or-plan.png" alt="The panel of the check of Fast: the counterexample, and the two repairs: x_plan 72 to 42, or deadline 250 to 280" width="280">
   <br>
   <em>Steps 3 and 4: the panel of the check of Fast, the counterexample at the top, the two repairs at the bottom.</em>
 </p>

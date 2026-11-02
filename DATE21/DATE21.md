@@ -25,6 +25,8 @@ contracts fit together, that is, can their assumptions and guarantees all
 hold? And can the coordinator be built from its contract? These are the
 checks to run before writing any code for the arm.
 
+<div style="max-width: 560px; margin: 0 auto" markdown>
+
 ```mermaid
 flowchart LR
   Mission -- "rpick, rplace" --> Coordinator
@@ -39,6 +41,8 @@ flowchart LR
   Pick -- picked --> Mission
   Place -- placed --> Mission
 ```
+
+</div>
 _The system: the mission planner, the coordinator, and the four actions, with the signals between them._
 
 ### The steps

@@ -36,7 +36,7 @@ refinement only compares formulas (every behavior allowed by the parts
 is allowed by the system) and does not ask whether a part can exist.
 
 <p align="center">
-  <img src="images/step1-greedy-unrealizable.png" alt="Step 1: Greedy, unrealizable, with its core in red">
+  <img src="images/step1-greedy-unrealizable.png" alt="Step 1: Greedy, unrealizable, with its core in red" width="600">
   <br>
   <em>Step 1: the core of Greedy in red.</em>
 </p>
