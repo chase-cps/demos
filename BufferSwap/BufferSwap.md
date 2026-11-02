@@ -19,7 +19,7 @@ and what must any buffer in that place satisfy? Answering from the
 contracts avoids checking the whole circuit again for every candidate.
 
 <p align="center">
-  <img src="images/system-pipeline.png" alt="The pipeline: Producer, TwoFifo with its Verilog, and Consumer, inside the requirement Pipeline" width="838">
+  <img src="images/system-pipeline.png" alt="The pipeline: Producer, TwoFifo with its Verilog, and Consumer, inside the requirement Pipeline" width="828">
   <br>
   <em>The system: the producer, the buffer, and the consumer, inside the requirement Pipeline.</em>
 </p>
@@ -33,10 +33,11 @@ how to read them.
 **Step 1. The old system.** _Producer_, _TwoFifo_, and _Consumer_,
 composed,
 [refine](https://chase-cps.github.io/contracts/checks/#verification-tasks)
-_Pipeline_, and the Verilog of `bsg_two_fifo` implements _TwoFifo_ (M ⊨ C).
+_Pipeline_, and the Verilog of `bsg_two_fifo` implements _TwoFifo_ (M ⊨ C:
+the code meets the contract).
 
 <p align="center">
-  <img src="images/step1-old-system.png" alt="Step 1: Producer, TwoFifo, and Consumer refine Pipeline; TwoFifo M ⊨ C green" width="834">
+  <img src="images/step1-old-system.png" alt="Step 1: Producer, TwoFifo, and Consumer refine Pipeline; TwoFifo M ⊨ C green" width="822">
   <br>
   <em>Step 1: the old system refines Pipeline; the Verilog implements TwoFifo.</em>
 </p>
@@ -49,7 +50,7 @@ In the counterexample of 4 steps, the empty buffer takes a value at step
 <p align="center">
   <img src="images/step2-onefifo-counterexample.png" alt="Step 2: OneFifo does not refine TwoFifo; the counterexample in the panel, the broken guarantee in red">
   <br>
-  <em>Step 2: OneFifo does not refine TwoFifo; the guarantee it breaks in red.</em>
+  <em>Step 2: OneFifo does not refine TwoFifo; the guarantee it breaks in red. The M ⊨ C of OneFifo is against its own contract.</em>
 </p>
 
 **Step 3. What the place needs.** CHASE computes the
@@ -59,24 +60,29 @@ contract any buffer in that place must meet, derived from the contracts.
 It has 3 assumptions and 3 guarantees. _Slot_ may assume what the
 consumer guarantees, that an offer is taken sooner or later
 (`G (v_o -> F yumi_i)`), so one entry is enough: _OneFifo_ refines _Slot_,
-and the system with _OneFifo_ refines _Pipeline_.
+and the system with _OneFifo_ refines _Pipeline_ (the script checks it; not
+drawn). In the diagram, the subtitle of _Pipeline_ marks the place with ?,
+and "candidate: OneFifo" names the part tried in it.
 
 <p align="center">
-  <img src="images/step3-slot.png" alt="Step 3: Slot, the quotient, with OneFifo inside; the tag ⪯ green" width="823">
+  <img src="images/step3-slot.png" alt="Step 3: Pipeline with Producer, Consumer, and Slot, the quotient Pipeline / (Producer ⊗ Consumer), with OneFifo inside; the tag ⪯ of Slot green" width="814">
   <br>
   <em>Step 3: OneFifo refines Slot, the contract of the place.</em>
 </p>
 
 **Step 4. On the Verilog.** The Verilog of `bsg_one_fifo` implements
-_OneFifo_ and _Slot_, and does not implement _TwoFifo_. The script also
+_OneFifo_ and _Slot_, and does not implement _TwoFifo_. The contract of
+_OneFifo_ has the guarantee `G (!v_o | !ready_o)`: with one entry, the
+buffer is not ready while it holds a value. The state machine of the
+Verilog has too many states to draw. The script also
 writes _Slot_ as SVA (`out/slot.sv`), so that a commercial tool such as
 Jasper can check any new buffer against it (`jasper/run.tcl`, not run by
 the script).
 
 <p align="center">
-  <img src="images/step4-rtl-onefifo.png" alt="Step 4: the RTL of bsg_one_fifo in Slot, M ⊨ C green" width="463">
+  <img src="images/step4-rtl-onefifo.png" alt="Step 4: Pipeline with the contract of OneFifo open in Slot; OneFifo M ⊨ C green" width="872">
   <br>
-  <em>Step 4: the Verilog of bsg_one_fifo implements its contract (M ⊨ C).</em>
+  <em>Step 4: the contract of OneFifo, open in the place of Slot; the Verilog of bsg_one_fifo implements it (M ⊨ C).</em>
 </p>
 
 ### Run it

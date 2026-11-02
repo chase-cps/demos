@@ -18,7 +18,7 @@ can it at least be checked for overflow? The same file then serves the
 C checker and the contracts of a whole system.
 
 <p align="center">
-  <img src="images/system.png" alt="tank.c drawn: pump with the terms read from its clauses, and flow, with no clause" width="338">
+  <img src="images/system.png" alt="tank.c drawn: pump with the terms read from its clauses, and flow, with no clause" width="321">
   <br>
   <em>The system of <code>tank.c</code>: <code>pump</code>, with the terms read from its clauses, and <code>flow</code>, with none.</em>
 </p>
@@ -26,32 +26,35 @@ C checker and the contracts of a whole system.
 ### The steps
 
 **Step 1. The pump meets its contract.** `pump` (clauses of ESBMC) runs
-at full speed (3) from a level of 80 and is off below 20. ESBMC proves
-that every call within the assumed levels, 0 to 100, gives back what the
-contract asks, in about 0.1 s (the tag M ⊨ C).
+at full speed (3) from a level of 80 and is off below 20. Its function
+button shows the code with its clauses. ESBMC proves that every call
+within the assumed levels, 0 to 100, gives back what the contract asks
+(the tag M ⊨ C: the code meets the contract). The tag A∧G says that the
+terms can hold together.
 
 <p align="center">
-  <img src="images/step1-pump-meets-contract.png" alt="pump open, its tag M ⊨ C green" width="322">
+  <img src="images/step1-pump-meets-contract.png" alt="The code of pump with its ESBMC clauses, over the box of pump, its tags A∧G and M ⊨ C green" width="480">
   <br>
-  <em>Step 1: <code>pump</code> meets the contract read from its clauses.</em>
+  <em>Step 1: the code of <code>pump</code> with its clauses; <code>pump</code> meets the contract read from them (M ⊨ C).</em>
 </p>
 
 **Step 2. Code with no clause.** `flow` divides the liters by the
-seconds. With no contract, it is checked for overflow, division by zero,
-and failed asserts (the tag `safe`). `liters / seconds` overflows for
-`liters = -2147483648`, `seconds = -1`; the panel gives the line.
+seconds. It has no clause: its contract is (⊤, ⊤). M ⊨ C still asks
+the code not to overflow, divide by zero, or go out of bounds;
+`liters / seconds` overflows for `liters = -2147483648`, `seconds = -1`,
+and the panel gives the line.
 
 <p align="center">
-  <img src="images/step2-flow-unsafe.png" alt="The tag safe of flow red: the call on its ports, the overflow on line 25">
+  <img src="images/step2-flow-unsafe.png" alt="flow open, its contract (⊤, ⊤), its tag M ⊨ C red: the call on its ports, the overflow on line 25 in the panel">
   <br>
-  <em>Step 2: <code>flow</code> is not safe code.</em>
+  <em>Step 2: <code>flow</code> does not meet even the contract (⊤, ⊤): its division overflows.</em>
 </p>
 
 **Step 3. The ring buffer, with and without the wrap.** `advance`
 (clauses of CBMC) gives the next slot of a ring buffer of 8 slots, and
 meets its contract. `advance_fast` does not wrap at the end: the slot
-`i = 7` gives `ni = 8`, and the term `ni <= 7` is red. The failing call
-is on the ports, ready to replay.
+`i = 7` gives `ni = 8`, and the term `ni <= 7` is red. The values of the
+failing call are on the ports.
 
 <p align="center">
   <img src="images/step3-advance-fast-fails.png" alt="advance green; advance_fast red: i = 7 gives ni = 8, the term ni <= 7 red">

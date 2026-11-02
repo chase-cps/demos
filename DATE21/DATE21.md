@@ -12,7 +12,8 @@ has seven contracts in LTL over Booleans and small integers:
   also the target position (`xtarget`, `ytarget`) and the angle
   (`desired_angle`) for each phase;
 - _Coordinator_: commands the pick and the place (`cmd_pick`,
-  `cmd_place`) once the arm is in position and turned;
+  `cmd_place`) once the arm is in position and turned; it reads `grip`
+  from _Pick_ (the gripper holds the piece);
 - _Move_, _Turn_, _Pick_, _Place_: the four actions of the arm, which
   report `pdone`, `adone`, `picked`, `placed`.
 
@@ -45,7 +46,8 @@ _The system: the mission planner, the coordinator, and the four actions, with th
 **Step 1. The mission refines the target.** _Mission_ refines _Target_:
 it assumes no more and guarantees at least as much, for every behavior.
 The console runs the commands of `solution.script` and writes the checks
-for nuXmv, which finds both formulas true:
+for nuXmv, which finds both formulas (the assumptions and the guarantees)
+true:
 
 ```
 $> logics_tool -i specs/robotic_arm.ltl -o /tmp/ -c solution.script
@@ -53,9 +55,9 @@ $> nuXmv /tmp/MT.smv
 ```
 
 <p align="center">
-  <img src="images/step3-mission-refines-target.png" alt="Step 1: Mission inside Target; Mission refines Target" width="578">
+  <img src="images/step3-mission-refines-target.png" alt="Step 1: Mission inside Target; Mission refines Target" width="565">
   <br>
-  <em>Step 1: Mission refines Target (⪯ green).</em>
+  <em>Step 1: Mission refines Target (⪯ green). The tags A, G, and R of each contract say that it is compatible, consistent, and realizable (steps 3 and 4).</em>
 </p>
 
 **Step 2. The other direction.** The reverse check shows that _Mission_
@@ -67,7 +69,7 @@ counterexample the piece is picked at step 1, and at step 2 `xtarget`,
 them.
 
 <p align="center">
-  <img src="images/step3-target-does-not-refine-mission.png" alt="Step 2: Target inside Mission; the refinement fails, the guarantees of Mission that fail in red, and the counterexample in the panel at step 2">
+  <img src="images/step3-target-does-not-refine-mission.png" alt="Step 2: Target inside Mission; the refinement fails, the guarantees of Mission that fail in red, and the counterexample in the panel and on the wires at step 2">
   <br>
   <em>Step 2: Target does not refine Mission; the counterexample at step 2.</em>
 </p>
@@ -83,6 +85,12 @@ writes the coordinator for slugs, which finds it realizable (a
 controller exists for every behavior of the arm and the mission) and
 synthesizes one of 128 states. By hand this controller would be written
 and then tested; here it comes from its contract.
+
+<p align="center">
+  <img src="images/step34-whole-system.png" alt="Steps 3 and 4: System, the six contracts composed, with its tags A and G green; Coordinator with its tag R green">
+  <br>
+  <em>Steps 3 and 4: the system is compatible (A) and consistent (G), and the coordinator is realizable (R).</em>
+</p>
 
 The tags of the pictures are explained on the page
 [Diagrams](https://chase-cps.github.io/interfaces/diagrams/#what-is-drawn).
@@ -100,4 +108,5 @@ sh diagram.sh
 - `specs/robotic_arm.ltl`: the seven contracts;
 - `specs/requirements_1.txt`, `specs/template_0_*.txt`: the power system;
 - `solution.script`: the commands of the console;
-- `diagram.sh`: draws `out/robotic_arm.html`, the diagrams above.
+- `diagram.sh`: draws `out/robotic_arm.html`, the diagrams of steps 1
+  and 2, and `out/robotic_arm-whole.html`, the system of steps 3 and 4.

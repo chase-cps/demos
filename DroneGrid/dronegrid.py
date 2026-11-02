@@ -26,7 +26,9 @@ or CBMC for the C code):
      the C code keeps the drones apart, shown one function at a time.
 
 The page out/dronegrid.html draws the step before and after the fix: each
-function is a component with its C code inside Fleet.
+function is a component with its C code inside Fleet. The page
+out/dronegrid-quotient.html draws the quotient CoordinatorNeeds twice, with
+Coordinator, then CoordinatorSafe, in its hole.
 
     python dronegrid.py
     python dronegrid.py --expect     # exit code 1 when a result is not the expected one
@@ -70,9 +72,9 @@ def main(expect: bool) -> int:
     # what the coordinator must do: the quotient of Fleet by the other parts
     others = c["Plan0"].compose(c["Plan1"]).compose(c["Move0"]).compose(c["Move1"])
     needs = c["Fleet"].divide(others, name="CoordinatorNeeds")
-    show(3, "Coordinator refines the quotient Fleet / (the other parts)",
-         refines(c["Coordinator"], needs).status, "invalid")
-    show(3, "CoordinatorSafe refines it", refines(c["CoordinatorSafe"], needs).status, "valid")
+    in_hole = [(c[name], needs, refines(c[name], needs)) for name in ("Coordinator", "CoordinatorSafe")]
+    show(3, "Coordinator refines the quotient Fleet / (the other parts)", in_hole[0][2].status, "invalid")
+    show(3, "CoordinatorSafe refines it", in_hole[1][2].status, "valid")
 
     def code(file, function):
         return CFunction(os.path.join(HERE, file), function)
@@ -101,6 +103,9 @@ def main(expect: bool) -> int:
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
     page = viz.save(viz.diagram(refines=pairs, title="DroneGrid: the step of two drones, before and after the fix"),
                     os.path.join(HERE, "out", "dronegrid.html"))
+    # the quotient CoordinatorNeeds, with each coordinator in its hole
+    viz.save(viz.diagram(refines=in_hole, title="DroneGrid: what the coordinator must do, and the two coordinators"),
+             os.path.join(HERE, "out", "dronegrid-quotient.html"))
     print(f"\nThe diagram: {os.path.relpath(page, HERE)}")
     return 0 if all(results) or not expect else 1
 

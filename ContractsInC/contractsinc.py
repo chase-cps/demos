@@ -5,8 +5,8 @@ ring.c those of CBMC (__CPROVER_requires, __CPROVER_ensures). load_c reads
 each function of a file as a contract (the requires clauses are its
 assumptions, the ensures clauses its guarantees) and the function as its
 implementation; ESBMC (or CBMC) checks the function against it. A function
-with no clause is checked alone: no overflow, division by zero, access out
-of bounds, or failed assert.
+with no clause has the contract (true, true), and is checked alone: no
+overflow, division by zero, access out of bounds, or failed assert.
 
   1. pump (tank.c) meets its contract: full speed from a level of 80, off
      below 20.
@@ -48,7 +48,7 @@ def main(expect: bool) -> int:
             r = is_implementation(function, contract)
             ok.append(r.status == WANT[name])
             alone = not contract.assumptions and not contract.guarantees
-            print(f"step {step + k}: {name} in {file}", "is safe code" if alone else "meets its contract",
+            print(f"step {step + k}: {name} in {file}", "meets its contract (no clause: true, true)" if alone else "meets its contract",
                   "->", r.status, "" if r.status == WANT[name] else f"   (expected {WANT[name]})")
             if r.status == "invalid" and getattr(r, "trace", None):
                 call = (r.trace.prefix + r.trace.loop)[0]

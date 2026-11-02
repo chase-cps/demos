@@ -18,7 +18,7 @@ different way. Which check catches which flaw, and which arbiter works
 with the robots?
 
 <p align="center">
-  <img src="images/system.png" alt="Fair, Robot1, and Robot2 inside ChargingStation, with their terms" width="707">
+  <img src="images/system.png" alt="Fair, Robot1, and Robot2 inside ChargingStation, with their terms" width="679">
   <br>
   <em>The system: an arbiter (here Fair) between the two robots, inside ChargingStation.</em>
 </p>
@@ -30,7 +30,8 @@ request at the next step, `G (req1 -> X grant1)` and the same for robot
 2. When both robots ask at once it cannot serve both without breaking
 `G !(grant1 & grant2)`: it is unrealizable, no arbiter can do it. The
 unrealizable core, the smallest set of guarantees in conflict, is these
-three formulas. Yet _Greedy_ with the robots refines _ChargingStation_:
+three formulas. Yet _Greedy_ with the robots refines _ChargingStation_
+(the script checks it; not drawn):
 refinement only compares formulas (every behavior allowed by the parts
 is allowed by the system) and does not ask whether a part can exist.
 
@@ -48,23 +49,24 @@ its outputs (¬V). `remove_redundant` removes its last guarantee,
 `G F (grant1 | !req1 | grant2)`, implied by the first one.
 
 <p align="center">
-  <img src="images/step2-fair-realizable.png" alt="Step 2: Fair, open, realizable and not vacuous" width="192">
+  <img src="images/step2-fair-realizable.png" alt="Step 2: Fair, open, realizable and not vacuous; its last guarantee is G F (grant1 | !req1 | grant2)" width="273">
   <br>
-  <em>Step 2: Fair is realizable (R) and not vacuous (¬V).</em>
+  <em>Step 2: Fair is realizable (R) and not vacuous (¬V); remove_redundant removes its last guarantee.</em>
 </p>
 
 **Step 3. Realizable for a bad reason.** _Pushy_ assumes that robot 1
 asks infinitely often, `G F req1`, but never right after a grant,
 `G (grant1 -> X !req1)`. By granting robot 1 at every step, the arbiter
 makes the robot break the first assumption, and then owes nothing. A
-contract is well separated (WS) when the component cannot win this way;
+contract is well-separated (WS) when the component cannot win this way;
 _Pushy_ is not, and the core is the two assumptions. _Polite_, which
-assumes `G ((req1 & grant1) -> X !req1)` instead, is well separated.
+assumes `G ((req1 & grant1) -> X !req1)` instead, is well-separated (not
+in the picture).
 
 <p align="center">
-  <img src="images/step3-pushy-not-well-separated.png" alt="Step 3: Pushy, with its core in red, and Polite">
+  <img src="images/step3-pushy-not-well-separated.png" alt="Step 3: Pushy, not well-separated, with its two assumptions in red, and the panel of the check">
   <br>
-  <em>Step 3: Pushy is not well separated; Polite is.</em>
+  <em>Step 3: Pushy is not well-separated; the core is its two assumptions.</em>
 </p>
 
 **Step 4. An arbiter that never grants.** _Trusting_ is _Fair_ with two
@@ -82,12 +84,14 @@ true.
 **Step 5. The arbiter with the robots.** _Fair_ and the robots feed each
 other. Composed with discharge (an assumption of one part that another
 part guarantees is dropped), they leave no assumption, and refine
-_ChargingStation_.
+_ChargingStation_. The ⊗ button of _ChargingStation_ shows the
+composition: its assumption is ⊤ (true), and its 11 guarantees are those
+of the parts (_Fair_ without its redundant guarantee).
 
 <p align="center">
-  <img src="images/step5-arbiter-and-robots.png" alt="Step 5: Fair, Robot1, and Robot2 inside ChargingStation" width="532">
+  <img src="images/step5-arbiter-and-robots.png" alt="Step 5: ChargingStation with the composition of Fair, Robot1, and Robot2 open: assumption ⊤ and its guarantees; ⪯ green" width="525">
   <br>
-  <em>Step 5: the composition refines ChargingStation.</em>
+  <em>Step 5: the composition, with no assumption left, refines ChargingStation (⪯).</em>
 </p>
 
 Each check of steps 1 to 4 is one call; by hand, each flaw means

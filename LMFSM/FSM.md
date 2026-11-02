@@ -12,8 +12,12 @@ NOMINAL, 2 MANEUVER (the pullup), 3 STANDBY; it reads `standby` (the pilot
 is in control), `apfail` (an external failure), `supported` (the system is
 healthy), and `good` (the sensor sees no fault). _Sensor_ has the states
 `SENSTATE` 0 NOMINAL, 1 TRANSITION, 2 FAULT; it reads `limits` (the limits
-are exceeded) and the mode of the autopilot. The contracts assume nothing
-of the environment. slugs checks realizability, nuXmv the refinements.
+are exceeded) and two outputs of the autopilot, `MODE` (the autopilot is
+not in TRANSITION) and `REQUEST` (it is in TRANSITION or NOMINAL), and it
+gives `good` back to the autopilot. The autopilot gives `pullup` when it is
+in MANEUVER. The two are drawn in the box _FlightControl_, whose contract
+is the system requirement _Pullup_. The contracts assume nothing of the
+environment. slugs checks realizability, nuXmv the refinements.
 
 **The question.** Two questions. Which of the first requirements are in
 conflict, so that no autopilot can meet them? And once they are
@@ -22,9 +26,9 @@ The first is asked before anyone builds the autopilot, the second before
 anyone signs off its timing.
 
 <p align="center">
-  <img src="images/system-autopilot-and-sensor.png" alt="The autopilot and the sensor, inside the system requirement Pullup" width="671">
+  <img src="images/system-autopilot-and-sensor.png" alt="FlightControl: the autopilot and the sensor, inside the system requirement Pullup" width="655">
   <br>
-  <em>The system: the autopilot and the sensor, inside the system requirement, FSM-001.</em>
+  <em>The system: FlightControl, the autopilot and the sensor inside the system requirement Pullup (FSM-001).</em>
 </p>
 
 ### The steps
@@ -35,7 +39,8 @@ how to read them.
 
 **Step 1. The first requirements.** A contract is
 [realizable](https://chase-cps.github.io/tools/synthesis/#realizability-and-synthesis)
-when some state machine meets it whatever the environment does. The first
+(the tag R) when some state machine meets it whatever the environment
+does. The first
 requirements of the autopilot are not. CHASE finds an
 [unrealizable core](https://chase-cps.github.io/tools/synthesis/#unrealizable-cores),
 the smallest set of requirements that no machine meets together: the
@@ -45,34 +50,35 @@ the pilot in control and good data, one says STANDBY and the other
 NOMINAL. The script replaces one requirement per core by its corrected
 version until the contract is realizable: four conflicts in the autopilot,
 one in the sensor, the ones FRET reports. Finding them by reading 14
-requirements is hard; each core points at two to four.
+requirements is hard; each core has three to five.
 
 <p align="center">
   <img src="images/step1-first-requirements-unrealizable.png" alt="Step 1: AutopilotFirst, unrealizable, with its first core in red">
   <br>
-  <em>Step 1: the first requirements; the cores in red.</em>
+  <em>Step 1: the first requirements; the first core in red.</em>
 </p>
 
 **Step 2. The system.** The corrected _Autopilot_ and _Sensor_ are
 realizable. Composed, they do not
 [refine](https://chase-cps.github.io/contracts/checks/#verification-tasks)
-_Pullup_, `G ((limits & !standby & !apfail & supported) -> pullup)`: a
+(the tag ⪯) _Pullup_, `G ((limits & !standby & !apfail & supported) -> pullup)`: a
 pullup at the step the limits are exceeded. In the counterexample, the
 limits are exceeded at step 1, but the autopilot is still in NOMINAL.
 
 <p align="center">
-  <img src="images/step2-does-not-refine-pullup.png" alt="Step 2: the counterexample, in the panel and on the wires">
+  <img src="images/step2-does-not-refine-pullup.png" alt="Step 2: Autopilot and Sensor inside Pullup, its tag red; the values of the counterexample at step 1 on the wires" width="740">
   <br>
-  <em>Step 2: the composition does not refine Pullup; the values at step 1.</em>
+  <em>Step 2: the composition does not refine Pullup; the values of the counterexample at step 1 on the wires.</em>
 </p>
 
 **Step 3. The system, with time.** The sensor and the autopilot each take
 a step to react. _PullupTimed_ gives the pullup that time: after three
 steps within the limits and one beyond, with the pilot not in control and
-no failure, the pullup comes at the fifth step. The composition refines it.
+no failure, the pullup comes one step after the limits are exceeded (step 4,
+counting from 0). The composition refines it.
 
 <p align="center">
-  <img src="images/step3-refines-pulluptimed.png" alt="Step 3: Autopilot and Sensor inside PullupTimed; the refinement holds" width="662">
+  <img src="images/step3-refines-pulluptimed.png" alt="Step 3: Autopilot and Sensor inside PullupTimed; the refinement holds" width="655">
   <br>
   <em>Step 3: the composition refines PullupTimed.</em>
 </p>

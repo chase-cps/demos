@@ -19,7 +19,7 @@ rather than one for the arm? And how does the check grow with the number
 of joints? An arm maker wants to add joints without redoing the proof.
 
 <p align="center">
-  <img src="images/system.png" alt="Joint1, Joint2, and Joint3 inside Joints; Joint1 open with its terms" width="762">
+  <img src="images/system.png" alt="Joint1, Joint2, and Joint3 inside Joints; Joint1 open with its terms" width="757">
   <br>
   <em>The system: the three joints inside the contract of the arm; Joint1 open (the others are the same with 2 and 3).</em>
 </p>
@@ -35,9 +35,9 @@ draws the same check: every tag is green, the composition refines
 (A∧G) and it is realizable (R).
 
 <p align="center">
-  <img src="images/step1-joints-refine-arm.png" alt="Step 1: Joints and Joint1 open: the assumptions and the guarantees of one joint and of the arm; the refinement holds" width="518">
+  <img src="images/step1-joints-refine-arm.png" alt="Step 1: the composition refines Joints (⪯), and each contract is feasible (A∧G) and realizable (R)" width="512">
   <br>
-  <em>Step 1: Joint1 and Joints open: what one joint and the arm assume and guarantee.</em>
+  <em>Step 1: the composition refines Joints (⪯), and each contract is feasible (A∧G) and realizable (R).</em>
 </p>
 
 **Step 2. One controller per joint, not one for the arm.**
@@ -49,10 +49,11 @@ step 1, the three small controllers are enough: their composition meets
 the contract of the arm.
 
 **Step 3. Scaling.** `scaling.py` builds the same contracts for N joints
-and checks the refinement: about 1 s for 3 joints and 5 s for 8 (Apple
-M4 Pro, nuXmv 2.2.0). With `--broken`, Joint1 does not guarantee
-`G F j1_done`, and nuXmv finds a counterexample of 3 or 4 steps for
-every N.
+and checks the refinement. With discharge, the refinement takes 0.7 s
+for 3 joints and 3.3 s for 8 (composing the 8 joints takes 21 s; Apple
+M4 Pro, nuXmv 2.2.0, `results/scaling_discharge.csv`). With `--broken`,
+Joint1 does not guarantee `G F j1_done`, and nuXmv finds a
+counterexample of 3 steps for every N.
 
 The tags of the pictures are explained on the page
 [Diagrams](https://chase-cps.github.io/interfaces/diagrams/#what-is-drawn).
@@ -63,10 +64,16 @@ The tags of the pictures are explained on the page
 pip install chase-cps
 chase-cps install nuxmv --accept-license
 chase-cps install slugs
-python scaling.py --joints 1 2 3 4 5 6 7 8 --broken --expect
+python scaling.py --joints 1 2 3 4 5 6 7 8 --broken --discharge --expect
 ```
 
-`compositional_demo.sh` and `singlemodel_demo.sh` run steps 1 and 2 with the console.
+`compositional_demo.sh` and `singlemodel_demo.sh` run steps 1 and 2 with the console; each
+takes the directory where it writes its files:
+
+```
+sh compositional_demo.sh /tmp/joints
+sh singlemodel_demo.sh /tmp/joints
+```
 
 ### Content of the directory
 - `specs.ltl`: the joints and the arm; `single_model.ltl`: the arm alone;

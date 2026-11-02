@@ -26,8 +26,9 @@ hover control mode) and the pilot (kias, kgs, hover_control_mode).
      hover within 12 steps. Pilot, with the requirements alone, does not
      refine it: kias may stay at 120.
   5. Slow, a pilot that slows down by 10 at each step, does not refine it
-     either: the hover control mode is never on, and the vehicle stays semi
-     thrust borne.
+     either: Slow says nothing of the hover control mode after the start; in
+     the counterexample it stays off, and the vehicle stays semi thrust
+     borne.
   6. Decel, which also turns the hover control mode on when kgs < 20,
      refines Q12, so ModeLogic || Decel refines Reach12. Decel does not
      refine Q06 = Reach06 / ModeLogic (no pilot does, step 2).
@@ -138,8 +139,10 @@ def main() -> int:
           f"[{time.time() - start:.1f} s, reals: {r.reals}]")
     if r.core is not None:
         if r.core.status == "found":
-            print(f"   unsat core ({r.core.checks} checks):")
-            for name in sorted({terms.get(str(g), str(g)) for g in r.core.core.guarantees}):
+            core = sorted({terms.get(str(g), str(g)) for g in r.core.core.guarantees})
+            print(f"   unsat core ({r.core.checks} checks): {len(core)} of the "
+                  f"{len({terms.get(str(g), str(g)) for g in c.guarantees})} requirements")
+            for name in core:
                 print("      " + name)
         else:
             print(f"   unsat core: {r.core.status} {r.core.reason}")

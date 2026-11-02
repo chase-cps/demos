@@ -2,15 +2,18 @@
 <html><head><meta charset="utf-8"><title>DroneTiming: the mission, and a drone before and after the repair</title>
 <style>
   :root { --ink:#1d2526; --soft:#667374; --faint:#97a3a4; --teal:#17393b; --line:#b6c1c1; --fill:#f5f7f7;
-          --wire:#7d8c8d; --ok:#2f7d4f; --bad:#b03a2e; --warn:#c07a14; --grid:#d3dbdb; --ground:#fcfdfd; }
+          --wire:#7d8c8d; --ok:#2f7d4f; --bad:#b03a2e; --warn:#c07a14; --grid:#d3dbdb; --ground:#fcfdfd;
+          --glass:rgba(255,255,255,.72); --frost:blur(6px) saturate(1.3);
+          --hole:#fdfaef; --hole-line:#f6eed5;   /* the hole of a quotient: pale yellow, seen when the diagram is small */
+          --r:6px; }   /* one corner for every box: tags, boxes, the toolbar, the details, the drawer */
   html, body { height:100%; overflow:hidden; }
   body { margin:0; font:13px/1.4 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color:var(--ink); background:var(--ground); }
   #top { position:fixed; top:0; left:0; right:0; z-index:10; display:flex; justify-content:space-between; align-items:flex-start;
          padding:10px 12px 0 18px; pointer-events:none; }
   #top > * { pointer-events:auto; }
-  .tools { display:flex; gap:2px; align-items:center; background:#fff; border:1px solid #e3e8e8; border-radius:8px;
+  .tools { display:flex; gap:2px; align-items:center; background:#fff; border:1px solid #e3e8e8; border-radius:var(--r);
            padding:2px; box-shadow:0 1px 4px rgba(0,0,0,.06); position:relative; margin-left:auto; }
-  .tools button { width:28px; height:26px; border:1px solid transparent; background:none; border-radius:6px;
+  .tools button { width:28px; height:26px; border:1px solid transparent; background:none; border-radius:var(--r);
                   cursor:pointer; color:var(--soft); display:flex; align-items:center; justify-content:center; padding:0; }
   .tools button:hover { background:var(--fill); color:var(--teal); }
   .tools button.on { background:#e6eeee; color:var(--teal); }
@@ -20,20 +23,20 @@
   [data-box].sel > rect:first-of-type { stroke:var(--teal); stroke-width:3px; }
   .trow > .hl { display:none; } .trow.sel > .hl { display:inline; }
   #export { display:none; position:absolute; right:12px; top:46px; background:#fff; border:1px solid #d5dddd;
-            border-radius:8px; padding:4px; gap:4px; box-shadow:0 4px 14px rgba(0,0,0,.08); z-index:7; }
+            border-radius:var(--r); padding:4px; gap:4px; box-shadow:0 4px 14px rgba(0,0,0,.08); z-index:7; }
   #export button { font:600 12px Helvetica, Arial, sans-serif; border:1px solid #d5dddd; background:#fff;
-                   border-radius:6px; padding:4px 10px; cursor:pointer; color:var(--teal); }
+                   border-radius:var(--r); padding:4px 10px; cursor:pointer; color:var(--teal); }
   #export button:hover { background:var(--fill); }
   @media print { body > *:not(#print) { display:none !important; } #print { display:block !important; }
                  #print svg { width:100%; height:auto; } @page { margin:12mm; } }
-  #help { position:absolute; right:12px; top:46px; background:#fff; border:1px solid #d5dddd; border-radius:8px;
+  #help { position:absolute; right:12px; top:46px; background:#fff; border:1px solid #d5dddd; border-radius:var(--r);
           box-shadow:0 6px 24px rgba(0,0,0,.12); padding:12px 14px; font:12px 'Arial Unicode MS', Helvetica, Arial, sans-serif;
           color:var(--soft); display:none; z-index:11; }
   #help div { display:flex; gap:10px; align-items:center; margin:6px 0; white-space:nowrap; }
   #help svg { flex:none; }
   #context { display:none; gap:8px; flex-wrap:wrap; padding-top:4px; }
   #stale { display:none; position:fixed; left:12px; bottom:12px; max-width:min(720px, 70%); z-index:6;
-           background:#fff6f4; border:1px solid var(--bad); border-radius:6px; padding:7px 10px;
+           background:#fff6f4; border:1px solid var(--bad); border-radius:var(--r); padding:7px 10px;
            font:12px/1.45 Helvetica, Arial, sans-serif; color:#7a2a20; white-space:pre-wrap; }
   #stale b { display:block; margin-bottom:2px; }
   #tip { display:none; position:fixed; z-index:20; max-width:420px; pointer-events:none;
@@ -42,20 +45,25 @@
   #run, #runsep { display:none; } #run .turn { display:none; } #run.busy .idle { display:none; }
   #run.busy .turn { display:inline; transform-origin:8px 8px; animation:turn 0.9s linear infinite; }
   @keyframes turn { to { transform:rotate(360deg); } }
+  /* a term picked in the panel, on the diagram */
+  @keyframes flash { 0%, 50%, 100% { opacity:0; } 25%, 75% { opacity:1; } }
+  rect.flash { fill:none; stroke:var(--bad); stroke-width:2; animation:flash 1.6s ease-in-out; pointer-events:none; }
   .pending circle { fill:var(--soft); animation:dot 1.2s ease-in-out infinite; }
   .pending circle:nth-of-type(2) { animation-delay:0.2s; } .pending circle:nth-of-type(3) { animation-delay:0.4s; }
   @keyframes dot { 0%, 80%, 100% { opacity:0.2; } 40% { opacity:1; } }
   #busy { display:none; position:fixed; right:14px; bottom:12px; z-index:6; padding:5px 12px;
           border-radius:12px; background:var(--teal); color:#fff; font:600 12px Helvetica, Arial, sans-serif;
           box-shadow:0 1px 4px rgba(0,0,0,.2); }
-  #context span { display:inline-flex; align-items:center; gap:7px; border:1px solid #d5dddd; border-radius:6px;
+  #context span { display:inline-flex; align-items:center; gap:7px; border:1px solid #d5dddd; border-radius:var(--r);
                   padding:2px 9px 2px 2px; font:11.5px Menlo, Monaco, monospace; color:var(--ink);
                   white-space:nowrap; background:#fff; }
   #context i { font:600 9.5px -apple-system, Helvetica, Arial, sans-serif; font-style:normal; color:#fff;
                background:#6f7f80; border-radius:4px; padding:2px 5px; }
-  #view { position:fixed; inset:0; overflow:hidden; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+  /* the view is the room left of the details and above the drawer (the camera fits the diagram there), but the
+     diagram goes on under them: they float over it, of frosted glass */
+  #view { position:fixed; inset:0; overflow:visible; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
   #view.moving { cursor:grabbing; }
-  #view > svg { display:block; width:100%; height:100%; }
+  #view > svg { display:block; width:100vw; height:100vh; }   /* the whole window, from the corner of the view */
   svg text { font-family:-apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
   .f { font-family:Menlo, Monaco, monospace; font-size:11.5px; fill:var(--ink); }
   .h { font-weight:600; font-size:12.5px; fill:var(--ink); cursor:pointer; }
@@ -64,13 +72,91 @@
   .halo { paint-order:stroke; stroke:#fff; stroke-width:3px; stroke-linejoin:round; }
   .icon { cursor:pointer; }
   #pop { position:fixed; left:50%; top:12%; transform:translateX(-50%); max-width:min(860px, 90vw); max-height:72vh;
-         background:#fff; border:1px solid #d5dddd; border-radius:10px; box-shadow:0 10px 36px rgba(0,0,0,.16);
+         background:#fff; border:1px solid #d5dddd; border-radius:var(--r); box-shadow:0 10px 36px rgba(0,0,0,.16);
          display:none; flex-direction:column; z-index:10; }
-  #pop header { padding:9px 16px; border-bottom:1px solid #e3e8e8; display:flex; gap:20px; align-items:center; }
+  #pop header { padding:8px 8px 8px 16px; border-bottom:1px solid #e3e8e8; display:flex; gap:20px; align-items:center; }
   #pop header b { font-size:13px; font-weight:600; flex:1; }
-  #pop button { font:12px -apple-system, Helvetica, Arial, sans-serif; border:1px solid #d5dddd; background:#fff;
-                border-radius:6px; padding:2px 10px; cursor:pointer; color:var(--soft); }
   #popview { overflow:auto; padding:6px 18px 16px; }
+  /* the waveform: a drawer under the diagram, beside the details; the names and values on the left, the steps scrolled and zoomed */
+  #wave { position:fixed; left:12px; right:12px; bottom:12px; box-sizing:border-box;
+          isolation:isolate; border:1px solid rgba(213,221,221,.9); border-radius:var(--r); box-shadow:0 6px 28px rgba(0,0,0,.14);
+          display:none; flex-direction:column; z-index:11; outline:none; overflow:hidden; }
+  body.insp #wave { right:calc(12px + min(402px, 100vw - 22px) + 12px); }   /* the details: 400 pixels and their border; the bottoms on one line */
+  .wv-grip { position:absolute; top:0; left:0; right:0; height:12px; cursor:ns-resize; z-index:4; }
+  .wv-grip::after { content:""; position:absolute; left:50%; top:3px; width:36px; height:3px; margin-left:-18px; border-radius:2px; background:#dfe5e5; }
+  .wv-grip:hover::after, .wv-grip.drag::after { background:var(--line); }
+  #wave header { padding:9px 8px 7px 16px; border-bottom:1px solid #e3e8e8; display:flex; gap:14px; align-items:center; user-select:none; }
+  #wave .wv-back { display:none; align-items:center; gap:8px; border:0; background:none; cursor:pointer; padding:0; margin-left:-6px;
+                   color:var(--teal); font:600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; flex:none; }
+  #wave .wv-back .ib { color:var(--teal); }
+  #wave header b { font-size:13px; font-weight:400; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #wave header b b { font-weight:600; }
+  .wv-where { font:12px Helvetica, Arial, sans-serif; color:var(--soft); white-space:nowrap; }
+  .wv-where .wv-k { color:#2f6fb5; font-weight:700; }
+  .wv-failat { font:600 12px Helvetica, Arial, sans-serif; color:#b03a2e; background:none; border:0; padding:3px 7px; margin:0 -7px;
+               border-radius:var(--r); cursor:pointer; white-space:nowrap; }
+  .wv-failat:hover { background:#fbeceb; }
+  .wv-tools { display:flex; gap:2px; align-items:center; }
+  .wv-keys { display:none; position:fixed; z-index:21; background:#fff; border:1px solid #d5dddd; border-radius:var(--r);
+             box-shadow:0 6px 20px rgba(0,0,0,.12); padding:9px 14px; font-size:12px; color:var(--ink);
+             grid-template-columns:auto auto; column-gap:18px; row-gap:4px; white-space:nowrap; }
+  .wv-keys.on { display:grid; }
+  .wv-keys-t { grid-column:1 / -1; font:600 12px -apple-system, Helvetica, Arial, sans-serif; color:var(--ink); margin-bottom:4px; }
+  .wv-caps { display:flex; gap:3px; align-items:center; color:var(--faint); font-size:11px; }
+  .wv-keys kbd { display:inline-block; min-width:12px; padding:0 5px; line-height:17px; text-align:center; border:1px solid #d5dddd;
+                 border-bottom-width:2px; border-radius:4px; background:#f7f9f9; font:11px -apple-system, Helvetica, Arial, sans-serif; color:var(--ink); }
+  .wv-scroll { flex:0 1 auto; overflow:auto; position:relative; cursor:default; scrollbar-width:none; }
+  .wv-scroll::-webkit-scrollbar { display:none; }
+  .wv-scroll.pan { cursor:grabbing; }
+  .wv-grid { position:relative; min-width:100%; }
+  .wv-hov { display:none; position:absolute; top:0; bottom:0; background:rgba(23,57,59,.05); pointer-events:none; }
+  .wv-fade { display:none; position:absolute; left:1px; right:1px; height:12px; z-index:3; pointer-events:none;
+             background:linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.95)); box-shadow:inset 0 -1px #e3e8e8; }
+  .wv-row { display:flex; align-items:stretch; border-bottom:1px solid #f1f4f4; }
+  .wv-row.nb { border-bottom-color:transparent; }
+  .wv-row.odd .wv-left { background:#fafbfb; }
+  .wv-left { position:sticky; left:0; z-index:1; flex:none; display:flex; align-items:center; background:#fff;
+             border-right:1px solid #e3e8e8; box-sizing:border-box; padding-left:12px; cursor:pointer; }
+  .wv-left.sel { box-shadow:inset 3px 0 #17393b; }
+  .wv-row.sel, .wv-row.sel .wv-left { background:#f0f5f4; }   /* the selected row: a faint tint across it */
+  .wv-name { flex:none; font:11px Menlo, Monaco, monospace; color:var(--soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .wv-name.port { color:var(--ink); font-weight:600; }
+  .wv-val { flex:none; box-sizing:border-box; padding-right:8px; font:11px Menlo, Monaco, monospace; color:#2f6fb5;
+            overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .wv-val small { display:block; color:var(--faint); font-size:9.5px; }
+  .wv-plot { flex:none; width:20px; height:20px; margin:0 2px; padding:0; border:0; background:none; color:var(--faint); border-radius:4px;
+             cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .wv-plot svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.4; stroke-linejoin:round; }
+  .wv-plot:hover { color:var(--teal); background:var(--fill); }
+  .wv-plot.on { color:var(--teal); background:#e1eded; }
+  span.wv-plot { cursor:inherit; }
+  .wv-group .wv-left { cursor:default; }
+  .wv-gname { font:10.5px Helvetica, Arial, sans-serif; color:var(--faint); min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wv-gname b { font-weight:600; color:var(--ink); }
+  .wv-axis { position:sticky; top:0; z-index:2; background:#fff; border-bottom:1px solid #d5dddd; }
+  .wv-axis .wv-left { z-index:3; cursor:default; align-items:flex-end; padding-bottom:10px; }
+  .wv-axis .wv-name { font:600 10.5px Helvetica, Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
+  .wv-corner { font:10.5px Helvetica, Arial, sans-serif; color:var(--soft); white-space:nowrap; }
+  .wv-at { color:#2f6fb5; font-weight:600; }
+  .wv-svg { display:block; flex:none; }
+  .wv-tick { font:10.5px Menlo, Monaco, monospace; fill:var(--soft); }
+  .wv-tick.cur { fill:#2f6fb5; font-weight:700; } .wv-tick.fail { fill:#b03a2e; font-weight:700; }
+  .wv-tick.ghost { fill:var(--faint); font-style:italic; }
+  .wv-loop { font:600 10px Helvetica, Arial, sans-serif; fill:var(--teal); }
+  .wv-fails { font:bold 10px Helvetica, Arial, sans-serif; fill:#b03a2e; }
+  .wv-v { font:11px Menlo, Monaco, monospace; fill:var(--ink); pointer-events:none; paint-order:stroke; stroke:#f7f9f9; stroke-width:3px; }
+  /* each in the lane of its mark: the loop on the first line, the step that fails on the second */
+  .wv-edge { position:absolute; z-index:4; display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
+  .wv-edge.r { right:22px; align-items:flex-end; }
+  .wv-edge span { height:12px; }
+  .wv-edge button { border:0; background:#fff; padding:0 6px; height:12px; line-height:12px; border-radius:4px; cursor:pointer;
+                    box-shadow:0 0 0 1px #e3e8e8; }
+  .wv-edge button.wv-fails { color:#b03a2e; } .wv-edge button.wv-loop { color:var(--teal); }
+  .wv-edge button:hover { background:var(--fill); }
+  #wave .wv-bar { display:block; visibility:hidden; flex:none; margin:4px 16px 0 0; }   /* its room kept: the drawer does not jump */
+  #wave .wv-bar.on { visibility:visible; }
+  #wave footer { display:flex; gap:16px; padding:6px 16px 8px; font-size:11.5px; color:var(--soft); border-top:1px solid #f1f4f4; }
+  #wave footer .wv-note { flex:1; } #wave footer .wv-hint { color:var(--faint); white-space:nowrap; }
   table.fsm { border-collapse:collapse; font:11.5px Menlo, Monaco, monospace; }
   table.fsm th { font:600 11.5px -apple-system, Helvetica, Arial, sans-serif; text-align:left; color:var(--soft);
                  padding:6px 16px 6px 0; border-bottom:1px solid #e3e8e8; position:sticky; top:0; background:#fff; }
@@ -79,31 +165,65 @@
   table.fsm td.when { color:var(--soft); }
   /* the inspector: docked on the right of the diagram (below it in a narrow window); it does not move with the view */
   #insp { position:fixed; top:46px; right:12px; bottom:12px; width:400px; max-width:calc(100vw - 24px); display:none;
-          flex-direction:column; background:#fff; border:1px solid #d5dddd; border-radius:10px;
-          box-shadow:0 4px 18px rgba(0,0,0,.08); z-index:9; color:var(--ink);
+          flex-direction:column; isolation:isolate;
+          border:1px solid rgba(213,221,221,.9); border-radius:var(--r); box-shadow:0 6px 24px rgba(0,0,0,.12); z-index:9; color:var(--ink);
           font:12px/1.45 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
   body.insp #insp { display:flex; }
+  /* the frosted glass on a layer of its own: a filter on the box would make it the frame of its fixed popups */
+  #insp::before, #wave::before { content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit;
+                                 background:var(--glass); -webkit-backdrop-filter:var(--frost); backdrop-filter:var(--frost); }
   body.insp #view { right:424px; }
-  #insp-tabs { display:flex; align-items:flex-end; gap:2px; padding:4px 6px 0 8px; border-bottom:1px solid #e3e8e8; flex:none; }
-  #insp-tabs button.tab { border:0; background:none; padding:7px 10px 6px; cursor:pointer; color:var(--soft);
-                          font:600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; border-bottom:2px solid transparent; }
-  #insp-tabs button.tab.on { color:var(--teal); border-bottom-color:var(--teal); }
-  #insp-tabs .count { margin-left:5px; padding:0 5px; border-radius:7px; background:var(--bad); color:#fff; font-size:10.5px; }
+  #insp-bar { display:flex; align-items:center; gap:6px; min-height:40px; padding:0 10px 0 14px; border-bottom:1px solid #e3e8e8; flex:none;
+              font:600 12px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color:var(--teal); }
+  #insp-bar .count { padding:0 5px; border-radius:7px; background:var(--bad); color:#fff; font-size:10.5px; }
+  /* the back arrow as far from the left, the top, the bottom, and its word */
+  #insp-bar button.back { display:flex; align-items:center; gap:8px; border:0; background:none; cursor:pointer; color:var(--teal);
+                          padding:0; margin-left:-6px; font:inherit; }
+  #insp-bar button.back .ib { color:var(--teal); }
+  #insp:focus { outline:none; }
   #repair { flex:1; overflow:auto; }
   @media (max-width: 820px) {
     #insp { top:auto; left:12px; right:12px; width:auto; height:45vh; max-width:none; }
     body.insp #view { right:0; bottom:calc(45vh + 12px); }
+    body.insp.wave #insp { display:none; }        /* the drawer in the place of the details; its arrow goes back */
+    body.insp #wave { right:12px; }
+    #wave .wv-back { display:flex; }
   }
   [data-box].pick > rect:first-of-type { stroke:#2f6fb5; stroke-width:3px; }
-  .pv-val { fill:#2f6fb5 !important; font-weight:600; }
+  .pv-plate { pointer-events:none; }
+  .pv-val, .pv-up { fill:#2f6fb5 !important; font-weight:600; paint-order:stroke; stroke:#fff; stroke-width:3px; stroke-linejoin:round; }   /* read over a wire */
   .rp-step { display:flex; gap:8px; align-items:center; margin-top:6px; color:var(--soft); }
   .rp-step input { flex:1; accent-color:var(--teal); }
   ul.rp-why { margin:4px 0 0; padding-left:16px; } ul.rp-why li { margin:2px 0; }
-  .rp-head { display:flex; gap:8px; align-items:center; padding:9px 10px 8px 14px; border-bottom:1px solid #e3e8e8;
-             position:sticky; top:0; background:#fff; }
-  .rp-head b { flex:1; font-size:12.5px; font-weight:600; min-width:0; overflow-wrap:anywhere; }
-  .rp-x { border:0; background:none; cursor:pointer; color:var(--soft); font-size:16px; line-height:1; padding:2px 6px; border-radius:5px; }
-  .rp-x:hover { background:var(--fill); color:var(--teal); }
+  /* the terms of a core: a click shows one on the diagram */
+  .rp-terms { display:flex; flex-direction:column; gap:3px; margin-top:6px; }
+  .rp-term { display:flex; gap:6px; align-items:flex-start; text-align:left; border:0; border-radius:4px; padding:3px 5px;
+             background:#fbeceb; color:var(--ink); cursor:pointer; font:inherit; }
+  .rp-term:hover { background:#f6dcd9; }
+  .rp-term .fs { display:flex; flex-direction:column; min-width:0; }
+  .rp-term .f.cut { -webkit-line-clamp:2; }
+  .rp-term .d { font:11px/1.4 Menlo, Monaco, monospace; color:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rp-term .ln { flex:none; margin-left:auto; padding-left:6px; color:#7a8a8a; font-size:10.5px; white-space:nowrap; }
+  .rp-term .st { flex:none; width:13px; height:13px; margin-top:1px; border-radius:3px; background:var(--teal); color:#fff;
+                 font:700 9.5px/13px Helvetica, Arial, sans-serif; text-align:center; }
+  .rp-term .f { font:11px/1.4 Menlo, Monaco, monospace; min-width:0; overflow-wrap:anywhere;
+                display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .rp-head { display:grid; grid-template-columns:52px minmax(0,1fr); column-gap:6px; align-items:center;
+             padding:9px 10px 8px 8px; border-bottom:1px solid #e3e8e8; position:sticky; top:0; background:#fff; z-index:1;
+             min-height:54px; box-sizing:border-box; }   /* room for a title of two lines: what is under it does not move */
+  .rp-head .t { flex:1; font-size:12.5px; min-width:0; overflow-wrap:anywhere; }
+  .rp-head .t b, .q-item .t b { font-weight:600; }
+  /* the small icons of the page: one size, one stroke, as the icons of the tools */
+  .ib { display:inline-flex; align-items:center; justify-content:center; flex:none; width:24px; height:24px; padding:0;
+        border:0; border-radius:var(--r); background:none; color:var(--soft); cursor:pointer; }
+  .ib svg, .chev svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.4;
+                       stroke-linecap:round; stroke-linejoin:round; }
+  button.ib:hover, button.back:hover .ib { background:var(--fill); color:var(--teal); }
+  button.ib.main { background:var(--teal); color:#fff; } button.ib.main:hover { background:var(--teal); color:#fff; opacity:.85; }
+  button.ib.on { background:#dfe9e9; color:var(--teal); }
+  button.ib.warn, button.ib.warn:hover { background:var(--warn); color:#fff; opacity:1; }
+  button.ib.off, button.ib.off:hover { opacity:.4; cursor:default; background:none; color:var(--soft); }
+  button.ib.main.off, button.ib.main.off:hover { background:var(--teal); color:#fff; }
   .rp-tag { flex:none; display:block; }
   .rp-chip { flex:none; font:600 10.5px 'Arial Unicode MS', 'Segoe UI', Helvetica, Arial, sans-serif; color:#fff; border-radius:4px;
              padding:1px 6px; background:var(--faint); }
@@ -111,7 +231,8 @@
   .rp-sec { padding:8px 14px 10px; border-bottom:1px solid #f1f4f4; }
   .rp-sec:last-child { border-bottom:0; }
   .rp-says { color:var(--soft); }
-  .rp-h { font:600 10.5px Helvetica, Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin:2px 0 6px; }
+  .rp-h { font:600 10.5px Helvetica, Arial, sans-serif; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin:2px 0 6px;
+          height:24px; display:flex; align-items:center; }   /* as high with the page buttons as without */
   .rp-row { display:grid; grid-template-columns:16px minmax(0,1fr) auto; gap:2px 6px; align-items:center; padding:4px 0; }
   .rp-row + .rp-row { border-top:1px dashed #edf1f1; }
   .rp-row input[type=checkbox] { margin:0; accent-color:var(--teal); }
@@ -122,7 +243,7 @@
   .rp-range { display:flex; gap:3px; align-items:center; color:var(--soft); font:11px Menlo, Monaco, monospace; }
   .rp-range input { width:54px; font:11px Menlo, Monaco, monospace; border:1px solid #d5dddd; border-radius:4px; padding:1px 4px; color:var(--ink); }
   .rp-btn { font:600 11.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; border:1px solid #d5dddd; background:#fff;
-            border-radius:6px; padding:3px 10px; cursor:pointer; color:var(--teal); white-space:nowrap; }
+            border-radius:var(--r); padding:3px 10px; cursor:pointer; color:var(--teal); white-space:nowrap; }
   .rp-btn:hover { background:var(--fill); }
   .rp-btn.main { background:var(--teal); border-color:var(--teal); color:#fff; }
   .rp-btn.on { background:#e6eeee; }
@@ -130,20 +251,40 @@
   .rp-btn:disabled { opacity:.45; cursor:default; background:#fff; }
   .rp-btn.main:disabled { background:var(--teal); }
   .rp-run { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .rp-opt { border:1px solid #e3e8e8; border-radius:8px; padding:7px 10px; margin:6px 0 0; display:grid;
+  .rp-opt { border:1px solid #e3e8e8; border-radius:var(--r); padding:7px 10px; margin:6px 0 0; display:grid;
             grid-template-columns:minmax(0,1fr) auto; gap:2px 8px; align-items:center; }
   .rp-opt.repaired { border-color:#b9d6c4; } .rp-opt.repaired:hover, .rp-opt.shown { border-color:var(--ok); background:#f6faf7; }
-  .rp-opt.old { opacity:.6; }
+  .rp-opt.old, .rp-opt.faint { opacity:.6; } .rp-opt.faint:hover { opacity:1; }
+  .rp-l { grid-column:1; font-size:11px; color:var(--soft); } .rp-l b { color:var(--ink); font-weight:600; }
+  .rp-t { grid-column:1; font-size:11.5px; }
+  .rp-h.rp-hb { justify-content:space-between; }
+  .rp-h.rp-hb .ib { text-transform:none; letter-spacing:0; }
+  #insp-bar .ib.wf-open { margin-left:auto; }
+  .ib.wf-open { width:auto; padding:0 7px 0 5px; gap:4px; border:1px solid var(--line); border-radius:var(--r); color:var(--teal); }
+  .ib.wf-open .wf-word { font:600 11px Helvetica, Arial, sans-serif; text-transform:none; letter-spacing:0; }
   .rp-v { font:11.5px Menlo, Monaco, monospace; overflow-wrap:anywhere; }
   .rp-v s { color:var(--bad); } .rp-v em { font-style:normal; color:var(--ok); font-weight:600; }
   .rp-m { grid-column:1; color:var(--soft); font-size:11px; }
-  .rp-b { grid-row:1 / span 2; grid-column:2; display:flex; gap:4px; align-items:center; }
+  .rp-b { grid-row:1 / span 3; grid-column:2; display:flex; gap:4px; align-items:center; }
   .rp-note { color:var(--soft); font-size:11px; margin-top:6px; }
   .rp-err { color:var(--bad); font-size:11px; margin-top:6px; white-space:pre-wrap; }
-  .rp-cmd { font:10.5px/1.5 Menlo, Monaco, monospace; background:var(--fill); border:1px solid #e3e8e8; border-radius:6px;
-            padding:5px 7px; margin-top:6px; white-space:pre-wrap; overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; }
+  .rp-cmd { font:10.5px/1.5 Menlo, Monaco, monospace; background:var(--fill); border:1px solid #e3e8e8; border-radius:var(--r);
+            padding:5px 7px; margin-top:6px; white-space:pre-wrap; overflow-x:auto; user-select:text; -webkit-user-select:text; }
+  /* a command breaks between its words only, never inside a flag (--serve) */
+  .rp-cmd > span, code.cmd { white-space:nowrap; }
+  code.cmd { font:10.5px Menlo, Monaco, monospace; background:var(--fill); border-radius:3px; padding:0 3px; }
   .rp-spin { width:10px; height:10px; border:1.6px solid #d5dddd; border-top-color:var(--teal); border-radius:50%;
              animation:turn 0.8s linear infinite; }
+  /* the steps in view, and a page back or on: only when the table is wider than the panel */
+  .rp-trace-top { display:none; align-items:center; justify-content:flex-end; gap:2px; margin-top:2px; color:var(--soft); font-size:11px; }
+  .rp-h .rp-trace-top { margin:0; }
+  .rp-trace-top.on { display:flex; }
+  /* a scroll bar of the page, always drawn: the one of the system shows only while scrolling (macOS) */
+  .rp-tracebox .rp-tracewrap { scrollbar-width:none; } .rp-tracebox .rp-tracewrap::-webkit-scrollbar { display:none; }
+  .rp-bar { display:none; position:relative; height:8px; margin:5px 0 2px; border-radius:4px; background:#edf1f1; cursor:pointer; }
+  .rp-bar.on { display:block; }
+  .rp-bar > div { position:absolute; top:0; bottom:0; border-radius:4px; background:#a9b6b6; cursor:grab; }
+  .rp-bar > div:hover, .rp-bar > div.drag { background:#7c8e8e; } .rp-bar > div.drag { cursor:grabbing; }
   .rp-tracewrap { overflow:auto; max-height:260px; margin-top:6px;
     /* a shadow at a side where more columns are: the table scrolls */
     background: linear-gradient(to right, var(--paper, #fff) 30%, transparent) left / 24px 100% no-repeat local,
@@ -153,28 +294,57 @@
   .rp-values { display:flex; flex-wrap:wrap; gap:2px 18px;
                font:11px Menlo, Monaco, monospace; color:var(--soft); }
   .rp-values span { white-space:nowrap; }
+  .rp-h .rp-file { margin-left:8px; font:400 10.5px Menlo, Monaco, monospace; text-transform:none; letter-spacing:0; color:var(--ink); }
+  .rp-io { display:grid; grid-template-columns:auto minmax(0,1fr); gap:3px 10px; align-items:baseline; }
+  .rp-io .w { font:600 10.5px Helvetica, Arial, sans-serif; color:var(--soft); }
   #view.previewing rect.core-row { fill:#e6efe6; }
   .rp-values .port { color:var(--ink); font-weight:600; }
-  table.rp-trace { border-collapse:collapse; font:11px Menlo, Monaco, monospace; }
-  table.rp-trace th { font:600 10.5px Helvetica, Arial, sans-serif; color:var(--soft); text-align:right; padding:2px 8px;
+  table.rp-trace { border-collapse:collapse; font:11px Menlo, Monaco, monospace; width:100%; }   /* the width of the panel, as every table */
+  table.rp-trace th { font:600 10.5px Helvetica, Arial, sans-serif; color:var(--soft); text-align:center; padding:2px 8px; white-space:nowrap;
                       border-bottom:1px solid #e3e8e8; position:sticky; top:0; background:#fff; }
-  table.rp-trace td { padding:2px 8px; text-align:right; border-bottom:1px solid #f1f4f4; white-space:nowrap; }
-  table.rp-trace td.v { text-align:left; color:var(--soft); }
-  table.rp-trace th.fail { color:var(--bad); }
-  .rp-broken { margin:4px 0 6px; } .rp-broken .code { font:11px Menlo, Monaco, monospace; color:var(--bad); margin:2px 0 0 8px; }
+  table.rp-trace td { padding:2px 8px; text-align:center; border-bottom:1px solid #f1f4f4; white-space:nowrap; }
+  table.rp-trace td.v { text-align:left; color:var(--soft); width:1%; }
+  table.rp-trace th:first-child { text-align:left; width:1%; }
+  table.rp-trace td[data-k] { min-width:var(--cw, 0); }
+  table.rp-trace td.unk { color:var(--soft); }
+  /* the first column, the names, stays when the table scrolls */
+  table.rp-trace th:first-child, table.rp-trace td.v { position:sticky; left:0; background:#fff; box-shadow:inset -1px 0 #e3e8e8; }
+  table.rp-trace td.v { z-index:1; } table.rp-trace th:first-child { z-index:3; } table.rp-trace th { z-index:2; }
+  table.rp-trace th.fail { color:var(--bad); background:#fbeceb; }
+  .rp-lead { margin-top:6px; }
+  .rp-broken { margin:6px 0 2px; } .rp-broken .code { font:11px Menlo, Monaco, monospace; color:var(--bad); margin:2px 0 0 8px; }
   table.rp-trace td.fail { background:#fbeceb; }
+  table.rp-trace .k { cursor:pointer; } table.rp-trace th.hov { color:#2f6fb5; } table.rp-trace td.hov { background:#eef4fb; }
+  table.rp-trace td.fail.hov { background:#f6dedc; }
+  /* the step on the diagram, when another than the one that fails: the column shaded, as the red one */
+  table.rp-trace th.cur { color:#2f6fb5; background:#dce9f7; }
+  table.rp-trace td.cur, table.rp-trace td.cur.hov { background:#dce9f7; }
+  .rp-at { color:var(--soft); margin-top:4px; } .rp-at .b { color:#2f6fb5; font-weight:600; } .rp-at .r { color:var(--bad); font-weight:600; }
   table.rp-trace tr.port td.v { color:var(--ink); font-weight:600; }
   .rp-link { border:0; background:none; color:var(--teal); text-decoration:underline; cursor:pointer;
              font:11px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; padding:4px 0 0; }
   pre.code { margin:0 0 12px; font:11.5px/1.55 Menlo, Monaco, monospace; color:var(--ink); overflow-x:auto; }
+  details.rp-code > summary { cursor:pointer; margin:2px 0 2px -4px; list-style:none; display:flex; align-items:center; gap:2px; }
+  details.rp-code > summary::-webkit-details-marker { display:none; }
+  .chev { display:inline-flex; color:var(--soft); transition:transform .12s; }
+  details[open] > summary .chev { transform:rotate(90deg); }
+  details.rp-code[open] > summary { margin-bottom:6px; }
+  details.rp-code pre.code { margin-bottom:4px; white-space:pre-wrap; overflow-wrap:anywhere; }   /* long lines wrap in the panel, */
+  details.rp-code pre.code span.l { padding-left:calc(2.4em + 12px); text-indent:calc(-2.4em - 12px); }   /* under their code */
+  pre.code span.l { display:block; } pre.code span.l.hit { background:#fbeceb; }
   pre.code span.n { display:inline-block; width:2.4em; color:var(--faint); text-align:right; margin-right:12px;
                     user-select:none; -webkit-user-select:none; }
   #popview h4 { font:600 12px -apple-system, Helvetica, Arial, sans-serif; color:var(--soft); margin:12px 0 4px; }
-  .q-item { padding:9px 10px 8px 14px; border-bottom:1px solid #f1f4f4; cursor:pointer; display:grid; gap:3px; }
+  .q-item { padding:9px 10px 8px 8px; border-bottom:1px solid #f1f4f4; cursor:pointer; display:grid;
+            grid-template-columns:52px minmax(0,1fr); column-gap:6px; align-items:center;
+            min-height:58px; box-sizing:border-box; }   /* a row of one line as high as one of two */
+  .q-tag { display:flex; justify-content:center; align-items:center; }
+  .q-main { display:grid; gap:3px; min-width:0; }
   .q-item.on { background:#eef3f9; }
   .q-item:last-child { border-bottom:0; } .q-item:hover { background:var(--fill); }
   /* the title of an item as the title of its details: no jump from one to the other */
-  .q-item .t { display:flex; gap:8px; align-items:center; font-weight:600; font-size:12.5px; }
+  .q-item .t, .q-item .s, .q-item .v { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }   /* one line each: rows of one height */
+  .q-item .t { font-size:12.5px; }
   .q-item .s { color:var(--soft); font-size:11px; } .q-item .s.ok { color:var(--ok); } .q-item .s.old { color:var(--warn); }
   .q-item .v { font:11px Menlo, Monaco, monospace; color:var(--ink); }
   .tools #repairs { width:auto; padding:0 7px; gap:4px; display:none; color:var(--bad); font:600 11.5px Helvetica, Arial, sans-serif; }
@@ -191,7 +361,7 @@
     <button class="on" title="Results of the checks (A∧G, A, G, R, WS, ¬V, ⪯, M ⊨ C, E ⊨ A) and their cores" onclick="flip(this, 'checks')"><svg viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="8" rx="3"/><path d="M5.5 8l1.8 1.8L10.5 6.3"/></svg></button>
     <span class="sep" id="runsep"></span>
     <button id="run" title="Check: A ∧ G of each contract, and the refinements, implementations, and environments drawn" onclick="runChecks()"><svg viewBox="0 0 16 16"><path class="idle" d="M5 3.2v9.6L13 8z"/><path class="turn" d="M8 2.2a5.8 5.8 0 1 1-5.8 5.8"/></svg></button>
-    <button id="repairs" title="The panel of the checks: open or close (Esc)" onclick="toggleQueue()"><svg viewBox="0 0 16 16"><path d="M10.2 2.4a3.2 3.2 0 0 0-3.9 4.1L2.6 10.2a1.3 1.3 0 0 0 1.8 1.8l3.7-3.7a3.2 3.2 0 0 0 4.1-3.9l-1.9 1.9-1.6-.4-.4-1.6z"/></svg><span id="repcount"></span></button>
+    <button id="repairs" title="Problems: the checks that fail (open or close, Esc)" onclick="toggleQueue()"><svg viewBox="0 0 16 16"><path d="M10.2 2.4a3.2 3.2 0 0 0-3.9 4.1L2.6 10.2a1.3 1.3 0 0 0 1.8 1.8l3.7-3.7a3.2 3.2 0 0 0 4.1-3.9l-1.9 1.9-1.6-.4-.4-1.6z"/></svg><span id="repcount"></span></button>
     <span class="sep"></span>
     <button title="Export the whole diagram (SVG, PNG, PDF)" onclick="exportMenu()"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.8 6.8 8 10l3.2-3.2M2.5 11.5v2h11v-2"/></svg></button>
     <button title="What the shapes mean" onclick="help()"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.4"/><circle cx="8" cy="11.6" r=".4"/></svg></button>
@@ -200,16 +370,30 @@
 <div id="stale"></div>
 <div id="busy">checking…</div>
 <div id="tip"></div>
-<div id="pop"><header><b id="poptitle"></b><button onclick="closePop()">close</button></header><div id="popview"></div></div>
-<div id="insp" role="complementary" aria-label="The checks"><div id="insp-tabs"></div><div id="repair"></div></div>
+<div id="pop"><header><b id="poptitle"></b><button class="ib" title="Close" aria-label="Close" onclick="closePop()"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div id="popview"></div></div>
+<div id="wave" tabindex="-1" role="dialog" aria-label="Waveform"></div>
+<div id="insp" role="complementary" aria-label="The checks" tabindex="-1"><div id="insp-bar"></div><div id="repair"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/elkjs@0.9.3/lib/elk.bundled.js"></script>
 <script>
 let DATA = {"title": "DroneTiming: the mission, and a drone before and after the repair", "nodes": [{"kind": "group", "op": "composition", "title": "Mission", "note": "FireTick \u2297 FireSpread \u2297 FireStateRx", "layout": "row", "contract": {"name": "Mission", "A": ["t_ft = d_ft"], "G": ["d_fr - t_fr <= y0"], "_A": ["t_ft = d_ft"], "_G": ["d_fr - t_fr <= 59"], "_gA": [[0]], "_gG": [[0]], "K": ["y0 = 59"]}, "inputs": [], "outputs": ["d_fr", "t_fr"], "children": [{"kind": "contract", "title": "FireTick", "note": null, "contract": {"name": "FireTick", "A": [], "G": ["t_ft <= d_ft", "d_ft <= T_ft", "T_ft - d_ft <= 0"]}, "inputs": [], "outputs": ["T_ft", "d_ft", "t_ft"], "id": "n1", "types": {"t_ft": {"label": "real"}, "d_ft": {"label": "real"}, "T_ft": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "FireSpread", "note": null, "contract": {"name": "FireSpread", "A": ["t_ft <= d_ft"], "G": ["t_fs = t_ft", "d_fs = T_ft", "t_fs <= d_fs", "d_fs <= T_fs", "T_fs - d_fs <= 59"]}, "inputs": ["T_ft", "d_ft", "t_ft"], "outputs": ["T_fs", "d_fs", "t_fs"], "id": "n2", "types": {"t_ft": {"label": "real"}, "d_ft": {"label": "real"}, "T_ft": {"label": "real"}, "t_fs": {"label": "real"}, "d_fs": {"label": "real"}, "T_fs": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "FireStateRx", "note": null, "contract": {"name": "FireStateRx", "A": ["t_fs <= d_fs"], "G": ["t_fr = t_fs", "d_fr = T_fs", "t_fr <= d_fr", "d_fr <= T_fr", "T_fr - d_fr <= 0.4"]}, "inputs": ["T_fs", "d_fs", "t_fs"], "outputs": ["T_fr", "d_fr", "t_fr"], "id": "n4", "types": {"t_fs": {"label": "real"}, "d_fs": {"label": "real"}, "T_fs": {"label": "real"}, "t_fr": {"label": "real"}, "d_fr": {"label": "real"}, "T_fr": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}], "edges": [{"from": ["n1", "out", "T_ft"], "to": ["n2", "in", "T_ft"], "var": "T_ft"}, {"from": ["n1", "out", "d_ft"], "to": ["n2", "in", "d_ft"], "var": "d_ft"}, {"from": ["n1", "out", "t_ft"], "to": ["n2", "in", "t_ft"], "var": "t_ft"}, {"from": ["n2", "out", "T_fs"], "to": ["n4", "in", "T_fs"], "var": "T_fs"}, {"from": ["n2", "out", "d_fs"], "to": ["n4", "in", "d_fs"], "var": "d_fs"}, {"from": ["n2", "out", "t_fs"], "to": ["n4", "in", "t_fs"], "var": "t_fs"}, {"from": ["n4", "out", "d_fr"], "to": [null, "out", "d_fr"], "var": "d_fr"}, {"from": ["n4", "out", "t_fr"], "to": [null, "out", "t_fr"], "var": "t_fr"}], "id": "n5", "types": {"t_ft": {"label": "real"}, "d_ft": {"label": "real"}, "T_ft": {"label": "real"}, "t_fs": {"label": "real"}, "d_fs": {"label": "real"}, "T_fs": {"label": "real"}, "t_fr": {"label": "real"}, "d_fr": {"label": "real"}, "T_fr": {"label": "real"}}, "composed": {"name": "FireTick_FireSpread_FireStateRx", "A": ["(true & t_ft <= d_ft & t_fs <= d_fs) | !(t_ft <= d_ft & d_ft <= T_ft & T_ft - d_ft <= 0 & (t_ft <= d_ft -> (t_fs = t_ft & d_fs = T_ft & t_fs <= d_fs & d_fs <= T_fs & T_fs - d_fs <= 59)) & (t_fs <= d_fs -> (t_fr = t_fs & d_fr = T_fs & t_fr <= d_fr & d_fr <= T_fr & T_fr - d_fr <= 0.4)))"], "G": ["t_ft <= d_ft", "d_ft <= T_ft", "T_ft - d_ft <= 0", "t_ft <= d_ft -> (t_fs = t_ft & d_fs = T_ft & t_fs <= d_fs & d_fs <= T_fs & T_fs - d_fs <= 59)", "t_fs <= d_fs -> (t_fr = t_fs & d_fr = T_fs & t_fr <= d_fr & d_fr <= T_fr & T_fr - d_fr <= 0.4)"]}, "badge": {"text": "\u2aaf", "status": "valid"}, "open": true}, {"kind": "group", "op": "composition", "title": "Fast", "note": "DroneTick \u2297 DroneSim2 \u2297 Assign \u2297 Target \u2297 Plan \u2297 Grant \u2297 Move \u2297 DroneSim3", "layout": "row", "contract": {"name": "Fast", "A": ["t_dk <= d_dk", "d_dk - t_dk <= offset"], "G": ["d_s3 - t_s3 <= deadline"], "_A": ["t_dk <= d_dk", "d_dk - t_dk <= 59"], "_G": ["d_s3 - t_s3 <= 250"], "_gA": [[0], [1]], "_gG": [[0]], "K": ["offset = 59", "deadline = 250"]}, "inputs": [], "outputs": ["d_s3", "t_s3"], "children": [{"kind": "contract", "title": "DroneTick", "note": null, "contract": {"name": "DroneTick", "A": [], "G": ["t_dk <= d_dk", "d_dk <= T_dk", "T_dk - d_dk <= 0"]}, "inputs": [], "outputs": ["T_dk", "d_dk", "t_dk"], "id": "n6", "types": {"t_dk": {"label": "real"}, "d_dk": {"label": "real"}, "T_dk": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "DroneSim2", "note": null, "contract": {"name": "DroneSim2", "A": ["t_dk <= d_dk"], "G": ["t_s2 = t_dk", "d_s2 = T_dk", "t_s2 <= d_s2", "d_s2 <= T_s2", "T_s2 - d_s2 <= 55"]}, "inputs": ["T_dk", "d_dk", "t_dk"], "outputs": ["T_s2", "d_s2", "t_s2"], "id": "n7", "types": {"t_dk": {"label": "real"}, "d_dk": {"label": "real"}, "T_dk": {"label": "real"}, "t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Assign", "note": null, "contract": {"name": "Assign", "A": ["t_s2 <= d_s2"], "G": ["t_a3 = t_s2", "d_a3 = T_s2", "t_a3 <= d_a3", "d_a3 <= T_a3", "T_a3 - d_a3 <= 33"]}, "inputs": ["T_s2", "d_s2", "t_s2"], "outputs": ["T_a3", "d_a3", "t_a3"], "id": "n9", "types": {"t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}, "t_a3": {"label": "real"}, "d_a3": {"label": "real"}, "T_a3": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Target", "note": null, "contract": {"name": "Target", "A": ["t_a3 <= d_a3"], "G": ["t_c2 = t_a3", "d_c2 = T_a3", "t_c2 <= d_c2", "d_c2 <= T_c2", "T_c2 - d_c2 <= 8"]}, "inputs": ["T_a3", "d_a3", "t_a3"], "outputs": ["T_c2", "d_c2", "t_c2"], "id": "n11", "types": {"t_a3": {"label": "real"}, "d_a3": {"label": "real"}, "T_a3": {"label": "real"}, "t_c2": {"label": "real"}, "d_c2": {"label": "real"}, "T_c2": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Plan", "note": null, "contract": {"name": "Plan", "A": ["t_s2 <= d_s2"], "G": ["t_c3 = t_s2", "d_c3 >= T_s2", "d_c3 >= T_c2", "d_c3 <= T_s2 | d_c3 <= T_c2", "t_c3 <= d_c3", "d_c3 <= T_c3", "T_c3 - d_c3 <= x_plan"], "_A": ["t_s2 <= d_s2"], "_G": ["t_c3 = t_s2", "d_c3 >= T_s2", "d_c3 >= T_c2", "d_c3 <= T_s2 | d_c3 <= T_c2", "t_c3 <= d_c3", "d_c3 <= T_c3", "T_c3 - d_c3 <= 72"], "_gA": [[0]], "_gG": [[0], [1], [2], [3], [4], [5], [6]], "K": ["x_plan = 72"]}, "inputs": ["T_c2", "T_s2", "d_s2", "t_s2"], "outputs": ["T_c3", "d_c3", "t_c3"], "id": "n13", "types": {"t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}, "T_c2": {"label": "real"}, "t_c3": {"label": "real"}, "d_c3": {"label": "real"}, "T_c3": {"label": "real"}}, "children": [], "edges": [], "layout": "row", "open": true}, {"kind": "contract", "title": "Grant", "note": null, "contract": {"name": "Grant", "A": ["t_c3 <= d_c3"], "G": ["t_a4 = t_c3", "d_a4 >= T_c3", "d_a4 >= T_a3", "d_a4 <= T_c3 | d_a4 <= T_a3", "t_a4 <= d_a4", "d_a4 <= T_a4", "T_a4 - d_a4 <= 0"]}, "inputs": ["T_a3", "T_c3", "d_c3", "t_c3"], "outputs": ["T_a4", "d_a4", "t_a4"], "id": "n15", "types": {"t_c3": {"label": "real"}, "d_c3": {"label": "real"}, "T_c3": {"label": "real"}, "T_a3": {"label": "real"}, "t_a4": {"label": "real"}, "d_a4": {"label": "real"}, "T_a4": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Move", "note": null, "contract": {"name": "Move", "A": ["t_a4 <= d_a4"], "G": ["t_c4 = t_a4", "d_c4 >= T_a4", "d_c4 >= T_c3", "d_c4 <= T_a4 | d_c4 <= T_c3", "t_c4 <= d_c4", "d_c4 <= T_c4", "T_c4 - d_c4 <= 53"]}, "inputs": ["T_a4", "T_c3", "d_a4", "t_a4"], "outputs": ["T_c4", "d_c4", "t_c4"], "id": "n17", "types": {"t_a4": {"label": "real"}, "d_a4": {"label": "real"}, "T_a4": {"label": "real"}, "T_c3": {"label": "real"}, "t_c4": {"label": "real"}, "d_c4": {"label": "real"}, "T_c4": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "DroneSim3", "note": null, "contract": {"name": "DroneSim3", "A": ["t_c4 <= d_c4"], "G": ["t_s3 = t_c4", "d_s3 >= T_c4", "d_s3 >= T_s2", "d_s3 <= T_c4 | d_s3 <= T_s2", "t_s3 <= d_s3", "d_s3 <= T_s3", "T_s3 - d_s3 <= 0.4"]}, "inputs": ["T_c4", "T_s2", "d_c4", "t_c4"], "outputs": ["T_s3", "d_s3", "t_s3"], "id": "n19", "types": {"t_c4": {"label": "real"}, "d_c4": {"label": "real"}, "T_c4": {"label": "real"}, "T_s2": {"label": "real"}, "t_s3": {"label": "real"}, "d_s3": {"label": "real"}, "T_s3": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}], "edges": [{"from": ["n6", "out", "T_dk"], "to": ["n7", "in", "T_dk"], "var": "T_dk"}, {"from": ["n6", "out", "d_dk"], "to": ["n7", "in", "d_dk"], "var": "d_dk"}, {"from": ["n6", "out", "t_dk"], "to": ["n7", "in", "t_dk"], "var": "t_dk"}, {"from": ["n7", "out", "T_s2"], "to": ["n9", "in", "T_s2"], "var": "T_s2"}, {"from": ["n7", "out", "d_s2"], "to": ["n9", "in", "d_s2"], "var": "d_s2"}, {"from": ["n7", "out", "t_s2"], "to": ["n9", "in", "t_s2"], "var": "t_s2"}, {"from": ["n9", "out", "T_a3"], "to": ["n11", "in", "T_a3"], "var": "T_a3"}, {"from": ["n9", "out", "d_a3"], "to": ["n11", "in", "d_a3"], "var": "d_a3"}, {"from": ["n9", "out", "t_a3"], "to": ["n11", "in", "t_a3"], "var": "t_a3"}, {"from": ["n11", "out", "T_c2"], "to": ["n13", "in", "T_c2"], "var": "T_c2"}, {"from": ["n7", "out", "T_s2"], "to": ["n13", "in", "T_s2"], "var": "T_s2"}, {"from": ["n7", "out", "d_s2"], "to": ["n13", "in", "d_s2"], "var": "d_s2"}, {"from": ["n7", "out", "t_s2"], "to": ["n13", "in", "t_s2"], "var": "t_s2"}, {"from": ["n9", "out", "T_a3"], "to": ["n15", "in", "T_a3"], "var": "T_a3"}, {"from": ["n13", "out", "T_c3"], "to": ["n15", "in", "T_c3"], "var": "T_c3"}, {"from": ["n13", "out", "d_c3"], "to": ["n15", "in", "d_c3"], "var": "d_c3"}, {"from": ["n13", "out", "t_c3"], "to": ["n15", "in", "t_c3"], "var": "t_c3"}, {"from": ["n15", "out", "T_a4"], "to": ["n17", "in", "T_a4"], "var": "T_a4"}, {"from": ["n13", "out", "T_c3"], "to": ["n17", "in", "T_c3"], "var": "T_c3"}, {"from": ["n15", "out", "d_a4"], "to": ["n17", "in", "d_a4"], "var": "d_a4"}, {"from": ["n15", "out", "t_a4"], "to": ["n17", "in", "t_a4"], "var": "t_a4"}, {"from": ["n17", "out", "T_c4"], "to": ["n19", "in", "T_c4"], "var": "T_c4"}, {"from": ["n7", "out", "T_s2"], "to": ["n19", "in", "T_s2"], "var": "T_s2"}, {"from": ["n17", "out", "d_c4"], "to": ["n19", "in", "d_c4"], "var": "d_c4"}, {"from": ["n17", "out", "t_c4"], "to": ["n19", "in", "t_c4"], "var": "t_c4"}, {"from": ["n19", "out", "d_s3"], "to": [null, "out", "d_s3"], "var": "d_s3"}, {"from": ["n19", "out", "t_s3"], "to": [null, "out", "t_s3"], "var": "t_s3"}], "id": "n20", "types": {"t_dk": {"label": "real"}, "d_dk": {"label": "real"}, "T_dk": {"label": "real"}, "t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}, "t_a3": {"label": "real"}, "d_a3": {"label": "real"}, "T_a3": {"label": "real"}, "t_c2": {"label": "real"}, "d_c2": {"label": "real"}, "T_c2": {"label": "real"}, "t_c3": {"label": "real"}, "d_c3": {"label": "real"}, "T_c3": {"label": "real"}, "t_a4": {"label": "real"}, "d_a4": {"label": "real"}, "T_a4": {"label": "real"}, "t_c4": {"label": "real"}, "d_c4": {"label": "real"}, "T_c4": {"label": "real"}, "t_s3": {"label": "real"}, "d_s3": {"label": "real"}, "T_s3": {"label": "real"}}, "composed": {"name": "DroneTick_DroneSim2_Assign_Target_Plan_Grant_Move_DroneSim3", "A": ["(true & t_dk <= d_dk & t_s2 <= d_s2 & t_a3 <= d_a3 & t_s2 <= d_s2 & t_c3 <= d_c3 & t_a4 <= d_a4 & t_c4 <= d_c4) | !(t_dk <= d_dk & d_dk <= T_dk & T_dk - d_dk <= 0 & (t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)) & (t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)) & (t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)) & (t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= x_plan)) & (t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)) & (t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)) & (t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4)))"], "G": ["t_dk <= d_dk & d_dk <= T_dk & T_dk - d_dk <= 0 & (t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)) & (t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)) & (t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)) & (t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= x_plan)) & (t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)) & (t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)) & (t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4))"], "_A": ["(true & t_dk <= d_dk & t_s2 <= d_s2 & t_a3 <= d_a3 & t_s2 <= d_s2 & t_c3 <= d_c3 & t_a4 <= d_a4 & t_c4 <= d_c4) | !(t_dk <= d_dk & d_dk <= T_dk & T_dk - d_dk <= 0 & (t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)) & (t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)) & (t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)) & (t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= 72)) & (t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)) & (t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)) & (t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4)))"], "_G": ["t_dk <= d_dk", "d_dk <= T_dk", "T_dk - d_dk <= 0", "t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)", "t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)", "t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)", "t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= 72)", "t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)", "t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)", "t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4)"], "_gA": [[0]], "_gG": [[0]], "K": ["x_plan = 72"]}, "badge": {"text": "\u2aaf", "status": "invalid", "why": {"failed": "guarantees", "trace": {"vars": ["T_a3", "T_a4", "T_c2", "T_c3", "T_c4", "T_dk", "T_s2", "T_s3", "d_a3", "d_a4", "d_c2", "d_c3", "d_c4", "d_dk", "d_s2", "d_s3", "t_a3", "t_a4", "t_c2", "t_c3", "t_c4", "t_dk", "t_s2", "t_s3"], "more": 0, "steps": [[-104, -24, -96, -24, 0, -192, -137, 0, -137, -24, -104, -96, -24, -192, -192, 0, -251, -251, -251, -251, -251, -251, -251, -251]], "loop": 0, "cut": false, "at": 0}, "violated": [0], "at": 0}}, "open": true}, {"kind": "group", "op": "composition", "title": "Fast_repaired", "note": "DroneTick \u2297 DroneSim2 \u2297 Assign \u2297 Target \u2297 Plan \u2297 Grant \u2297 Move \u2297 DroneSim3", "layout": "row", "contract": {"name": "Fast_repaired", "A": ["t_dk <= d_dk", "d_dk - t_dk <= offset"], "G": ["d_s3 - t_s3 <= deadline"], "_A": ["t_dk <= d_dk", "d_dk - t_dk <= 59"], "_G": ["d_s3 - t_s3 <= 250"], "_gA": [[0], [1]], "_gG": [[0]], "K": ["offset = 59", "deadline = 250"]}, "inputs": [], "outputs": ["d_s3", "t_s3"], "children": [{"kind": "contract", "title": "DroneTick", "note": null, "contract": {"name": "DroneTick", "A": [], "G": ["t_dk <= d_dk", "d_dk <= T_dk", "T_dk - d_dk <= 0"]}, "inputs": [], "outputs": ["T_dk", "d_dk", "t_dk"], "id": "n21", "types": {"t_dk": {"label": "real"}, "d_dk": {"label": "real"}, "T_dk": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "DroneSim2", "note": null, "contract": {"name": "DroneSim2", "A": ["t_dk <= d_dk"], "G": ["t_s2 = t_dk", "d_s2 = T_dk", "t_s2 <= d_s2", "d_s2 <= T_s2", "T_s2 - d_s2 <= 55"]}, "inputs": ["T_dk", "d_dk", "t_dk"], "outputs": ["T_s2", "d_s2", "t_s2"], "id": "n22", "types": {"t_dk": {"label": "real"}, "d_dk": {"label": "real"}, "T_dk": {"label": "real"}, "t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Assign", "note": null, "contract": {"name": "Assign", "A": ["t_s2 <= d_s2"], "G": ["t_a3 = t_s2", "d_a3 = T_s2", "t_a3 <= d_a3", "d_a3 <= T_a3", "T_a3 - d_a3 <= 33"]}, "inputs": ["T_s2", "d_s2", "t_s2"], "outputs": ["T_a3", "d_a3", "t_a3"], "id": "n24", "types": {"t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}, "t_a3": {"label": "real"}, "d_a3": {"label": "real"}, "T_a3": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Target", "note": null, "contract": {"name": "Target", "A": ["t_a3 <= d_a3"], "G": ["t_c2 = t_a3", "d_c2 = T_a3", "t_c2 <= d_c2", "d_c2 <= T_c2", "T_c2 - d_c2 <= 8"]}, "inputs": ["T_a3", "d_a3", "t_a3"], "outputs": ["T_c2", "d_c2", "t_c2"], "id": "n26", "types": {"t_a3": {"label": "real"}, "d_a3": {"label": "real"}, "T_a3": {"label": "real"}, "t_c2": {"label": "real"}, "d_c2": {"label": "real"}, "T_c2": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Plan", "note": null, "contract": {"name": "Plan", "A": ["t_s2 <= d_s2"], "G": ["t_c3 = t_s2", "d_c3 >= T_s2", "d_c3 >= T_c2", "d_c3 <= T_s2 | d_c3 <= T_c2", "t_c3 <= d_c3", "d_c3 <= T_c3", "T_c3 - d_c3 <= x_plan"], "_A": ["t_s2 <= d_s2"], "_G": ["t_c3 = t_s2", "d_c3 >= T_s2", "d_c3 >= T_c2", "d_c3 <= T_s2 | d_c3 <= T_c2", "t_c3 <= d_c3", "d_c3 <= T_c3", "T_c3 - d_c3 <= 42"], "_gA": [[0]], "_gG": [[0], [1], [2], [3], [4], [5], [6]], "K": ["x_plan = 42"]}, "inputs": ["T_c2", "T_s2", "d_s2", "t_s2"], "outputs": ["T_c3", "d_c3", "t_c3"], "id": "n28", "types": {"t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}, "T_c2": {"label": "real"}, "t_c3": {"label": "real"}, "d_c3": {"label": "real"}, "T_c3": {"label": "real"}}, "children": [], "edges": [], "layout": "row", "open": true}, {"kind": "contract", "title": "Grant", "note": null, "contract": {"name": "Grant", "A": ["t_c3 <= d_c3"], "G": ["t_a4 = t_c3", "d_a4 >= T_c3", "d_a4 >= T_a3", "d_a4 <= T_c3 | d_a4 <= T_a3", "t_a4 <= d_a4", "d_a4 <= T_a4", "T_a4 - d_a4 <= 0"]}, "inputs": ["T_a3", "T_c3", "d_c3", "t_c3"], "outputs": ["T_a4", "d_a4", "t_a4"], "id": "n30", "types": {"t_c3": {"label": "real"}, "d_c3": {"label": "real"}, "T_c3": {"label": "real"}, "T_a3": {"label": "real"}, "t_a4": {"label": "real"}, "d_a4": {"label": "real"}, "T_a4": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "Move", "note": null, "contract": {"name": "Move", "A": ["t_a4 <= d_a4"], "G": ["t_c4 = t_a4", "d_c4 >= T_a4", "d_c4 >= T_c3", "d_c4 <= T_a4 | d_c4 <= T_c3", "t_c4 <= d_c4", "d_c4 <= T_c4", "T_c4 - d_c4 <= 53"]}, "inputs": ["T_a4", "T_c3", "d_a4", "t_a4"], "outputs": ["T_c4", "d_c4", "t_c4"], "id": "n32", "types": {"t_a4": {"label": "real"}, "d_a4": {"label": "real"}, "T_a4": {"label": "real"}, "T_c3": {"label": "real"}, "t_c4": {"label": "real"}, "d_c4": {"label": "real"}, "T_c4": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}, {"kind": "contract", "title": "DroneSim3", "note": null, "contract": {"name": "DroneSim3", "A": ["t_c4 <= d_c4"], "G": ["t_s3 = t_c4", "d_s3 >= T_c4", "d_s3 >= T_s2", "d_s3 <= T_c4 | d_s3 <= T_s2", "t_s3 <= d_s3", "d_s3 <= T_s3", "T_s3 - d_s3 <= 0.4"]}, "inputs": ["T_c4", "T_s2", "d_c4", "t_c4"], "outputs": ["T_s3", "d_s3", "t_s3"], "id": "n34", "types": {"t_c4": {"label": "real"}, "d_c4": {"label": "real"}, "T_c4": {"label": "real"}, "T_s2": {"label": "real"}, "t_s3": {"label": "real"}, "d_s3": {"label": "real"}, "T_s3": {"label": "real"}}, "children": [], "edges": [], "layout": "row"}], "edges": [{"from": ["n21", "out", "T_dk"], "to": ["n22", "in", "T_dk"], "var": "T_dk"}, {"from": ["n21", "out", "d_dk"], "to": ["n22", "in", "d_dk"], "var": "d_dk"}, {"from": ["n21", "out", "t_dk"], "to": ["n22", "in", "t_dk"], "var": "t_dk"}, {"from": ["n22", "out", "T_s2"], "to": ["n24", "in", "T_s2"], "var": "T_s2"}, {"from": ["n22", "out", "d_s2"], "to": ["n24", "in", "d_s2"], "var": "d_s2"}, {"from": ["n22", "out", "t_s2"], "to": ["n24", "in", "t_s2"], "var": "t_s2"}, {"from": ["n24", "out", "T_a3"], "to": ["n26", "in", "T_a3"], "var": "T_a3"}, {"from": ["n24", "out", "d_a3"], "to": ["n26", "in", "d_a3"], "var": "d_a3"}, {"from": ["n24", "out", "t_a3"], "to": ["n26", "in", "t_a3"], "var": "t_a3"}, {"from": ["n26", "out", "T_c2"], "to": ["n28", "in", "T_c2"], "var": "T_c2"}, {"from": ["n22", "out", "T_s2"], "to": ["n28", "in", "T_s2"], "var": "T_s2"}, {"from": ["n22", "out", "d_s2"], "to": ["n28", "in", "d_s2"], "var": "d_s2"}, {"from": ["n22", "out", "t_s2"], "to": ["n28", "in", "t_s2"], "var": "t_s2"}, {"from": ["n24", "out", "T_a3"], "to": ["n30", "in", "T_a3"], "var": "T_a3"}, {"from": ["n28", "out", "T_c3"], "to": ["n30", "in", "T_c3"], "var": "T_c3"}, {"from": ["n28", "out", "d_c3"], "to": ["n30", "in", "d_c3"], "var": "d_c3"}, {"from": ["n28", "out", "t_c3"], "to": ["n30", "in", "t_c3"], "var": "t_c3"}, {"from": ["n30", "out", "T_a4"], "to": ["n32", "in", "T_a4"], "var": "T_a4"}, {"from": ["n28", "out", "T_c3"], "to": ["n32", "in", "T_c3"], "var": "T_c3"}, {"from": ["n30", "out", "d_a4"], "to": ["n32", "in", "d_a4"], "var": "d_a4"}, {"from": ["n30", "out", "t_a4"], "to": ["n32", "in", "t_a4"], "var": "t_a4"}, {"from": ["n32", "out", "T_c4"], "to": ["n34", "in", "T_c4"], "var": "T_c4"}, {"from": ["n22", "out", "T_s2"], "to": ["n34", "in", "T_s2"], "var": "T_s2"}, {"from": ["n32", "out", "d_c4"], "to": ["n34", "in", "d_c4"], "var": "d_c4"}, {"from": ["n32", "out", "t_c4"], "to": ["n34", "in", "t_c4"], "var": "t_c4"}, {"from": ["n34", "out", "d_s3"], "to": [null, "out", "d_s3"], "var": "d_s3"}, {"from": ["n34", "out", "t_s3"], "to": [null, "out", "t_s3"], "var": "t_s3"}], "id": "n35", "types": {"t_dk": {"label": "real"}, "d_dk": {"label": "real"}, "T_dk": {"label": "real"}, "t_s2": {"label": "real"}, "d_s2": {"label": "real"}, "T_s2": {"label": "real"}, "t_a3": {"label": "real"}, "d_a3": {"label": "real"}, "T_a3": {"label": "real"}, "t_c2": {"label": "real"}, "d_c2": {"label": "real"}, "T_c2": {"label": "real"}, "t_c3": {"label": "real"}, "d_c3": {"label": "real"}, "T_c3": {"label": "real"}, "t_a4": {"label": "real"}, "d_a4": {"label": "real"}, "T_a4": {"label": "real"}, "t_c4": {"label": "real"}, "d_c4": {"label": "real"}, "T_c4": {"label": "real"}, "t_s3": {"label": "real"}, "d_s3": {"label": "real"}, "T_s3": {"label": "real"}}, "composed": {"name": "DroneTick_DroneSim2_Assign_Target_Plan_Grant_Move_DroneSim3", "A": ["(true & t_dk <= d_dk & t_s2 <= d_s2 & t_a3 <= d_a3 & t_s2 <= d_s2 & t_c3 <= d_c3 & t_a4 <= d_a4 & t_c4 <= d_c4) | !(t_dk <= d_dk & d_dk <= T_dk & T_dk - d_dk <= 0 & (t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)) & (t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)) & (t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)) & (t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= x_plan)) & (t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)) & (t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)) & (t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4)))"], "G": ["t_dk <= d_dk & d_dk <= T_dk & T_dk - d_dk <= 0 & (t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)) & (t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)) & (t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)) & (t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= x_plan)) & (t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)) & (t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)) & (t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4))"], "_A": ["(true & t_dk <= d_dk & t_s2 <= d_s2 & t_a3 <= d_a3 & t_s2 <= d_s2 & t_c3 <= d_c3 & t_a4 <= d_a4 & t_c4 <= d_c4) | !(t_dk <= d_dk & d_dk <= T_dk & T_dk - d_dk <= 0 & (t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)) & (t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)) & (t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)) & (t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= 42)) & (t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)) & (t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)) & (t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4)))"], "_G": ["t_dk <= d_dk", "d_dk <= T_dk", "T_dk - d_dk <= 0", "t_dk <= d_dk -> (t_s2 = t_dk & d_s2 = T_dk & t_s2 <= d_s2 & d_s2 <= T_s2 & T_s2 - d_s2 <= 55)", "t_s2 <= d_s2 -> (t_a3 = t_s2 & d_a3 = T_s2 & t_a3 <= d_a3 & d_a3 <= T_a3 & T_a3 - d_a3 <= 33)", "t_a3 <= d_a3 -> (t_c2 = t_a3 & d_c2 = T_a3 & t_c2 <= d_c2 & d_c2 <= T_c2 & T_c2 - d_c2 <= 8)", "t_s2 <= d_s2 -> (t_c3 = t_s2 & d_c3 >= T_s2 & d_c3 >= T_c2 & (d_c3 <= T_s2 | d_c3 <= T_c2) & t_c3 <= d_c3 & d_c3 <= T_c3 & T_c3 - d_c3 <= 42)", "t_c3 <= d_c3 -> (t_a4 = t_c3 & d_a4 >= T_c3 & d_a4 >= T_a3 & (d_a4 <= T_c3 | d_a4 <= T_a3) & t_a4 <= d_a4 & d_a4 <= T_a4 & T_a4 - d_a4 <= 0)", "t_a4 <= d_a4 -> (t_c4 = t_a4 & d_c4 >= T_a4 & d_c4 >= T_c3 & (d_c4 <= T_a4 | d_c4 <= T_c3) & t_c4 <= d_c4 & d_c4 <= T_c4 & T_c4 - d_c4 <= 53)", "t_c4 <= d_c4 -> (t_s3 = t_c4 & d_s3 >= T_c4 & d_s3 >= T_s2 & (d_s3 <= T_c4 | d_s3 <= T_s2) & t_s3 <= d_s3 & d_s3 <= T_s3 & T_s3 - d_s3 <= 0.4)"], "_gA": [[0]], "_gG": [[0]], "K": ["x_plan = 42"]}, "badge": {"text": "\u2aaf", "status": "valid"}, "open": true}], "edges": [], "context": []};
 let busy = false;               // checks running in the editor (setBusy)
 let progressed = {};            // the results known while they run: contract name -> {tag: status}
 const LINE = 17, PAD = 10, PORT = 6, HEAD = 28, ICON = 16, INLINE_STATES = 8;
+const R = 6;          // the corner of every box, as --r in the styles
 const ctx = document.createElement("canvas").getContext("2d");
 function textWidth(s, font) { ctx.font = font; return ctx.measureText(s).width; }
+// a number in a few digits, never rounder than it is: 0.8095238095238095 is 0.8095, but 17.996 is
+// 17.996, not 18 (the value a term compares it with), and 12345.6 keeps its units
+function digits(x) {
+  if (typeof x !== "number" || Number.isInteger(x) || !isFinite(x) || String(x).length <= 7) return String(x);   // 17.875 whole
+  for (let p = Math.max(4, Math.floor(Math.log10(Math.abs(x))) + 2); p < 17; p++) {
+    const t = x.toPrecision(p);
+    if (+t === x || !/0$/.test(t.replace(/e.*$/, ""))) return String(+t);
+  }
+  return String(x);
+}
+// a Boolean value of a counterexample: ⊤ or ⊥ (the formulas keep the words true and false)
+const truth = b => b ? "⊤" : "⊥";
 const FONT_F = "11.5px Menlo, Monaco, monospace", FONT_H = "600 12.5px Helvetica, Arial, sans-serif",
       FONT_S = "11px 'Arial Unicode MS', Helvetica, Arial, sans-serif", FONT_W = "10px Menlo, Monaco, monospace";
 const show = { names: true, types: true, conditions: true, checks: true };
@@ -280,9 +464,9 @@ function wrap(f) {
 // Each part opens with a tag: θ (parameters: named constants), A (assumes), G (guarantees), E (an environment).
 // With a core in focus, its terms are on a red ground: [kind, tag, text, in the core].
 // src: the lines of the terms in the file, [first, last], when known.
-function terms(c, out, core, src) {
+function terms(c, out, core, src, which) {
   const part = (tag, fs, hit, at) => fs.forEach((f, j) => wrap(f).forEach((l, i) =>
-    out.push(["f", i || j ? "" : tag, l, hit.includes(j), at && at[j]])));
+    out.push(["f", i || j ? "" : tag, l, hit.includes(j), at && at[j], which ? which + ":" + tag + j : null])));
   if (c.K) part("θ", c.K, []);           // the parameters (named constants) and their values
   if (c.E) { part("A", c.A, core ? core.A : [], src && src.A); part("E", c.E, []); return; }
   // no assumption is A = ⊤ (true), as no guarantee is G = ⊤: both written
@@ -313,7 +497,7 @@ function lines(n) {
   const out = [], core = focused(n);
   const part = (c, which) => {
     const ts = [];
-    terms(c, ts, core && core.part === which ? core : null, which === "contract" ? n.source : null);
+    terms(c, ts, core && core.part === which ? core : null, which === "contract" ? n.source : null, which);
     if (ts.length <= LONG) { out.push(...ts); return; }
     const parts = [];                  // A and G cut apart: the first lines of each
     ts.forEach(t => (t[1] || !parts.length) ? parts.push([t]) : parts[parts.length - 1].push(t));
@@ -323,7 +507,7 @@ function lines(n) {
       const keep = Math.max(1, i === parts.length - 1 ? left : Math.max(Math.floor(SHORT / parts.length), SHORT - rest));
       let room = keep - p.filter(t => t[3]).length;   // the lines of a core in focus are kept first
       const shown = p.filter(t => t[3] || room-- > 0);
-      if (shown[0] !== p[0]) shown[0] = [shown[0][0], p[0][1], shown[0][2], shown[0][3], shown[0][4]];
+      if (shown[0] !== p[0]) shown[0] = [shown[0][0], p[0][1], shown[0][2], shown[0][3], shown[0][4], shown[0][5]];
       out.push(...shown);
       if (p.length > shown.length)   // with the lines of the terms it hides, for the cursor
         out.push(["more", "", "⋯ " + (p.length - shown.length) + " more lines", c,
@@ -382,7 +566,7 @@ const REF = s => s.startsWith("⪯"), rest = s => s.slice(1).trim();
 const tagWidth = s => REF(s) ? 22 + (rest(s) ? textWidth(rest(s), FONT_T) + 2 : 0) : textWidth(s, FONT_T) + 12;
 function tag(g, x, y, s, status) {
   const c = COLOR[status], ink = c ? "#fff" : "var(--soft)";
-  el("rect", { x, y, width: tagWidth(s), height: 16, rx: 4, fill: c || "#fff", stroke: c || "var(--line)",
+  el("rect", { x, y, width: tagWidth(s), height: 16, rx: R, fill: c || "#fff", stroke: c || "var(--line)",
                "stroke-width": 1 }, g);
   if (REF(s)) {               // refinement as in the book: ≺, curved, over a bar
     el("path", { d: `M${x + 15.8} ${y + 2.2} C${x + 14.6} ${y + 5.6} ${x + 11} ${y + 6.9} ${x + 6} ${y + 7.1}`
@@ -397,7 +581,7 @@ function tag(g, x, y, s, status) {
 // A check running: a tag as wide as its result will be, with three dots.
 function pending(g, x, y, s) {
   const w = tagWidth(s), p = el("g", { class: "pending" }, g);
-  el("rect", { x, y, width: w, height: 16, rx: 4, fill: "#fff", stroke: "var(--line)", "stroke-width": 1 }, p);
+  el("rect", { x, y, width: w, height: 16, rx: R, fill: "#fff", stroke: "var(--line)", "stroke-width": 1 }, p);
   [-5, 0, 5].forEach(d => el("circle", { cx: x + w / 2 + d, cy: y + 8, r: 1.6 }, p));
   tip(p, (WHAT[s] || s) + ": being checked");
   return w;
@@ -410,7 +594,6 @@ const WHAT = { "A": "compatible: the assumptions A are satisfiable",
                "WS": "well-separated: the component cannot win by making the environment break A",
                "¬V": "not vacuous: each liveness guarantee asks something of the component",
                "M ⊨ C": "the model implements the contract",
-               "safe": "safe code: no overflow, division by zero, access out of bounds, or failed assert",
                "E ⊨ A": "the environment satisfies the assumptions",
                "⪯": "what is inside refines this contract" };
 const checks = n => show.checks && n.checks ? n.checks : [];
@@ -458,6 +641,7 @@ const FLOW = { "elk.layered.spacing.nodeNodeBetweenLayers": "72", "elk.spacing.n
                "elk.layered.layering.strategy": "INTERACTIVE" };
 let widen = {};
 const KIND = {};
+const ERR = {};          // the wires of a signal the parts do not agree on: what to say
 // The column of each box inside n, by the flow of its wires: the longest
 // path from the inputs of n, a wire back to an earlier box (a loop) left out.
 // Viewpoints stacked in one box share a column.
@@ -515,7 +699,7 @@ function toElk(n, column, row) {
   if (!inside(n) || folded.has(n.id)) { base.width = sz.w; base.height = sz.h; return base; }
   const col = columns(n);
   const edges = (n.edges || []).filter(w => !w.open).map((w, i) => {
-    const id = n.id + ":e" + i; KIND[id] = typeOf(n, w.var);
+    const id = n.id + ":e" + i; KIND[id] = typeOf(n, w.var); ERR[id] = w.error;
     return { id, w, sources: [(w.from[0] || n.id) + ":" + w.from[1] + ":" + w.from[2]],
              targets: [(w.to[0] || n.id) + ":" + w.to[1] + ":" + w.to[2]] }; });
   const strip = es => es.map(({ w, ...ed }) => ed);
@@ -549,7 +733,7 @@ function tip(parent, s) { parent.setAttribute("data-tip", s); }
 // states and a move for a model, with a spark when it was synthesized.
 function icon(g, kind, x, y, on, title, off) {
   const c = el("g", { class: off ? "" : "icon" }, g), ink = off ? "var(--line)" : "var(--teal)", fg = on ? "#fff" : ink;
-  el("rect", { x, y, width: ICON, height: ICON, rx: 4, fill: on ? ink : "#fff",
+  el("rect", { x, y, width: ICON, height: ICON, rx: R, fill: on ? ink : "#fff",
                stroke: ink, "stroke-width": 1.1 }, c);
   if (kind === "contract") {
     el("rect", { x: x + 4, y: y + 3.5, width: 8, height: 9, rx: 1.5, fill: "none", stroke: fg, "stroke-width": 1.1 }, c);
@@ -571,10 +755,10 @@ function icon(g, kind, x, y, on, title, off) {
 }
 
 const STYLE = {
-  contract:  { rx: 10, fill: "#fff", stroke: "var(--teal)", width: 1.2, dash: "none" },
+  contract:  { rx: R, fill: "#fff", stroke: "var(--teal)", width: 1.2, dash: "none" },
   component: { rx: 2, fill: "#fff", stroke: "var(--ink)", width: 1.8, dash: "none" },
-  group:     { rx: 10, fill: "var(--fill)", stroke: "var(--line)", width: 1, dash: "none" },
-  hole:      { rx: 10, fill: "url(#hatch)", stroke: "var(--teal)", width: 1.2, dash: "5 4" },
+  group:     { rx: R, fill: "var(--fill)", stroke: "var(--line)", width: 1, dash: "none" },
+  hole:      { rx: R, fill: "url(#hatch)", stroke: "var(--teal)", width: 1.2, dash: "5 4" },
   environment: { rx: 2, fill: "var(--fill)", stroke: "var(--soft)", width: 1.4, dash: "none" } };
 
 function drawNode(g, e, ox, oy) {
@@ -613,7 +797,7 @@ function drawNode(g, e, ox, oy) {
     ix += tag(t, ix, y + 6, c.name, c.status) + 4;
     tip(t, (WHAT[c.name] || c.name) + ": " + (SAYS[c.status] || "not checked") + (c.reason ? " (" + c.reason + ")" : "")
            + (fix ? ". Click: why it fails" : c.core ? (on ? ". Click: hide the core" : ". Click: show the core") : ""));
-    if (on) el("rect", { x: ix - 4 - tagWidth(c.name) - 2, y: y + 4, width: tagWidth(c.name) + 4, height: 20, rx: 5,
+    if (on) el("rect", { x: ix - 4 - tagWidth(c.name) - 2, y: y + 4, width: tagWidth(c.name) + 4, height: 20, rx: R,
                          fill: "none", stroke: COLOR[c.status], "stroke-width": 1 }, t);
     if (c.core || fix) { t.setAttribute("class", "icon");
       // one that fails: its details, with its core shown; one that holds: its core on and off
@@ -628,7 +812,7 @@ function drawNode(g, e, ox, oy) {
   let rx = x + e.width - PAD;
   if (inside(n)) {             // fold: hide or show the boxes inside
     const f = el("g", { class: "icon" }, box), shut = folded.has(n.id), cx = rx - ICON / 2, cy = y + 14;
-    el("rect", { x: rx - ICON, y: y + 6, width: ICON, height: ICON, rx: 4, fill: shut ? "var(--teal)" : "#fff",
+    el("rect", { x: rx - ICON, y: y + 6, width: ICON, height: ICON, rx: R, fill: shut ? "var(--teal)" : "#fff",
                  stroke: "var(--teal)", "stroke-width": 1.1 }, f);
     el("path", { d: shut ? `M${cx - 3.5} ${cy - 1.5} L${cx} ${cy + 2} L${cx + 3.5} ${cy - 1.5}`
                          : `M${cx - 3.5} ${cy + 1.5} L${cx} ${cy - 2} L${cx + 3.5} ${cy + 1.5}`,
@@ -643,13 +827,14 @@ function drawNode(g, e, ox, oy) {
     const known = busy && !n.badge.status && n.contract && (progressed[n.contract.name] || {})[n.badge.text];
     if (busy && !n.badge.status && !known) pending(b, rx - w, y + 6, n.badge.text);
     else tag(b, rx - w, y + 6, n.badge.text, n.badge.status || known);
-    tip(b, (WHAT[n.badge.text.split(" of ")[0]] || n.badge.text) + ": " + (SAYS[n.badge.status] || "not checked")
-           + ". Click: the check" + ((n.repair || {})[tagOf(n.badge.text)] ? ", and its repairs" : ""));
+    // the tip says the check as the panel does ("Room and Thermostat do not refine Comfort")
+    tip(b, plainOf(checkTitle(n, tagOf(n.badge.text))) + ". Click for the details"
+           + ((n.repair || {})[tagOf(n.badge.text)] ? " and the repairs" : "") + ".");
     b.onclick = () => openRepair(n, tagOf(n.badge.text)); }
-  sz.ls.forEach(([k, label, s, core, at], i) => {
+  sz.ls.forEach(([k, label, s, core, at, term], i) => {
     const frame = r => el("rect", { class: "hl", x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, rx: 3,
                                      fill: "none", stroke: "var(--teal)", "stroke-width": 1.5 }, r);
-    const ty = y + HEAD + 12 + i * LINE, row = el("g", {}, box);
+    const ty = y + HEAD + 12 + i * LINE, row = el("g", term ? { "data-term": term } : {}, box);
     if (k === "f") {
       if (core) el("rect", { x: x + 4, y: ty - 12, width: e.width - 8, height: LINE, rx: 3, fill: "#f6dcd9", class: "core-row" }, row);
       if (at) {             // its lines in the file: the editor goes there, and marks it from there
@@ -673,12 +858,18 @@ function drawNode(g, e, ox, oy) {
     else text(row, x + PAD, ty, "s", s); });
   if (sz.m) drawModel(box, sz.m, x + PAD, y + HEAD + sz.ls.length * LINE + (sz.ls.length ? 8 : 0) + 4);
   (e.ports || []).forEach(p => {
-    el("rect", { x: x + p.x, y: y + p.y, width: p.width, height: p.height, fill: "var(--teal)" }, g);
+    el("rect", { class: "port", x: x + p.x, y: y + p.y, width: p.width, height: p.height, fill: "var(--teal)" }, g);
     (p.labels || []).forEach(l => { const t = text(g, x + p.x + l.x, y + p.y + l.y + 9, "w", l.text);
       t.setAttribute("data-var", String(p.id).split(":").pop()); t.setAttribute("data-pbox", n.id);
       if (l.x < 0) t.setAttribute("data-side", "left"); }); });
   (e.children || []).forEach(c => drawNode(g, c, x, y));
   (e.edges || []).forEach(ed => drawEdge(g, ed, x, y));
+  // a signal the parts do not agree on (two drivers, two types): its names on the ports red, and said
+  Object.entries(n.clash || {}).forEach(([v, says]) => {
+    const here = new Set([n.id, ...(n.children || []).map(c => c.id)]);
+    g.querySelectorAll('text[data-var="' + v + '"]').forEach(t => {
+      if (!here.has(t.getAttribute("data-pbox"))) return;
+      t.setAttribute("style", "fill:var(--bad)"); tip(t, says); }); });
   if (folded.has(n.id)) return;
   (n.edges || []).filter(w => w.open).forEach(w => {
     let c = null, dx = 0, dy = 0;              // the box, directly inside or in a row
@@ -709,17 +900,24 @@ function drawNode(g, e, ox, oy) {
 }
 
 function drawEdge(g, ed, ox, oy) {
-  const k = KIND[ed.id];
+  const k = KIND[ed.id], bad = ERR[ed.id];
   (ed.sections || []).forEach(s => {
     const pts = [s.startPoint, ...(s.bendPoints || []), s.endPoint];
-    el("polyline", { points: pts.map(p => (ox + p.x) + "," + (oy + p.y)).join(" "), fill: "none",
-                     stroke: "var(--wire)", "stroke-width": k && k.bus ? 2.6 : k ? 1.8 : 1.1,
-                     "stroke-linejoin": "round", "marker-end": "url(#arrow)" }, g);
+    const line = el("polyline", { points: pts.map(p => (ox + p.x) + "," + (oy + p.y)).join(" "), fill: "none",
+                     stroke: bad ? "var(--bad)" : "var(--wire)", "stroke-width": k && k.bus ? 2.6 : k || bad ? 1.8 : 1.1,
+                     "stroke-linejoin": "round", "marker-end": bad ? "url(#arrow-bad)" : "url(#arrow)" }, g);
+    if (bad) tip(line, bad);
     if (k && k.bus) {         // a bus: a slash and its width, on its longest segment
       let a = pts[0], b = pts[1] || pts[0];
       for (let i = 0; i + 1 < pts.length; i++)
         if (Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y) > Math.hypot(b.x - a.x, b.y - a.y)) { a = pts[i]; b = pts[i + 1]; }
-      const mx = ox + (a.x + b.x) / 2, my = oy + (a.y + b.y) / 2;
+      // the slash where no label of a port is: the middle, else a third, else none (the wire is thick)
+      const labels = [...document.querySelectorAll("#view text[data-var]")].map(t => t.getBBox());
+      const free = (x, y) => !labels.some(q => x + 8 > q.x && x - 8 < q.x + q.width && y + 10 > q.y && y - 10 < q.y + q.height);
+      const at = [0.5, 0.35, 0.65, 0.25, 0.75].map(t => [ox + a.x + (b.x - a.x) * t, oy + a.y + (b.y - a.y) * t])
+        .find(([x, y]) => free(x, y));
+      if (!at) return;
+      const [mx, my] = at;
       el("line", { x1: mx - 4, y1: my + 5, x2: mx + 4, y2: my - 5, stroke: "var(--wire)", "stroke-width": 1.3 }, g);
       if (!show.types) text(g, mx + 4, my - 6, "w", String(k.bus));
     } });
@@ -762,7 +960,7 @@ function drawModel(g, m, ax, ay) {
     (ed.labels || []).forEach(l => text(lg, x0 + l.x + 2, ay + l.y + 9, "w halo", l.text));
   });
   m.f.states.forEach(s => { const c = m.pos[s.id], x = x0 + c.x, y = ay + c.y;
-    el("rect", { x, y, width: c.width, height: c.height, rx: 11, fill: "#fff", stroke: "var(--teal)",
+    el("rect", { x, y, width: c.width, height: c.height, rx: R, fill: "#fff", stroke: "var(--teal)",
                  "stroke-width": s.init ? 2.2 : 1 }, lg);
     const t = text(lg, x + c.width / 2, y + 15, "w", s.label); t.setAttribute("text-anchor", "middle");
     t.setAttribute("style", "fill:var(--ink)");
@@ -790,10 +988,14 @@ function place() {
     dots.setAttribute("patternTransform", `translate(${cam.x % step},${cam.y % step})`);
   }
 }
+// the scale of the whole diagram in the view: a small diagram is made larger too, up to 1.5 times
+function fitScale() {
+  const v = document.getElementById("view"), W = v.clientWidth, H = v.clientHeight - TOP;
+  return Math.min(1.5, (W - 40) / Math.max(size0.w, 1), (H - 30) / Math.max(size0.h, 1));
+}
 function fit() {
   const v = document.getElementById("view"), W = v.clientWidth, H = v.clientHeight - TOP;
-  // a small diagram is made larger too, up to 1.5 times
-  const k = Math.min(1.5, (W - 40) / Math.max(size0.w, 1), (H - 30) / Math.max(size0.h, 1));
+  const k = fitScale();
   cam = { k, x: Math.max(20, (W - size0.w * k) / 2), y: TOP + Math.max(10, (H - size0.h * k) / 2) };
   place();
 }
@@ -844,11 +1046,19 @@ function zoomBy(f) { if (!cam) return; const v = document.getElementById("view")
     zoomAt(e.clientX, e.clientY, Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.002)));          // a pinch comes with ctrl
   }, { passive: false });
   document.addEventListener("keydown", e => {
-    if (e.key === "Escape") {                     // the help first, then the panel
-      const help = document.getElementById("help");
-      if (help.style.display === "block") help.style.display = "none"; else hideInspector();
+    if (e.key === "Escape") {      // the help first, the model window, the details (back to the list), the panel
+      const help = document.getElementById("help"), pop = document.getElementById("pop");
+      if (help.style.display === "block") help.style.display = "none";
+      else if (WAVE.open) closeWave();
+      else if (pop.style.display === "flex") closePop();
+      else if (inspector.open && inspector.tab === "details" && panel) closeRepair();
+      else hideInspector();
       return; }
     if (e.target.closest && e.target.closest("input, textarea")) return;
+    if (WAVE.open && WAVE.key && !(e.target.closest && e.target.closest("#wave, button, a, select, summary")) && WAVE.key(e)) return;
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && inspector.open && panel && panel.goStep
+        && document.getElementById("insp").contains(document.activeElement)) {   // the step of the counterexample
+      panel.goStep(e.key === "ArrowLeft" ? -1 : 1); e.preventDefault(); return; }
       if (!cam) return;
     if (e.key === "+" || e.key === "=") zoomBy(1.25);
     else if (e.key === "-") zoomBy(1 / 1.25);
@@ -864,10 +1074,13 @@ function svgIn(container, width, height) {
   const m = el("marker", { id: "arrow", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7,
                            markerHeight: 7, markerUnits: "userSpaceOnUse", orient: "auto" }, defs);
   el("path", { d: "M0,0 L10,5 L0,10 z", fill: "var(--wire)" }, m);
+  const mb = el("marker", { id: "arrow-bad", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7,
+                            markerHeight: 7, markerUnits: "userSpaceOnUse", orient: "auto" }, defs);
+  el("path", { d: "M0,0 L10,5 L0,10 z", fill: "var(--bad)" }, mb);
   const h = el("pattern", { id: "hatch", width: 7, height: 7, patternUnits: "userSpaceOnUse",
                             patternTransform: "rotate(45)" }, defs);
-  el("rect", { width: 7, height: 7, fill: "#fff" }, h);
-  el("line", { x1: 0, y1: 0, x2: 0, y2: 7, stroke: "#e6ecec", "stroke-width": 2 }, h);
+  el("rect", { width: 7, height: 7, fill: "var(--hole)" }, h);
+  el("line", { x1: 0, y1: 0, x2: 0, y2: 7, stroke: "var(--hole-line)", "stroke-width": 2 }, h);
   const d = el("pattern", { id: "dots", width: DOT, height: DOT, patternUnits: "userSpaceOnUse" }, defs);
   el("circle", { cx: 1, cy: 1, r: 1, fill: "var(--grid)" }, d);
   el("rect", { width: "100%", height: "100%", fill: "url(#dots)" }, svg);
@@ -888,7 +1101,7 @@ function narrow(e, todo) {
 }
 const ROOT = { id: "root", types: {}, children: DATA.nodes };
 function rootEdges() {      // from an environment to the box it drives
-  return (DATA.edges || []).map((w, i) => { const id = "root:e" + i; KIND[id] = typeOf(ROOT, w.var);
+  return (DATA.edges || []).map((w, i) => { const id = "root:e" + i; KIND[id] = typeOf(ROOT, w.var); ERR[id] = w.error;
     return { id, sources: [w.from.join(":")], targets: [w.to.join(":")] }; });
 }
 // The items of the diagram in rows, when one row would be much wider than
@@ -983,8 +1196,11 @@ async function render() {
     rows.forEach((c, r) => { dx[r] = left - c.x; dy[r] = y - c.y; c.x = left; c.y = y; y += c.height + 40; });
     (out.edges || []).forEach(ed => {          // a wire from an environment moves with its row
       const r = of[ed.sources[0].split(":")[0]];
+      // given from the corner of its row (elkjs: the container of the wire), else from the root
+      const inRow = rows.indexOf(rows.find(c => c.id === ed.container));
+      const [ox, oy] = inRow >= 0 ? [rows[inRow].x, rows[inRow].y] : [dx[r], dy[r]];
       (ed.sections || []).forEach(sec => [sec.startPoint, sec.endPoint, ...(sec.bendPoints || [])]
-        .forEach(p => { p.x += dx[r]; p.y += dy[r]; }));
+        .forEach(p => { p.x += ox; p.y += oy; }));
     });
     out.height = y - 40;
   }
@@ -999,6 +1215,9 @@ async function render() {
   const g = svgIn(document.getElementById("view"), out.width, out.height);
   (out.children || []).forEach(c => drawNode(g, c, 0, 0));
   (out.edges || []).forEach(ed => drawEdge(g, ed, 0, 0));
+  // the ports over the wires: an arrow ends at its port, not on it (their places are absolute)
+  const ports = el("g", { class: "ports" }, g);
+  g.querySelectorAll("rect.port").forEach(r => ports.appendChild(r));
   select(selectedLine, false, selectedAt);
   afterRender();
 }
@@ -1085,7 +1304,7 @@ function help() {
   [["contract", "parameters θ, assumptions A, guarantees G"], ["composed", "composed contract (⊗)"],
    ["model", "model given (RTL, JSON, SMV)"], ["synth", "model synthesized (slugs)"]].forEach(([k, t]) =>
     sample(svg => icon(svg, k, 16, 2, false, t), t));
-  sample(s => { el("rect", { x: 16, y: 2, width: 16, height: 16, rx: 4, fill: "#fff", stroke: "#17393b", "stroke-width": 1.1 }, s);
+  sample(s => { el("rect", { x: 16, y: 2, width: 16, height: 16, rx: R, fill: "#fff", stroke: "#17393b", "stroke-width": 1.1 }, s);
                 el("path", { d: "M20.5 11.5 L24 8 L27.5 11.5", fill: "none", stroke: "#17393b", "stroke-width": 1.4 }, s); },
          "hide the boxes inside");
   // a check: green when it holds, red when not, grey when undecided
@@ -1094,7 +1313,7 @@ function help() {
     tag(svg, 44 - w - 2, 2, t, "valid"); tag(svg, 46, 2, t, "invalid");
     d2.appendChild(document.createTextNode(d)); h.appendChild(d2); };
   [["A", "compatible"], ["G", "consistent"], ["A∧G", "feasible"], ["R", "realizable"],
-   ["WS", "well-separated"], ["¬V", "no vacuous output"], ["M ⊨ C", "implements"], ["safe", "safe code"],
+   ["WS", "well-separated"], ["¬V", "no vacuous output"], ["M ⊨ C", "implements"],
    ["E ⊨ A", "environment"], ["⪯", "refines"]].forEach(([t, d]) => pair(t, d));
   sample(s => el("rect", { x: 4, y: 4, width: 40, height: 12, rx: 3, fill: "#f6dcd9" }, s), "core (click a red tag)");
   sample(s => { tag(s, 4, 2, "⪯", "invalid"); }, "click a result: the check, and its repairs");
@@ -1112,8 +1331,8 @@ function help() {
 function svgDefsHatch(s) {
   const p = el("pattern", { id: "hatchh", width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" },
                el("defs", {}, s));
-  el("rect", { width: 6, height: 6, fill: "#fff" }, p);
-  el("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: "#dfe6e6", "stroke-width": 2 }, p);
+  el("rect", { width: 6, height: 6, fill: "var(--hole)" }, p);
+  el("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: "var(--hole-line)", "stroke-width": 2 }, p);
 }
 
 function drawContext() {
@@ -1226,27 +1445,45 @@ function exportMenu() {
   const m = document.getElementById("export");
   m.style.display = m.style.display === "flex" ? "none" : "flex";
 }
-function exported() {
+// The diagram as a file: each element with its computed style written on it as attributes, not the
+// styles of the page (other programs read little CSS, and the rules for printing the page would hide
+// it); what is hidden left out; no ground (the PNG and the PDF are on white).
+const PAINT = ["fill", "fill-opacity", "stroke", "stroke-width", "stroke-opacity", "stroke-dasharray",
+               "stroke-linecap", "stroke-linejoin", "opacity", "paint-order"];
+const FONT = ["font-family", "font-size", "font-weight", "font-style", "text-anchor", "letter-spacing"];
+function exported(ground) {
   const src = document.querySelector("#view > svg");
   if (!src || !camera) return null;
   const box = camera.getBBox(), pad = 16, w = Math.ceil(box.width + 2 * pad), h = Math.ceil(box.height + 2 * pad);
+  const sel = [...src.querySelectorAll(".sel")];          // the box of the cursor, and a flash: not in the file
+  sel.forEach(e => e.classList.remove("sel"));
   const svg = src.cloneNode(true);
+  sel.forEach(e => e.classList.add("sel"));
+  svg.querySelectorAll(".flash").forEach(e => e.remove());
+  const from = [...src.querySelectorAll("*")].filter(e => !e.classList.contains("flash")), to = [...svg.querySelectorAll("*")];
+  const gone = [];
+  from.forEach((e, i) => {
+    const c = getComputedStyle(e), x = to[i];
+    if (c.display === "none" || c.visibility === "hidden") { gone.push(x); return; }
+    if (e.closest("defs") && e.tagName !== "pattern" && e.parentNode.tagName !== "pattern" && e.parentNode.tagName !== "marker") return;
+    for (const k of PAINT) { const v = c.getPropertyValue(k); if (v) x.setAttribute(k, v.replace(/url\("?(#[^")]+)"?\)/, "url($1)")); }
+    if (e.tagName === "text" || e.tagName === "tspan") for (const k of FONT) { const v = c.getPropertyValue(k); if (v) x.setAttribute(k, v); }
+    x.removeAttribute("class"); x.removeAttribute("style");
+  });
+  gone.forEach(x => x.remove());
   svg.setAttribute("xmlns", NS);
   svg.setAttribute("width", w); svg.setAttribute("height", h); svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.removeAttribute("class"); svg.removeAttribute("style");
   [...svg.children].filter(c => c.tagName === "rect").forEach(c => c.remove());   // the dots
-  svg.querySelectorAll(".sel").forEach(e => e.classList.remove("sel"));            // the box of the cursor
   const g = [...svg.children].find(c => c.tagName === "g");
   g.setAttribute("transform", `translate(${pad - box.x},${pad - box.y})`);
-  const ground = document.createElementNS(NS, "rect");
-  ground.setAttribute("width", w); ground.setAttribute("height", h); ground.setAttribute("fill", "#fff");
-  svg.insertBefore(ground, g);
-  const style = document.createElementNS(NS, "style");
-  style.textContent = [...document.querySelectorAll("style")].map(x => x.textContent).join("\n");
-  svg.insertBefore(style, svg.firstChild);
+  if (ground) {
+    const r = document.createElementNS(NS, "rect");
+    r.setAttribute("width", w); r.setAttribute("height", h); r.setAttribute("fill", "#fff");
+    svg.insertBefore(r, g);
+  }
   svg.querySelectorAll("[data-tip]").forEach(e => e.removeAttribute("data-tip"));
-  const root = getComputedStyle(document.documentElement);
-  const text = new XMLSerializer().serializeToString(svg)
-    .replace(/var\((--[\w-]+)\)/g, (_, v) => root.getPropertyValue(v).trim() || "#000");
+  const text = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(svg);
   return { text, w, h };
 }
 let vscodeApi = null;
@@ -1310,31 +1547,101 @@ function h(tag, attrs, ...kids) {
     e.appendChild(typeof c === "string" || typeof c === "number" ? document.createTextNode(String(c)) : c); });
   return e;
 }
+// The title of a check, as parts: a name (of a part, a model, a contract: {b: name}) or plain text.
+// richOf draws it with the names in bold; plainOf is its text (for a tooltip).
+const B = name => ({ b: name });
+const andOf = names => names.length < 2 ? [B(names[0])]
+  : names.slice(0, -1).flatMap((x, i) => i ? [", ", B(x)] : [B(x)]).concat([" and ", B(names[names.length - 1])]);
+const plainOf = parts => parts.map(x => typeof x === "string" ? x : x.b).join("");
+const richOf = parts => parts.map(x => typeof x === "string" ? x : h("b", {}, x.b));
 function checkTitle(n, t) {
-  return (statusOf(n, t) === "unknown" ? "Not decided: " : "") + claimOf(n, t);
+  const st = statusOf(n, t);         // a check not run is not said as if it held
+  return (st === "unknown" ? ["Not decided: "] : st === "valid" || st === "invalid" ? [] : ["Not checked: "]).concat(claimOf(n, t));
 }
-// the claim of a check, said as it is: "A refines B", or "A does not refine B" when it fails
+// the model of a check of an implementation, said as the reader knows it: the C function f, the state
+// machine of X, the RTL of X; from the argument of a repair ("heater.c:thermostat", "path/arb.smv") or the box
+function modelOf(n, arg) {
+  const src = n.model && n.model.source, file = arg ? arg.split("/").pop() : "";
+  if (src === "c" || /\.(c|h):/.test(file)) return ["The C function ", B(file ? file.split(":").pop() : n.model.name)];
+  if (src === "rtl" || /\.s?v$/.test(file)) return ["The RTL of ", B(n.title)];
+  return ["The state machine of ", B(n.title)];
+}
+// the claim of a check, said as it is: "Room and Thermostat do not refine Comfort" when it fails
 function claimOf(n, t) {
   const no = statusOf(n, t) === "invalid", r = (n.repair || {})[t];
   const v = (yes, not) => no ? not : yes;
-  if (r && r.check === "refines") return r.args[0].split("+").join(" ⊗ ") + v(" refines ", " does not refine ") + r.args[1];
-  if (r && r.check === "impl") return r.args[0].split("/").pop() + v(" implements ", " does not implement ") + r.args[1];
-  if (r && r.check === "env") return r.args[0].split("/").pop() + v(" is an environment of ", " is not an environment of ") + r.args[1];
-  if (r) return "A ∧ G of " + r.args[0] + v(" can hold", " cannot hold");
   const req = (n.contract && n.contract.name) || n.title;           // from the box: what is inside, its model
+  const refines = (names, what) => andOf(names).concat([names.length > 1 ? v(" refine ", " do not refine ")
+                                                                         : v(" refines ", " does not refine "), B(what)]);
+  const meets = (model, what) => model.concat(what === null ? [v(" meets its contract", " does not meet its contract")]
+                                                           : [v(" implements ", " does not implement "), B(what)]);
+  const conflict = what => ["The terms of ", B(what), v(" can hold together", " conflict")];
+  if (r && r.check === "refines") return refines(r.args[0].split("+"), r.args[1]);
+  if (r && r.check === "impl") {
+    const model = modelOf(n, r.args[0]);
+    return meets(model, model[1].b === r.args[1] ? null : r.args[1]);
+  }
+  if (r && r.check === "env") return [B(r.args[0].split("/").pop()), v(" is an environment of ", " is not an environment of "), B(r.args[1])];
+  if (r) return conflict(r.args[0]);
   if (t === "⪯") {
     // what is inside the box (the candidate in a hole, the parts of a decomposition), else its note
-    const inner = (n.children || []).filter(c => c.kind !== "hole").map(c => c.title).join(" ⊗ ") || n.note;
-    return inner ? inner + v(" refines ", " does not refine ") + req : n.title;
+    const inner = (n.children || []).filter(c => c.kind !== "hole").map(c => c.title);
+    const names = inner.length ? inner : (n.note ? n.note.split(" ⊗ ") : []);
+    return names.length ? refines(names, req) : [B(n.title)];
   }
-  if (t === "M ⊨ C" && n.model) return n.model.name + (n.model.name === req ? v(" meets its contract", " does not meet its contract")
-                                                                          : v(" implements ", " does not implement ") + req);
-  if (t === "safe" && n.model) return n.model.name + v(" is safe code", " is not safe code");
-  if (t === "E ⊨ A") return n.title + v(" is an environment", " is not an environment");
-  // a check of one contract, as a sentence: "EPS is not realizable"
-  if (t === "A∧G") return "A ∧ G of " + req + v(" can hold", " cannot hold");
-  if (t === "¬V") return req + v(" is not vacuous", " is vacuous");
-  return req + v(" is ", " is not ") + (WHAT[t] || t).split(":")[0].replace(/\s*\(.*\)$/, "");
+  if (t === "M ⊨ C" && n.model) {
+    const model = modelOf(n, null);
+    return n.model.name === req && n.model.source !== "c" ? [B(req), v(" meets its contract", " does not meet its contract")]
+                                                          : meets(model, model[1].b === req ? null : req);
+  }
+  if (t === "E ⊨ A") {                // whose environment: the contract its wires go to
+    const e = (DATA.edges || []).find(x => x.from[0] === n.id), to = e && byId[e.to[0]];
+    const of = to && ((to.contract && to.contract.name) || to.title);
+    return [B(n.title), v(" is an environment", " is not an environment")].concat(of ? [" of ", B(of)] : []);
+  }
+  if (t === "A∧G") return conflict(req);
+  if (t === "¬V") return [B(req), v(" is not vacuous", " is vacuous")];
+  return [B(req), v(" is ", " is not ") + (WHAT[t] || t).split(":")[0].replace(/\s*\(.*\)$/, "")];
+}
+// The second line of a check in the list: where its counterexample fails first and with which values,
+// how many terms are in conflict, the constants that can change; nothing when there is nothing to say.
+function factsOf(n, t, r, w) {
+  const out = [];
+  const c = (n.checks || []).find(x => x.name === t);
+  if (c && c.core && statusOf(n, t) === "invalid") {
+    const k = (c.core.A || []).length + (c.core.G || []).length, many = k > 1;
+    if (k) out.push(t === "R" ? k + (many ? " guarantees" : " guarantee") + " in conflict"
+                  : ["A", "G", "A∧G"].includes(t) ? k + (many ? " terms" : " term") + " in conflict"
+                  : k + (many ? " terms" : " term") + " involved");
+  }
+  const tr = w && w.trace;
+  if (tr && tr.steps && tr.steps.length && statusOf(n, t) === "invalid") {
+    // the values of the variables of the terms it breaks (else of the terms of the contract), two at most
+    const terms = (w.violated || []).map(i => ((n.contract || {}).G || [])[i]).filter(Boolean);
+    const text = (terms.length ? terms : [].concat((n.contract || {}).A || [], (n.contract || {}).G || [])).join(" ");
+    const named = new Set((text.match(/[A-Za-z_]\w*/g) || []));
+    const fmt = x => typeof x === "boolean" ? truth(x) : String(x);
+    const vals = k => tr.vars.map((x, i) => [x, i]).filter(([x]) => named.has(x)).slice(0, 2)
+                        .map(([x, i]) => x + " = " + fmt(tr.steps[k][i])).join(", ");
+    const call = n.model && n.model.source === "c" && t === "M ⊨ C";       // one call of a C function
+    const still = tr.steps.length === 1 && tr.loop === 0;                    // one state, forever
+    const ever = wholeRun(n, w);
+    const k = w.at;
+    if (call) out.push(vals(0) ? "Fails for " + vals(0) : "");
+    else if (still) out.push(vals(0) ? vals(0) + " at every step" : "");
+    else if (!ever && k !== undefined && k !== null && tr.steps[k])
+      out.push("Fails at " + (DATA.period ? "t = " + timeOf(k) + " s" : "step " + k) + (vals(k) ? " (" + vals(k) + ")" : ""));
+  }
+  if (r && r.constants.length) out.push("Repairable: " + r.constants.map(x => x.name).join(", "));
+  if (!out.filter(Boolean).length && w && w.reason) out.push(reasonOf(w.reason).text);
+  return out.filter(Boolean).join(". ");
+}
+// A term that asks for something to happen (F, U) fails on the whole run, its loop included, not at a step.
+function wholeRun(n, w) {
+  if (w && w.whole) return true;
+  if (w && w.at !== undefined && w.at !== null) return false;     // a step settles it (F[0,6] p at 6)
+  const terms = ((w && w.violated) || []).map(i => ((n.contract || {}).G || [])[i]).filter(Boolean);
+  return terms.length > 0 && terms.every(x => /^\s*(G\s*)?F\b|^\s*F\[|\bU\b/.test(x));
 }
 // the tag of a check as the diagram draws it, for a panel
 function tagSvg(t, status) {
@@ -1342,38 +1649,56 @@ function tagSvg(t, status) {
   tag(svg, 1, 1, t, status || null);
   return svg;
 }
-// The panel of the checks: docked on the right of the diagram, with its
-// tabs: the checks that fail, the check picked (why it fails, how to fix it),
-// and the code of a C function. A click on the tag of a check picks it.
+// The panel of the checks: docked on the right of the diagram. It shows the
+// list of the checks that fail, or the details of the one picked (why it
+// fails, the code of a C function, how to fix it), with a way back to the
+// list. A click on the tag of a check picks it.
 let inspector = { open: false, tab: "problems" };
 // the view keeps its middle when the panel takes the right of the window, or gives it back
+// the panel opened or closed: the diagram keeps its middle in the middle of the room left; a diagram
+// seen whole that the panel would cut is fitted to the room left, and fitted again when it closes
 function shiftView(sign) {
   const panelWidth = innerWidth > 820 ? 424 : 0;
-  if (cam && panelWidth) { cam.x += sign * panelWidth / 2; place(); }
+  if (!cam || !panelWidth) return;
+  const W = document.getElementById("view").clientWidth;
+  const whole = w => cam.x >= -1 && cam.x + size0.w * cam.k <= w + 1;
+  if (sign < 0 && whole(W) && !whole(W - panelWidth)) { inspector.fitted = true; return "fit"; }
+  if (sign > 0 && inspector.fitted) { inspector.fitted = false; return "fit"; }
+  cam.x += sign * panelWidth / 2; place();
 }
 function showInspector(tab) {
-  if (!inspector.open) shiftView(-1);
+  const how = !inspector.open ? shiftView(-1) : null;
   inspector.open = true;
   if (tab) inspector.tab = tab;
   document.body.classList.add("insp");
+  if (how === "fit") fit();
   document.getElementById("repairs").classList.add("on");     // pressed while the panel is open
   renderInspector();
   renderQueue();
 }
 function hideInspector() {
-  if (inspector.open) shiftView(1);
+  closeWave();
+  inspector.waved = false;
+  const how = inspector.open ? shiftView(1) : null;
   inspector.open = false;
   document.body.classList.remove("insp");
+  if (how === "fit") fit();
   document.getElementById("repairs").classList.remove("on");
   renderQueue();
   closeRepair();
 }
 async function openRepair(n, t) {
+  // the waveform is of one check: that of the new one, if it has one (also when it was open before Problems)
+  const waved = WAVE.open || inspector.waved;
+  inspector.waved = false;
+  closeWave(waved);
   const keys = keysOf(DATA.nodes);
   // the counterexample opens at the step where a term fails first, when it has one
   const w0 = n.badge && tagOf(n.badge.text) === t ? n.badge.why : ((n.checks || []).find(c => c.name === t) || {}).why;
   panel = { id: n.id, tag: t, nkey: keys[n.id], step: (w0 && w0.at) || 0 };
   if (w0 && w0.parts) Object.keys(w0.parts).forEach(id => open.add("c:" + id));   // the parts whose assumptions break
+  const ci = (n.checks || []).findIndex(c => c.name === t && c.core);               // a core: shown, its lines unfolded
+  if (ci >= 0) { focus[n.id] = ci; open.add((n.checks[ci].core.part === "composed" ? "k:" : "c:") + n.id); }
   inspector.tab = "details";
   showInspector();
   const r0 = (n.repair || {})[t];      // the boxes that declare the constants, and the box of the check, open
@@ -1383,6 +1708,8 @@ async function openRepair(n, t) {
                       (b.children || []).forEach(walk); })(n);
   await render();
   renderInspector();
+  document.getElementById("insp").focus({ preventScroll: true });    // the arrow keys: the steps of its counterexample
+  if (waved && panel && panel.wave) panel.wave(); else if (waved) viewAboveWave(false);
   bringInto(n);
   if (r0 && backend() && statusOf(n, t) === "invalid") {   // found at once: the constants that may change already
     const s = stateOf(r0);
@@ -1391,6 +1718,8 @@ async function openRepair(n, t) {
   }
 }
 function closeRepair() {
+  inspector.waved = inspector.open && WAVE.open;   // back to Problems: the next problem opens with its waveform
+  closeWave();
   panel = null;
   clearPreview(true);
   clearReplay();
@@ -1408,17 +1737,21 @@ function rebindPanel() {
 }
 function renderInspector() {
   if (!inspector.open) return;
-  const list = failing(), n = panel && byId[panel.id], code = n && n.model && n.model.code;
+  const list = failing(), n = panel && byId[panel.id];
   if (inspector.tab === "details" && !n) inspector.tab = "problems";
-  if (inspector.tab === "code" && !code) inspector.tab = n ? "details" : "problems";
-  const tabs = document.getElementById("insp-tabs");
-  tabs.innerHTML = "";
-  const tab = (key, label, count) => h("button", { class: "tab" + (inspector.tab === key ? " on" : ""),
-    onclick: () => { inspector.tab = key; renderInspector(); } }, label, count ? h("span", { class: "count" }, String(count)) : null);
-  tabs.append(tab("problems", "Problems", list.length), n ? tab("details", "Details") : "", code ? tab("code", "Code") : "");
+  const bar = document.getElementById("insp-bar");
+  bar.innerHTML = "";
+  if (inspector.tab === "details")
+    bar.append(h("button", { class: "back", title: "Back to the checks that fail (Esc)", onclick: closeRepair },
+      svgSpan("ib", '<path d="M13 8H3M7 4L3 8l4 4"/>'), "Problems"));
+  else bar.append("Problems", list.length ? h("span", { class: "count" }, String(list.length)) : "");
   if (inspector.tab === "problems") fillProblems(list);
-  else if (inspector.tab === "code") fillCode(n);
   else fillPanel();
+  if (inspector.tab === "details" && panel && panel.wave) {   // the waveform: at the right of the line of the panel
+    const b = iconButton(GLYPH.wave, "Open the waveform of every step", panel.wave, "wf-open");
+    b.appendChild(h("span", { class: "wf-word" }, "Waveform"));
+    bar.append(b);
+  }
 }
 const ROLE = { part: "part", requirement: "requirement", contract: "contract" };
 // the panel drawn again keeps in the window: its height changes as repairs come
@@ -1427,24 +1760,39 @@ function fillPanel() {
   const box = document.getElementById("repair");
   const n = panel && byId[panel.id];
   box.innerHTML = "";
+  panel.wave = null;
   if (!n) return;
   const t = panel.tag, r = (n.repair || {})[t], st = statusOf(n, t), how = backend();
   box.appendChild(h("div", { class: "rp-head" },
-    tagSvg(t, st), h("b", {}, checkTitle(n, t)),
-    h("button", { class: "rp-x", title: "Back to the list", onclick: closeRepair }, "×")));
+    h("span", { class: "q-tag" }, tagSvg(t, st)), h("span", { class: "t" }, richOf(checkTitle(n, t)))));
   const unsure = st === "unknown" ? ((n.badge && tagOf(n.badge.text) === t ? n.badge.reason
                                      : ((n.checks || []).find(c => c.name === t) || {}).reason) || "") : "";
   const says = st === "valid" ? "Holds." : st === "invalid" ? null
              : st === "unknown" ? "Not decided" + (unsure ? ": " + reasonOf(unsure).text + (reasonOf(unsure).line ? ", line " + reasonOf(unsure).line : "") : ".")
+             : n.clash ? "The parts do not agree: " + Object.values(n.clash).join("; ")
+                         + ". Their composition is not defined, so this cannot be checked until that is fixed."
              : "Not checked yet.";
   if (says) box.appendChild(h("div", { class: "rp-sec" }, h("div", { class: "rp-says" }, says)));
   const why = whySection(n, t, st);
   if (why) box.appendChild(why);
+  const code = codeSection(n);
+  if (code) box.appendChild(code);
   if (st !== "invalid") return;          // nothing to fix
   if (!r) { box.appendChild(noRepairSection(n, t)); return; }
   const s = stateOf(r), sig = repairSig(r);
   // the constants
-  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h", title: "Pick the parameters that may change, and their ranges" }, "Repair ", h("span", { style: "text-transform:none" }, "θ")));
+  const picked = r.constants.filter(c => s.picks[c.name]);
+  const act = s.running
+    ? iconButton(GLYPH.stop, "Stop the search", () => stopRepairs(r))
+    : iconButton(s.options.length ? GLYPH.again : GLYPH.find,
+                 !how ? "Repairs run in VS Code, or on a page of chase-cps view FILE --serve"
+                 : !picked.length ? "Pick a constant first"
+                 : s.options.length ? "Find again: the least change of the picked constants"
+                 : "Find the least change of the picked constants",
+                 () => findRepairs(n, t), "main", !how || !picked.length);
+  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h rp-hb" },
+    h("span", { title: "Pick the constants that may change, and their ranges" }, "Repair ", h("span", { style: "text-transform:none" }, "θ")),
+    act));
   r.constants.forEach(c => {
     const [lo, hi] = s.ranges[c.name];
     const num = (v, i) => h("input", { type: "number", value: v, step: c.type === "int" ? 1 : "any", "aria-label": (i ? "high" : "low") + " " + c.name,
@@ -1458,18 +1806,9 @@ function fillPanel() {
       h("span", { class: "rp-who" }, (c.type === "int" ? "int" : "real") + " · " + c.owners.map(o => o.contract).join(", "),
         c.role === "requirement" ? h("span", { class: "rp-role " + c.role, title: "Changed only with your consent" }, ROLE[c.role]) : null)));
   });
-  const picked = r.constants.filter(c => s.picks[c.name]);
-  const run = h("div", { class: "rp-run" });
-  if (s.running) {
-    run.appendChild(h("span", { class: "rp-spin" }));
-    run.appendChild(h("span", { class: "rp-says" }, "Searching… " + s.running.done + " / " + s.running.of));
-    run.appendChild(h("button", { class: "rp-btn", onclick: () => stopRepairs(r) }, "Stop"));
-  } else {
-    run.appendChild(h("button", { class: "rp-btn main", disabled: !how || !picked.length,
-                                  onclick: () => findRepairs(n, t) }, s.options.length ? "Find again" : "Find repairs"));
-    if (!picked.length) run.appendChild(h("span", { class: "rp-says" }, "Pick a parameter."));
-  }
-  sec.appendChild(h("div", { style: "margin-top:8px" }, run));
+  if (s.running) sec.appendChild(h("div", { class: "rp-run", style: "margin-top:8px" }, h("span", { class: "rp-spin" }),
+    h("span", { class: "rp-says" }, "Searching… " + s.running.done + " / " + s.running.of)));
+  else if (!picked.length) sec.appendChild(h("div", { class: "rp-says", style: "margin-top:8px" }, "Pick a constant."));
   box.appendChild(sec);
   // the repairs
   if (s.options.length || s.error) {
@@ -1483,47 +1822,98 @@ function fillPanel() {
   }
   if (!how) box.appendChild(h("div", { class: "rp-sec" },
     h("div", { class: "rp-note", style: "margin-top:0", title: "This page cannot run repairs: open the file in VS Code, or draw it with chase-cps view FILE --serve" }, "Repairs run in VS Code, or:"),
-    h("div", { class: "rp-cmd" }, commandOf(r, s))));
+    h("div", { class: "rp-cmd" }, words(commandOf(r, s)))));
 }
 // Why the check fails: in one line, then the counterexample (and its steps on the diagram).
 function whySection(n, t, st) {
   if (st !== "invalid") return null;
   const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "Counterexample"));
-  if (t !== "⪯" && t !== "M ⊨ C" && t !== "safe" && t !== "E ⊨ A") {
+  if (t !== "⪯" && t !== "M ⊨ C" && t !== "E ⊨ A") {
     const c = (n.checks || []).find(x => x.name === t);
     if (!(c && c.core)) return null;
     sec.firstChild.textContent = "Why it fails";
-    sec.appendChild(h("div", {}, "The terms in conflict are red."));
+    const src = n[c.core.part] || {};
+    const list = [].concat((c.core.A || []).map(i => ["A", i, (src.A || [])[i]]), (c.core.G || []).map(i => ["G", i, (src.G || [])[i]]))
+                   .filter(x => x[2]);
+    // the line of each term in the file: terms cut short alike still tell apart
+    const lineAt = (p, i) => { const at = c.core.part === "contract" && n.source && (n.source[p] || [])[i];
+                               return at ? at[0] : null; };
+    // terms that begin alike (a long computed contract): each also shows where it differs from the others
+    const apart = f => {
+      const same = Math.max(0, ...list.map(x => x[2]).filter(g => g !== f).map(g => { let k = 0;
+                     while (k < f.length && f[k] === g[k]) k++; return k; }));
+      if (same < 60) return null;
+      const at = f.lastIndexOf(" ", Math.max(0, same - 12));
+      return f.slice(at < 0 ? same : at + 1);
+    };
+    const nA = list.filter(x => x[0] === "A").length, nG = list.length - nA;
+    const these = (k, one, many) => k === 1 ? "This " + one : "These " + k + " " + many;
+    const all = these(list.length, nA && nG ? "term" : nA ? "assumption" : "guarantee", nA && nG ? "terms" : nA ? "assumptions" : "guarantees");
+    // what the core says, for the kind of check: no strategy (R), terms false together (consistency),
+    // assumptions the component's outputs can make false (WS)
+    const say = t === "R" ? "No component can meet " + all.toLowerCase().replace(/^these \d+ /, list.length === 2 ? "both " : "these " + list.length + " ")
+                            + " for every input that the assumptions allow: the environment has a strategy that makes one fail."
+      : t === "¬V" ? (nA ? these(nA, "assumption makes ", "assumptions make ") + (nG === 1 ? "a guarantee" : nG + " guarantees") + " vacuous."
+                         : these(nG, "guarantee is", "guarantees are") + " vacuous.")
+      : t === "WS" ? "With " + all.toLowerCase() + ", the component can make an assumption false by its outputs, and so meet the contract without its guarantees."
+      : all + (list.length === 1 ? " cannot hold." : list.length === 2 ? " cannot both hold." : " cannot all hold together.");
+    sec.appendChild(h("div", {}, say));
+    sec.appendChild(h("div", { class: "rp-terms" }, list.map(([p, i, f]) =>
+      h("button", { class: "rp-term", title: "Show it on the diagram", onclick: () => showTerm(n, c.core.part + ":" + p + i) },
+        h("span", { class: "st" }, p),
+        h("span", { class: "fs" }, h("span", { class: "f" + (apart(f) ? " cut" : "") }, f),
+          apart(f) ? h("span", { class: "d" }, "… " + apart(f)) : null),
+        lineAt(p, i) ? h("span", { class: "ln" }, "line " + lineAt(p, i)) : null))));
     return sec;
   }
   const w = n.badge && n.badge.why, req = (n.contract && n.contract.name) || n.title;
   const code = n.model && n.model.source === "c";
   // said only when the table does not: which side fails
+  const whole = w && w.trace && wholeRun(n, w);
+  const looped = w && w.trace && w.trace.loop !== null && w.trace.loop !== undefined;
   const lead = w && w.failed === "assumptions"
-    ? "The environment of this trace meets the assumptions of " + req + " and breaks an assumption of the "
-      + "parts: " + req + " allows an input that the parts do not accept." : null;
+    ? req + " allows this input, and the parts do not accept it."
+    : whole ? "No single step breaks " + req + ": the whole run does" + (looped ? ", its loop repeated forever." : ".") : null;
   if (w && w.trace) {
-    if (lead) sec.appendChild(h("div", {}, lead));
-    if (w.broken && w.broken.length)  // the core of a refinement that fails on the assumptions
-      sec.appendChild(h("div", { class: "rp-broken" }, h("div", {}, "The assumptions it breaks (in red):"),
-        w.broken.map(b => h("div", { class: "code" }, b))));
+    const trace = whole ? { ...w.trace, at: null, whole: true } : w.trace;
     const terms = n.contract ? [].concat(n.contract.A || [], n.contract.G || [], n.contract.E || []).join(" ") : "";
     const named = new Set((terms.match(/[A-Za-z_]\w*/g) || []).filter(x => !/^(G|F|X|U|R|W|true|false)$/.test(x)));
-    sec.appendChild(traceTable(w.trace, w.trace.vars.filter(v => named.has(v)), req));
-    const last = w.trace.steps.length - 1;
-    if (last > 0) {                        // a step of the counterexample, on the diagram
-      const label = h("span", {}, "");
-      const say = k => { label.textContent = (DATA.period ? "t = " + timeOf(k) : "step " + k) + (w.trace.loop === k ? " ↺" : ""); };
-      const slider = h("input", { type: "range", min: 0, max: last, value: panel.step || 0, "aria-label": "step",
-        oninput: e => { panel.step = +e.target.value; say(panel.step); replay(n, w.trace, panel.step); } });
-      say(panel.step || 0);
-      sec.appendChild(h("div", { class: "rp-step", title: "The values of this step are on the diagram" }, slider, label));
+    const last = trace.steps.length - 1;
+    // the table picks the step on the diagram: a click on a column, or the arrow keys
+    const go = k => { k = Math.max(0, Math.min(last, k)); panel.step = k; replay(n, trace, k); table.setStep(k);
+                      if (WAVE.open) WAVE.setStep(k); };
+    const first = trace.vars.filter(v => named.has(v));
+    // one call of a C function: its inputs and outputs, not a state repeated forever
+    const shown = code && last === 0 ? { ...trace, loop: null } : trace;
+    const table = traceTable(shown, first, req, last > 0 ? panel.step || 0 : null, go, n);
+    panel.goStep = last > 0 ? d => go((panel.step || 0) + d) : null;
+    // the waveform: every step kept, in a drawer under the diagram; its button on the line of the panel
+    if (last > 0) panel.wave = () => openWave(trace, first, checkTitle(n, t), go, req);
+    if (table.nav) {                    // on the line of the heading: the page back and on
+      const head = sec.firstChild;
+      head.classList.add("rp-hb");
+      head.textContent = "";
+      head.append(h("span", {}, "Counterexample"), table.nav);
     }
+    sec.appendChild(table);
+    // what the table does not say, under it: the table stays right under its heading in every problem
+    if (lead) sec.appendChild(h("div", { class: "rp-lead" }, lead));
+    if (w.broken && w.broken.length)  // the core of a refinement that fails on the assumptions
+      sec.appendChild(h("div", { class: "rp-broken" }, h("div", {}, t === "E ⊨ A" ? "The assumptions it breaks (red):"
+                                                                              : "The assumptions of the parts it breaks (red):"),
+        w.broken.map(b => h("div", { class: "code" }, b))));
   } else {
     sec.appendChild(h("div", { class: "rp-note", title: inEditor() ? "" : "chase-cps view FILE --check --no-results" },
                       "Not kept: " + (inEditor() ? "press ▶ to check again." : "run the check again.")));
   }
-  const toCode = () => { inspector.tab = "code"; renderInspector(); };
+  const toCode = () => {                 // the code, unfolded, at the line
+    const d = document.querySelector("#repair details.rp-code"), at = d && d.querySelector('[data-line="' + why.line + '"]');
+    if (!d) return;
+    d.open = true; panel.code = true;
+    d.querySelectorAll(".hit").forEach(x => x.classList.remove("hit"));
+    if (at) at.classList.add("hit");
+    (at || d).scrollIntoView({ block: "center" });
+  };
   const why = w && w.reason ? reasonOf(w.reason) : null;
   if (why) sec.appendChild(h("div", { class: "rp-note", title: w.reason }, why.text,
     why.line && code && n.model.code ? [", ", h("button", { class: "rp-link", onclick: toCode }, "line " + why.line)]
@@ -1538,73 +1928,210 @@ function reasonOf(r) {
 // A step as the page shows it: its number, or its time i·Δτ when the diagram has a period.
 const timeOf = i => DATA.period ? String(+(i * Number(DATA.period)).toFixed(9)) : String(i);
 // A counterexample: one column per step (one only for a check of one call), the ports of the box first.
-function traceTable(tr, first, req) {
-  const fmt = v => v === null || v === undefined ? "" : typeof v === "boolean" ? (v ? "true" : "false") : String(v);
+// With a step (the one on the diagram): its column marked blue, the column of the step that fails
+// first red; a click on a column picks its step, and the arrow keys the next one.
+function traceTable(tr, first, req, step, onPick, io) {
+  const fmt = v => v === null || v === undefined ? "?" : typeof v === "boolean" ? truth(v) : String(v);
   const order = tr.vars.map((_, i) => i).sort((a, b) => (first.includes(tr.vars[b]) - first.includes(tr.vars[a])) || a - b);
   // one call of a function: name = value; one state repeated forever is a table, with its ↺
   const one = tr.steps.length === 1 && (tr.loop === null || tr.loop === undefined);
-  if (one) {                            // one call: name = value, in rows that wrap
-    const grid = h("div", { class: "rp-values" }, order.map(i => h("span", { class: first.includes(tr.vars[i]) ? "port" : "" },
-      tr.vars[i] + " = " + fmt(tr.steps[0][i]))));
+  if (one) {                            // one call: name = value, in rows that wrap, its inputs and its outputs apart
+    const val = i => h("span", { class: first.includes(tr.vars[i]) ? "port" : "" }, tr.vars[i] + " = " + fmt(tr.steps[0][i]));
+    const ins = new Set((io && io.inputs) || []), outs = new Set((io && io.outputs) || []);
+    const groups = [["In", order.filter(i => ins.has(tr.vars[i]))], ["Out", order.filter(i => outs.has(tr.vars[i]))],
+                    ["", order.filter(i => !ins.has(tr.vars[i]) && !outs.has(tr.vars[i]))]].filter(g => g[1].length);
+    const grid = groups.length > 1 || (groups[0] && groups[0][0])
+      ? h("div", { class: "rp-io" }, groups.flatMap(([w, is]) => [h("span", { class: "w" }, w), h("div", { class: "rp-values" }, is.map(val))]))
+      : h("div", { class: "rp-values" }, order.map(val));
     const notes = [tr.more ? tr.more + " more variables not kept." : null].filter(Boolean);
     return h("div", { class: "rp-tracewrap" }, grid, notes.length ? h("div", { class: "rp-note" }, notes.join(" ")) : null);
   }
-  const t = h("table", { class: "rp-trace", title: tr.vars.length ? "T: true, F: false" : "" });
-  const cell = v => typeof v === "boolean" ? (v ? "T" : "F") : fmt(v);       // a column per step: short
+  // every step kept, as the waveform: the columns scroll under the names, a page at a time
+  const kept = tr.steps.length, keptCut = tr.cut;
+  const t = h("table", { class: "rp-trace", title: tr.vars.length ? "⊤ true, ⊥ false" : "" });
+  const cell = v => typeof v === "number" ? digits(v) : fmt(v);       // a column per step: short, the whole value in its tip
+  const picks = step !== null && step !== undefined && onPick;
+  const show = k => picks ? "Show " + (DATA.period ? "t = " + timeOf(k) : "step " + k) + " on the diagram" : "";
   if (!one) t.appendChild(h("tr", {}, h("th", { title: DATA.period ? "time: a step every " + DATA.period + " s" : "" }, DATA.period ? "t" : "step"),
-    tr.steps.map((_, i) => h("th", { class: tr.at === i ? "fail" : "",
-                                     title: (tr.at === i ? "a term fails first at this step. " : "")
-                                            + (tr.loop === i ? "the loop starts here, and repeats forever. " : "")
-                                            + (DATA.period ? "step " + i : "") },
+    tr.steps.map((_, i) => h("th", { class: (tr.at === i ? "fail" : "") + (picks ? " k" : ""), "data-k": String(i),
+                                     title: (tr.at === i ? "A term fails first at this step. " : "")
+                                            + (tr.loop === i ? "The loop starts here. " : "") + show(i) },
                              (tr.loop === i ? "↺ " : "") + timeOf(i)))));
   const rows = order.map(i => h("tr", { class: first.includes(tr.vars[i]) ? "port" : "" },
-    h("td", { class: "v" }, tr.vars[i]), tr.steps.map((st, k) => h("td", { class: tr.at === k ? "fail" : "" }, cell(st[i])))));
+    h("td", { class: "v" }, tr.vars[i]), tr.steps.map((st, k) => h("td", { class: (tr.at === k ? "fail" : "") + (picks ? " k" : "")
+                                                                                    + (st[i] === null || st[i] === undefined ? " unk" : ""),
+                                                                           "data-k": String(k),
+                                                                           title: [cell(st[i]) !== fmt(st[i]) ? tr.vars[i] + " = " + fmt(st[i]) : "", show(k)].filter(Boolean).join(" · ") },
+                                                                     cell(st[i])))));
   const LIMIT = one ? 24 : 12;
+  // the columns of the steps all as wide as the widest value or step of the rows shown
+  const widest = Math.max(1, ...tr.steps.map((st, k) => Math.max(String(timeOf(k)).length,
+                                                                 ...order.slice(0, LIMIT).map(i => String(cell(st[i])).length))));
+  t.style.setProperty("--cw", widest + "ch");
   rows.slice(0, LIMIT).forEach(r => t.appendChild(r));
   const wrap = h("div", { class: "rp-tracewrap" }, t);
+  // the table scrolls under its first column; above it, a page back or on
+  // a column under the names is never cut in two: the scroll stops at the edges of the columns
+  const snap = (x, to = Math.round) => { const ks = t.querySelectorAll("th[data-k]"), n = ks.length - 1;    // the width of a column, exact
+                      const w = n > 0 ? (ks[n].getBoundingClientRect().left - ks[0].getBoundingClientRect().left) / n : 0;
+                      return w > 0 ? to(x / w) * w : x; };
+  const turn = d => { const v = t.querySelector("th, td.v"), c = t.querySelector('th[data-k="0"]');
+                      const w = c ? c.offsetWidth : 40, room = wrap.clientWidth - (v ? v.offsetWidth : 0);
+                      wrap.scrollLeft = snap(wrap.scrollLeft + d * Math.max(1, Math.floor(room / w)) * w); };
+  const prev = iconButton(GLYPH.prev, "Earlier steps", () => turn(-1)), next = iconButton(GLYPH.next, "Later steps", () => turn(1));
+  const top = h("div", { class: "rp-trace-top" }, prev, next);
+  // the bar under the table: its thumb is the part in view; drag it, or click the bar to page
+  const thumb = h("div", {}), bar = h("div", { class: "rp-bar" }, thumb);
+  const out = h("div", { class: "rp-tracebox" }, top, wrap, bar);
+  out.nav = top;                        // the caller may put it on the line of its heading
+  bar.addEventListener("mousedown", e => {
+    if (e.target === thumb) return;
+    turn(e.offsetX < thumb.offsetLeft ? -1 : 1);
+  });
+  thumb.addEventListener("mousedown", e => {
+    e.preventDefault(); e.stopPropagation();
+    const x0 = e.clientX, s0 = wrap.scrollLeft, k = wrap.scrollWidth / bar.clientWidth;
+    thumb.classList.add("drag");
+    const move = m => { wrap.scrollLeft = s0 + (m.clientX - x0) * k; };
+    const up = () => { thumb.classList.remove("drag"); removeEventListener("mousemove", move); removeEventListener("mouseup", up); };
+    addEventListener("mousemove", move); addEventListener("mouseup", up);
+  });
+  const last = tr.steps.length - 1;
+  // the end of the scroll on the edge of a column too: a margin after the table, less than a column
+  const align = () => { const ks = t.querySelectorAll("th[data-k]"), n = ks.length - 1;
+                        const w = n > 0 ? (ks[n].getBoundingClientRect().left - ks[0].getBoundingClientRect().left) / n : 0;
+                        const end = wrap.scrollWidth - wrap.clientWidth - (parseFloat(t.style.marginRight) || 0);
+                        const m = w > 0 && end > 1 ? (w - end % w) % w : 0;
+                        if (Math.abs(m - (parseFloat(t.style.marginRight) || 0)) > 0.5) t.style.marginRight = m + "px"; };
+  const where = () => {
+    align();
+    const over = wrap.scrollWidth > wrap.clientWidth + 1;
+    top.classList.toggle("on", over);
+    bar.classList.toggle("on", over);
+    if (!over) return;
+    const w = bar.clientWidth;
+    thumb.style.width = Math.max(24, w * wrap.clientWidth / wrap.scrollWidth) + "px";
+    thumb.style.left = (w - thumb.offsetWidth) * wrap.scrollLeft / Math.max(1, wrap.scrollWidth - wrap.clientWidth) + "px";
+    prev.style.visibility = wrap.scrollLeft > 1 ? "visible" : "hidden";
+    next.style.visibility = wrap.scrollLeft + wrap.clientWidth < wrap.scrollWidth - 1 ? "visible" : "hidden";
+  };
+  wrap.addEventListener("scroll", where);
+  if (typeof ResizeObserver === "function") new ResizeObserver(where).observe(wrap);
+  requestAnimationFrame(where);
   if (rows.length > LIMIT) {
-    const more = h("button", { class: "rp-link", onclick: () => { rows.slice(LIMIT).forEach(r => t.appendChild(r)); more.remove(); } },
+    const more = h("button", { class: "rp-link", onclick: () => { rows.slice(LIMIT).forEach(r => t.appendChild(r)); more.remove(); where(); } },
                    (rows.length - LIMIT) + " more variables");
-    wrap.appendChild(more);
+    out.appendChild(more);
   }
-  const notes = [tr.cut ? "The first " + tr.steps.length + " steps." : null,
+  const notes = [keptCut ? "The first " + kept + " steps are kept." : null,
                  tr.loop !== null && tr.loop !== undefined
                    ? "↺ " + timeOf(tr.loop) + ": from this step on, the steps repeat forever." : null,
                  tr.more ? tr.more + " more variables not kept." : null].filter(Boolean);
-  if (notes.length) wrap.appendChild(h("div", { class: "rp-note" }, notes.join(" ")));
-  return wrap;
+  if (notes.length) out.appendChild(h("div", { class: "rp-note" }, notes.join(" ")));
+  if (!picks) { out.setStep = () => {}; return out; }
+  const column = k => t.querySelectorAll('[data-k="' + k + '"]');
+  t.addEventListener("click", e => { const c = e.target.closest("[data-k]"); if (c) onPick(+c.dataset.k); });
+  t.addEventListener("mouseover", e => { const c = e.target.closest("[data-k]");
+    t.querySelectorAll(".hov").forEach(x => x.classList.remove("hov")); if (c) column(c.dataset.k).forEach(x => x.classList.add("hov")); });
+  t.addEventListener("mouseleave", () => t.querySelectorAll(".hov").forEach(x => x.classList.remove("hov")));
+  // the step on the diagram is marked only when it is not the one shown at first (the step that fails)
+  const base = tr.at !== null && tr.at !== undefined ? tr.at : step;
+  out.setStep = k => {
+    t.querySelectorAll(".cur").forEach(x => x.classList.remove("cur"));
+    if (k !== base) column(k).forEach(x => x.classList.add("cur"));
+    const th = t.querySelector('th[data-k="' + k + '"]'), v = t.querySelector("th");   // the column in view
+    if (th) {                           // the next column: just enough; one further away: in the middle
+      const names = v ? v.offsetWidth : 0, left = th.offsetLeft - names, right = th.offsetLeft + th.offsetWidth;
+      const far = left < wrap.scrollLeft - th.offsetWidth || right > wrap.scrollLeft + wrap.clientWidth + th.offsetWidth;
+      if (far) wrap.scrollLeft = snap(left - (wrap.clientWidth - names - th.offsetWidth) / 2);
+      else if (left < wrap.scrollLeft) wrap.scrollLeft = snap(left, Math.floor);
+      else if (right > wrap.scrollLeft + wrap.clientWidth) wrap.scrollLeft = snap(right - wrap.clientWidth, Math.ceil);
+    }
+    where();
+  };
+  requestAnimationFrame(() => out.setStep(step));       // once in the page: the scroll needs its width
+  out.setStep(step);
+  return out;
 }
 // A check that fails with no constant to repair, or a page that cannot run repairs: in a few points.
 function noRepairSection(n, t) {
   const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h" }, "How to fix"));
   const clauses = n.model && n.model.source === "c" && n.model.name === ((n.contract || {}).name);
-  const points = t === "safe"
+  const code = x => h("code", { class: "cmd" }, x);
+  // a number of the terms (not a step of an interval, F[0,6]) can be repaired once it is named
+  const terms = [].concat((n.contract || {}).A || [], (n.contract || {}).G || []).join(" ").replace(/\[[^\]]*\]/g, "");
+  const named = /(^|[^\w'])\d+(\.\d+)?\b/.test(terms)
+    ? ["To repair a number of the terms, name it in the file and write the name in the term:",
+       h("div", { class: "rp-cmd" }, "integer constant k 2;")] : null;
+  // the constants that can change, and whose they are: "theta (Thermostat), tmax (Comfort)"
+  const r0 = (n.repair || {})[t];
+  // else those of the parts inside (first: the requirement may be right) and of the box
+  const inner = []; (function walk(b) { (b.children || []).forEach(c => { inner.push(c); walk(c); }); })(n);
+  const ks = [...inner, n].flatMap(b => ((b.contract || {}).K || []).map(x => x.split(" = ")[0] + " (" + b.contract.name + ")"));
+  const owned = r0 && r0.constants && r0.constants.length
+    ? r0.constants.map(c => c.name + " (" + [...new Set(c.owners.map(o => o.contract))].join(", ") + ")").join(", ")
+    : [...new Set(ks)].join(", ");
+  const holed = (n.children || []).some(c => c.kind === "hole") || n.kind === "hole";
+  const of = t === "E ⊨ A" ? (() => { const e = (DATA.edges || []).find(x => x.from[0] === n.id), to = e && byId[e.to[0]];
+                                      return to ? (to.contract && to.contract.name) || to.title : null; })() : null;
+  const bare = !((n.contract || {}).A || []).length && !((n.contract || {}).G || []).length;
+  const points = t === "M ⊨ C" && clauses && bare        // no clause: the contract (⊤, ⊤), the code alone fails
     ? ["Fix the code, or exclude such inputs with a requires clause."]
     : t === "M ⊨ C" && clauses && !(n.contract || {}).K
     ? ["Fix the code, or change its requires / ensures clauses."]
-    : n.contract && n.contract.K
-    ? ["Repair the named constants in VS Code, or with chase-cps view FILE --serve."]
-    : ["No named constant to repair: change a term of a part or of the requirement. A constant declared "
-       + "in the file (integer constant k 2;) can be repaired."]
-       .concat(t === "⪯" ? ["What a part must guarantee: divide the requirement by the other parts (divide)."] : []);
+    : owned
+    ? [["Repair " + owned + " in VS Code, or with ", code("chase-cps view FILE --serve"), "."]]
+    : [{ "⪯": "Change a term of a part or of the requirement.",
+         "E ⊨ A": "Change the environment, or weaken the assumptions" + (of ? " of " + of : "") + ".",
+         "M ⊨ C": "Change the model, or its contract.",
+         "A": "Weaken or drop one of the red assumptions.",
+         "G": "Weaken or drop one of the red terms.",
+         "A∧G": "Weaken or drop one of the red terms.",
+         "R": "Weaken a red guarantee, or assume more of the environment.",
+         "WS": "Change the red terms so that the outputs of the component cannot make an assumption false.",
+         "¬V": "Ask something of the component in the red guarantees." }[t] || "Change one of the red terms.", named]
+       .concat(t === "⪯" && holed ? ["Or put in the hole a part that refines the quotient: what the missing part must guarantee."] : [])
+       .filter(Boolean);
   sec.appendChild(h("ul", { class: "rp-why" }, points.map(x => h("li", {}, x))));
   return sec;
 }
+// which constants a repair changes, as the first line of its card: "Change r and vmax together"
+function changeLabel(names) {
+  const out = h("div", { class: "rp-l" }, "Change ");
+  names.forEach((k, i) => { if (i) out.append(i === names.length - 1 ? " and " : ", "); out.append(h("b", {}, k)); });
+  if (names.length > 1) out.append(" together");
+  return out;
+}
+// the time a repair was asked to take: its own, or the time limit of the page (in the editor, the
+// time it took when it stopped at the limit)
+const limitOf = o => o.limit || (backend() === "serve" ? TIME_LIMIT : Math.max(1, Math.round(o.res.seconds || 0)));
 function optionCard(n, t, r, s, o, sig) {
   const res = o.res, old = o.sig !== sig && !o.applied;
-  const names = o.names.join(", ");
+  if (o.running) return h("div", { class: "rp-opt" }, changeLabel(o.names),
+    h("div", { class: "rp-run" }, h("span", { class: "rp-spin" }), h("span", { class: "rp-says" }, "Searching for up to " + o.running + " s…")));
   if (res.status !== "repaired") {
+    const range = k => k + " in [" + o.ranges[k].join(", ") + "]";
+    const rs = o.names.map(range), list = rs.length > 1 ? rs.slice(0, -1).join(", ") + " and " + rs[rs.length - 1] : rs[0];
+    const timed = !res.reason || /time limit/.test(res.reason);
     const text = res.status === "holds" ? "Holds already."
-      : res.status === "impossible" ? "No value in " + o.names.map(k => "[" + o.ranges[k].join(", ") + "]").join(" × ") + " works."
-      : res.bound !== undefined && res.bound !== null ? "Stopped: the least change is ≥ " + res.bound + "."
-      : "Not decided.";
-    const card = h("div", { class: "rp-opt " + res.status + (old ? " old" : ""), title: res.reason || "" },
-      h("div", { class: "rp-v", style: "font-family:inherit" }, text), h("div", { class: "rp-m" }, (old ? "Out of date · " : "") + names));
-    if (res.status === "impossible" && !old) card.appendChild(h("div", { class: "rp-b" },
-      h("button", { class: "rp-btn", onclick: () => { o.names.forEach(k => { const [a, b] = s.ranges[k], w = Math.max(b - a, 1);
-        s.ranges[k] = [a >= 0 ? Math.max(0, a - w / 2) : a - w / 2, b + w / 2]
-          .map(x => r.constants.find(c => c.name === k).type === "int" ? Math.round(x) : x); });
-        findRepairs(n, t); } }, "Widen")));
+      : res.status === "impossible" ? (o.names.length === 1 ? "No value of " + list + " works." : "No values of " + list + " work together.")
+          + " Edit the range" + (o.names.length > 1 ? "s" : "") + " above to search further."
+      : res.bound !== undefined && res.bound !== null ? "Stopped after " + limitOf(o) + " s: the least change is at least " + short(res.bound) + "."
+      : timed ? "No answer within " + limitOf(o) + " s."
+      : /optimization/.test(res.reason) ? "No answer: z3 did not finish the optimization."
+      : "No answer: " + res.reason.split(";")[0].replace(/\.$/, "") + ".";
+    // all together, undecided, when one alone has its least change already: shown faint
+    const faint = o.names.length > 1 && res.status === "unknown"
+      && s.options.some(p => p.names.length === 1 && p.res.status === "repaired" && p.res.optimal);
+    const card = h("div", { class: "rp-opt " + res.status + (old ? " old" : "") + (faint ? " faint" : ""), title: res.reason || "" },
+      changeLabel(o.names), h("div", { class: "rp-t" }, text), old ? h("div", { class: "rp-m" }, "Out of date") : null);
+    if (res.status === "unknown" && timed) {
+      const longer = 2 * limitOf(o);
+      card.appendChild(h("div", { class: "rp-b" }, iconButton(GLYPH.longer,
+        !backend() ? "Repairs run in VS Code, or on a page of chase-cps view FILE --serve"
+        : old ? "Out of date: find the repairs again" : "Try longer: search again for up to " + longer + " s",
+        () => retryOption(n, t, r, o, longer), "", !backend() || old || !!s.running)));
+    }
     return card;
   }
   const v = h("div", { class: "rp-v" });
@@ -1612,30 +2139,34 @@ function optionCard(n, t, r, s, o, sig) {
   (moved.length ? moved : o.names).forEach((k, i) => { if (i) v.appendChild(document.createTextNode("   "));
     v.append(k + " ", h("s", {}, o.from[k]), " → ", h("em", {}, res.text[k] === null ? "≈ " + short(res.values[k]) : res.text[k])); });
   const meta = [o.applied ? "Applied" : old ? "Out of date" : null, res.optimal ? "optimal" : "least found",
-                "change " + short(res.cost)].filter(Boolean).join(" · ");
+                "change " + short(res.cost), o.confirm ? "click ✓ again to change the requirement" : null].filter(Boolean).join(" · ");
   const how = res.method + (res.rounds ? ", " + res.rounds + (res.rounds === 1 ? " round" : " rounds") : "") + ", " + res.seconds + " s";
   const req = o.names.some(k => (r.constants.find(c => c.name === k) || {}).role === "requirement");
   const lines = o.names.every(k => (r.constants.find(c => c.name === k) || { owners: [] }).owners.every(w => w.line));
   const exact = o.names.every(k => res.text[k] !== null);
   const can = backend() && !old && lines && exact && !o.applied;
   const shown = previewing && previewing.pinned && previewing.option === o;
-  const apply = h("button", { class: "rp-btn" + (can ? " main" : ""), disabled: !can,
-    title: !exact ? "This value has no finite decimal: write a nearby one by hand" : !lines ? "No declaration of the constant in the file"
-         : req ? "Changes a requirement" : "Write the value in the file",
-    onclick: e => applyOption(n, t, r, o, e.target) }, o.applied ? "Applied" : "Apply");
+  const apply = iconButton(GLYPH.apply,
+    o.applied ? "Applied: the value is in the file"
+    : !backend() ? "Repairs are written by VS Code, or on a page of chase-cps view FILE --serve"
+    : old ? "Out of date: find the repairs again"
+    : !exact ? "This value has no finite decimal: write a nearby one by hand"
+    : !lines ? "No declaration of the constant in the file"
+    : o.confirm ? "Click again to change the requirement"
+    : "Write the new value into the file and check again" + (req ? " (it changes a requirement)" : ""),
+    () => applyOption(n, t, r, o), (can ? "main" : "") + (o.confirm ? " warn" : ""), !can);
+  const preview = iconButton(GLYPH.eye, shown ? "Stop showing this change on the diagram"
+                                             : "Show this change on the diagram (the file is not changed)",
+    () => { if (shown) clearPreview(true); else { const p = previewOf(n, t, r, o); p.pinned = true; showPreview(p); }
+            renderPanel(); }, shown ? "on" : "", old);
   const card = h("div", { class: "rp-opt repaired" + (old ? " old" : "") + (shown ? " shown" : ""),
                           onmouseenter: () => { if (!old) hoverPreview(previewOf(n, t, r, o)); },
                           onmouseleave: () => clearPreview(false) },
-    v, h("div", { class: "rp-m", title: how }, meta),
-    h("div", { class: "rp-b" },
-      h("button", { class: "rp-btn" + (shown ? " on" : ""), disabled: old, title: "Keep it drawn on the diagram",
-                    onclick: () => { if (shown) clearPreview(true); else { const p = previewOf(n, t, r, o); p.pinned = true; showPreview(p); }
-                                     renderPanel(); } }, "Preview"),
-      apply));
+    changeLabel(o.names), v, h("div", { class: "rp-m", title: how }, meta),
+    h("div", { class: "rp-b" }, preview, apply));
   return card;
 }
-// a number in a few digits: 0.8095238095238095 is 0.8095
-const short = x => typeof x === "number" && !Number.isInteger(x) ? String(+x.toPrecision(4)) : String(x);
+const short = digits;
 // the value of a repair is the one it had
 const same = (o, k) => o.res.text[k] !== null && Number(o.res.text[k]) === Number(o.from[k]);
 // what a repair changes, as a key: the same changes from two runs are one repair
@@ -1650,6 +2181,8 @@ function previewOf(n, t, r, o) {
   o.names.forEach(k => { values[k] = o.res.text[k] === null ? String(o.res.values[k]) : o.res.text[k]; });
   return { id: n.id, tag: t, values, from: o.from, owners, option: o, pinned: false };
 }
+// a command as its words, each kept whole on a line (with the spaces between them to copy)
+const words = c => c.split(" ").flatMap((w, i) => i ? [" ", h("span", {}, w)] : [h("span", {}, w)]);
 function commandOf(r, s) {
   const flag = { refines: "--refines", impl: "--impl", env: "--env", verify: "--verify", compat: "--compat", consist: "--consist" }[r.check];
   const q = a => { a = a.replace(/^.*\//, ""); return /^[\w.+:-]+$/.test(a) ? a : JSON.stringify(a); };   // run next to the file
@@ -1693,6 +2226,27 @@ function stopRepairs(r) {
   const s = stateOf(r);
   if (s.cancel) s.cancel();
   s.running = null;
+  s.options.forEach(o => { o.running = null; });
+  renderPanel(); renderQueue();
+}
+// One repair asked again with a longer time: its card shows the new answer.
+async function retryOption(n, t, r, o, limit) {
+  const s = stateOf(r);
+  if (s.running) return;
+  const params = o.names.map(k => ({ name: k, low: o.ranges[k][0], high: o.ranges[k][1],
+                                     type: r.constants.find(c => c.name === k).type }));
+  const token = {};
+  s.error = null; s.running = { done: 0, of: 1, token }; o.running = limit;
+  renderPanel(); renderQueue();
+  try {
+    const res = await askRepair({ check: r.check, args: r.args, params, time_limit: limit }, s);
+    if (!s.running || s.running.token !== token) return;
+    o.res = res; o.limit = limit;
+  } catch (e) {
+    if (!s.running || s.running.token !== token) return;
+    s.error = String(e && e.message || e);
+  }
+  o.running = null; s.running = null;
   renderPanel(); renderQueue();
 }
 let repairSeq = 0;
@@ -1720,14 +2274,9 @@ function askRepair(req, s) {
   }
   return Promise.reject(new Error("This page cannot run repairs."));
 }
-function applyOption(n, t, r, o, button) {
+function applyOption(n, t, r, o) {
   const req = o.names.some(k => (r.constants.find(c => c.name === k) || {}).role === "requirement");
-  if (req && !button.getAttribute("data-sure")) {       // a requirement: asked twice
-    button.setAttribute("data-sure", "1");
-    button.textContent = "Change the requirement?";
-    button.className = "rp-btn warn";
-    return;
-  }
+  if (req && !o.confirm) { o.confirm = true; renderPanel(); return; }    // a requirement: asked twice
   const edits = [];
   o.names.forEach(k => (r.constants.find(c => c.name === k) || { owners: [] }).owners
     .forEach(w => edits.push({ line: w.line, name: k, value: o.res.text[k] })));
@@ -1795,30 +2344,581 @@ function fillProblems(list) {
     const r = (n.repair || {})[t], w = n.badge && tagOf(n.badge.text) === t ? n.badge.why : null;
     const s = r && stateOf(r), sig = r && repairSig(r);
     const best = s && s.options.find(o => o.res.status === "repaired" && o.sig === sig);
-    const what = s && s.running ? "finding repairs…"
-      : best ? best.names.map(k => k + " " + best.from[k] + " → " + best.res.text[k]).join(", ")
-      : r ? "θ: " + r.constants.map(c => c.name).join(", ")
-      : t === "A∧G" ? "terms in conflict"
-      : w && w.reason ? reasonOf(w.reason).text
-      : "no constant to repair";
+    const what = s && s.running ? "Finding repairs…"
+      : best ? "Repair: " + best.names.map(k => k + " " + best.from[k] + " → " + best.res.text[k]).join(", ")
+      : factsOf(n, t, r, w);
+    const title = checkTitle(n, t);
     box.appendChild(h("div", { class: "q-item" + (panel && panel.id === n.id && panel.tag === t ? " on" : ""),
-                               onclick: () => openRepair(n, t) },
-      h("div", { class: "t" }, tagSvg(t, "invalid"), checkTitle(n, t)),
-      h("div", { class: best ? "v" : "s" }, what)));
+                               title: plainOf(title) + (what ? "\n" + what : ""), onclick: () => openRepair(n, t) },
+      h("div", { class: "q-tag" }, tagSvg(t, "invalid")),
+      h("div", { class: "q-main" }, h("div", { class: "t" }, richOf(title)),
+        what ? h("div", { class: best ? "v" : "s" }, what) : null)));
   });
 }
-function fillCode(n) {
-  const box = document.getElementById("repair"), c = n.model.code;
+// The waveform of a counterexample: a drawer under the diagram, beside the details, a row per variable
+// and the steps as columns, as the waveform viewers draw a simulation. The names and the values at the
+// cursor stay on the left; the steps scroll and zoom. The step that fails first is a red column, the
+// loop a shaded span with one more pass drawn faded, the current step a blue cursor that the table and
+// the diagram follow (and the other way round).
+const WAVE = { open: false, height: null };
+const WV = { axis: 54, band: 33, row: 24, bool: 24, plot: 56, group: 18, min: 6, max: 240 };
+function openWave(tr, first, title, pick, reqName) {
+  closeWave();
+  const box = document.getElementById("wave"), n = tr.steps.length;
+  const loop = tr.loop === null || tr.loop === undefined ? null : tr.loop;
+  const ghost = loop === null ? 0 : n - loop;           // one more pass of the loop, faded
+  const cols = n + ghost;
+  const fails = tr.at !== undefined && tr.at !== null;
+  const req = i => first.includes(tr.vars[i]);
+  const order = tr.vars.map((_, i) => i).sort((a, b) => (req(b) - req(a)) || a - b);
+  const groups = order.some(req) && !order.every(req);  // the variables of the requirement, then the others
+  const kind = i => tr.steps.every(st => st[i] === null || st[i] === undefined || typeof st[i] === "boolean") ? "bool"
+    : tr.steps.every(st => st[i] === null || st[i] === undefined || typeof st[i] === "number") ? "num" : "text";
+  const S = { cur: panel && panel.step !== undefined && panel.step !== null ? panel.step : (tr.at || 0), px: 32,
+              plots: new Set(), sel: order.length ? order[0] : null, fit: false, center: false };
+  const mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  const real = c => c < n ? c : loop + (c - n);         // the step of a column (the faded pass: the loop again)
+  const valueAt = (c, i) => tr.steps[real(c)][i];
+  const fmt = v => v === null || v === undefined ? "?" : typeof v === "boolean" ? truth(v) : String(v);
+  const short = v => typeof v === "number" ? digits(v) : fmt(v);
+  const label = k => DATA.period ? timeOf(k) : String(k);
+  const at = k => DATA.period ? "t = " + label(k) + " s" : "step " + label(k);
+  const NS = "http://www.w3.org/2000/svg";
+  const sv = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag);
+    Object.entries(attrs || {}).forEach(([a, v]) => e.setAttribute(a, v)); if (parent) parent.appendChild(e); return e; };
+
+  // the widths on the left: the longest name (and room for the plot button), the widest value
+  const MONO = "11px Menlo, Monaco, monospace";
+  const nameW = Math.max(72, Math.min(220, Math.ceil(Math.max(0, ...order.map(i => textWidth(tr.vars[i], (req(i) ? "600 " : "") + MONO)))) + 24));
+  const seen = new Set([].concat(...tr.steps.map(st => order.map(i => fmt(st[i])))));
+  const corner = k => DATA.period ? label(k) + " s" : label(k);
+  const valW = Math.max(48, Math.min(120, Math.ceil(Math.max(textWidth("value at " + corner(n - 1), "10.5px Helvetica, Arial, sans-serif"),
+                                                              ...[...seen].map(v => textWidth(v, MONO)))) + 16));
+  const L = 12 + nameW + valW;
+
+  // the bar: the check, the step at the cursor, the step that fails, the zoom, the keys, the cross
+  const where = h("span", { class: "wv-where" });
+  const failAt = fails ? h("button", { class: "wv-failat", "data-tip": "Go to the step that fails (F)", onclick: () => jump(tr.at) },
+                           "Fails at " + (DATA.period ? "t = " + label(tr.at) + " s" : label(tr.at))) : null;
+  const keys = h("div", { class: "wv-keys" });
+  const kb = iconButton(GLYPH.keys, "Keys (?)", () => toggleKeys());
+  const zout = iconButton(GLYPH.zout, "Zoom out (-)", () => zoom(1 / 1.5)), zin = iconButton(GLYPH.zin, "Zoom in (+)", () => zoom(1.5));
+  // in a narrow window the drawer takes the place of the details: its arrow goes back to the problems, as theirs
+  const back = h("button", { class: "back wv-back", title: "Back to the checks that fail", onclick: () => closeRepair() },
+                 svgSpan("ib", '<path d="M13 8H3M7 4L3 8l4 4"/>'), "Problems");
+  const bar = h("header", {}, back, h("b", {}, richOf(title)), where, failAt,
+    h("span", { class: "wv-tools" },
+      zout, zin,
+      iconButton(GLYPH.fit, "Show all steps (0)", fitAll),
+      kb,
+      iconButton('<path d="M4 4l8 8M12 4l-8 8"/>', "Close (Esc)", closeWave)));
+  bar.addEventListener("click", () => { if (WAVE.open) box.focus({ preventScroll: true }); });   // the keys stay with the drawer
+  const grip = h("div", { class: "wv-grip" });
+  const scroll = h("div", { class: "wv-scroll" });
+  const grid = h("div", { class: "wv-grid" });
+  scroll.appendChild(grid);
+  const thumb = h("div", {}), sbar = h("div", { class: "rp-bar wv-bar", style: "margin-left:" + L + "px" }, thumb);
+  const step1 = k => DATA.period ? "The step at t = " + label(k) + " s" : "Step " + label(k);
+  const steps2 = (a, b) => DATA.period ? "The steps at t = " + label(a) + " to " + label(b) + " s" : "Steps " + label(a) + " to " + label(b);
+  const again = loop === null ? "" : "↺ " + (loop === 0 ? (n === 1 ? "The step repeats" : "All " + n + " steps repeat")
+    : loop === n - 1 ? step1(loop) + " repeats" : steps2(loop, n - 1) + " repeat") + " forever; the faded "
+    + (ghost === 1 ? "column is its" : "columns are their") + " next pass. ";
+  const foot = h("footer", {}, h("span", { class: "wv-span" }),
+    h("span", { class: "wv-note" }, (tr.whole ? "No single step breaks " + reqName + ": the whole run does. " : "")
+                                    + again + (tr.cut ? "The first " + n + " steps are kept. " : "")),
+    h("span", { class: "wv-hint" }));
+  const fade = h("div", { class: "wv-fade" });     // over the last row in view, when there are more rows under it
+  // the keys, as keycaps ("~" a word between them), those of a Mac on a Mac
+  keys.append(h("div", { class: "wv-keys-t" }, "Keys of the waveform"));
+  [[["←", "→"], "The step before or after"],
+   [[mac ? "⌥" : "Alt", "~+", "←", "→", "~or", "[", "]"], "The previous or next change of the selected row"],
+   [["Home", "End"], "The first or the last step"], fails ? [["F"], "The step that fails"] : null,
+   loop !== null ? [["L"], "The first step of the loop"] : null, [["↑", "↓"], "The row above or below"],
+   [["Enter"], "A row of numbers as a line, or as values again"], [["+", "−", "0"], "Zoom in, zoom out, show all steps"],
+   [[mac ? "⌘" : "Ctrl", "~+ wheel"], "Zoom where the pointer is"], [["~Drag, or", "Shift", "~+ wheel"], "Pan along the steps"],
+   [["Esc"], "Close"]]
+    .filter(Boolean).forEach(([ks, d]) => keys.append(
+      h("span", { class: "wv-caps" }, ks.map(k => k[0] === "~" ? h("span", {}, k.slice(1)) : h("kbd", {}, k))), h("span", {}, d)));
+  const edgeL = h("div", { class: "wv-edge" }), edgeR = h("div", { class: "wv-edge r" });   // the markers out of view
   box.innerHTML = "";
-  const sec = h("div", { class: "rp-sec" }, h("div", { class: "rp-h", style: "text-transform:none;letter-spacing:0" }, c.file));
-  c.parts.forEach((q, i) => {
-    if (c.parts.length > 1) sec.appendChild(h("div", { class: "rp-note", style: "margin:" + (i ? 8 : 4) + "px 0 2px" }, q.name));
-    const pre = h("pre", { class: "code" });
-    q.text.split("\n").forEach((l, i) => { pre.appendChild(h("span", { class: "n" }, String(q.line + i)));
-                                         pre.appendChild(document.createTextNode(l + "\n")); });
-    sec.appendChild(pre);
+  box.append(grip, bar, keys, scroll, sbar, foot, fade, edgeL, edgeR);
+  box.style.display = "flex";
+  document.body.classList.add("wave");
+  WAVE.open = true;
+  WAVE.setStep = k => { S.cur = k; draw(); show(k, S.center); };
+  // a jump (the step that fails, the loop, a marker at the edge, the view at first): the step brought
+  // from out of view to the middle; a step to the next one stays as near as it can
+  function jump(k) { S.center = true; try { pick(k); } finally { S.center = false; } }
+  WAVE.px = () => S.px;                  // for the tests: the width of a step, the left part, the step at a point
+  WAVE.left = () => L;
+  WAVE.stepAt = x => { const c = colAt(x); return c === null ? null : real(c); };
+
+  // the keys: under their button, or above it when there is no room under
+  function toggleKeys(on) {
+    on = on === undefined ? !keys.classList.contains("on") : on;
+    keys.classList.toggle("on", on);
+    if (!on) return;
+    const r = kb.getBoundingClientRect(), w = keys.offsetWidth, hk = keys.offsetHeight;
+    keys.style.left = Math.max(8, Math.min(r.right - w, innerWidth - w - 8)) + "px";
+    keys.style.top = (r.bottom + 6 + hk > innerHeight - 8 ? Math.max(8, r.top - 6 - hk) : r.bottom + 6) + "px";
+  }
+  // the height: at most 45% of the window (or what the top edge was dragged to, kept for the next
+  // drawer), never more than the rows, and cut between two rows, not through one
+  function fitHeight() {
+    const chrome = box.offsetHeight - scroll.offsetHeight;
+    const room = Math.min(WAVE.height || 0.45 * innerHeight, innerHeight - 70) - chrome;
+    const rows = grid.querySelectorAll(".wv-row");
+    if (grid.offsetHeight <= room) { scroll.style.maxHeight = ""; return; }
+    let fit = 0;
+    rows.forEach((r, j) => { const b = r.offsetTop + r.offsetHeight; if (b <= room || j < 2) fit = Math.max(fit, b); });
+    scroll.style.maxHeight = fit + "px";
+  }
+  // the top edge: drag it for a taller or shorter drawer, up to all its rows; a double-click for the height it had
+  grip.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    const y0 = e.clientY, h0 = box.offsetHeight, most = box.offsetHeight - scroll.offsetHeight + grid.offsetHeight;
+    grip.classList.add("drag");
+    const move = m => { WAVE.height = Math.max(Math.min(140, most), Math.min(innerHeight - 70, most, h0 + y0 - m.clientY)); fitHeight(); place(); };
+    const up = () => { grip.classList.remove("drag"); removeEventListener("pointermove", move); removeEventListener("pointerup", up); };
+    addEventListener("pointermove", move); addEventListener("pointerup", up);
   });
-  box.appendChild(sec);
+  grip.addEventListener("dblclick", () => { WAVE.height = null; fitHeight(); place(); });
+
+  const avail = () => Math.max(120, scroll.clientWidth - L - 16);
+  // the least width of a step: that of all the steps in the drawer (down to a pixel), or WV.min if more
+  const least = () => Math.max(Math.min(1, WV.min), Math.min(WV.min, avail() / cols));
+  // all the steps in the width; the drawer stays so ("fitted") as it gets wider or narrower, until a zoom or a pan
+  function fitAll() { S.px = Math.max(least(), Math.min(WV.max, avail() / cols)); S.fit = true; draw(); scroll.scrollLeft = 0; }
+  function zoom(f, atX) {                // around a point of the view (the pointer), or around the cursor
+    const x = atX === undefined ? (S.cur + .5) * S.px - scroll.scrollLeft : atX;
+    const a = (scroll.scrollLeft + x) / S.px;
+    const px = Math.max(least(), Math.min(WV.max, S.px * f));
+    if (px === S.px) return;
+    S.px = px; S.fit = false;
+    draw();
+    scroll.scrollLeft = a * S.px - x;
+    if (atX === undefined) show(S.cur);
+  }
+  function show(k, center) {             // the step k in view: in the middle when it comes from out of view, if asked
+    const x0 = k * S.px, x1 = x0 + S.px, a = scroll.scrollLeft, b = a + avail();
+    if (x0 >= a && x1 <= b) return;
+    if (center) scroll.scrollLeft = x0 + S.px / 2 - avail() / 2;
+    else if (x0 < a) scroll.scrollLeft = x0 - S.px; else scroll.scrollLeft = x1 - avail() + S.px;
+  }
+  function selRow() {                    // the selected row in view, under the axis, above the bottom
+    const rw = grid.querySelector('.wv-row[data-i="' + S.sel + '"]');
+    if (!rw) return;
+    const top = scroll.scrollTop + WV.axis, bot = scroll.scrollTop + scroll.clientHeight - 12;
+    if (rw.offsetTop < top) scroll.scrollTop = rw.offsetTop - WV.axis;
+    else if (rw.offsetTop + rw.offsetHeight > bot) scroll.scrollTop = rw.offsetTop + rw.offsetHeight - scroll.clientHeight + 12;
+  }
+  const colAt = clientX => {
+    const r = scroll.getBoundingClientRect();
+    const c = Math.floor((scroll.scrollLeft + clientX - r.left - L) / S.px);
+    return c < 0 || c >= cols ? null : c;
+  };
+
+  let words = [], hov = null, tags = [];  // the words of the boxes: {t, a, b, txt}; the column under the pointer; the marker words
+  function draw() {
+    const px = S.px, W = cols * px, every = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000].find(e => e * px >= 30) || 2000;
+    tags = [];
+    grid.style.width = (L + W + 16) + "px";
+    grid.innerHTML = "";
+    words = [];
+    const left = (cls, ...kids) => h("div", { class: "wv-left" + (cls ? " " + cls : ""), style: "width:" + L + "px" }, ...kids);
+    // behind the values: the loop, the cursor, the step that fails, the start of the loop, the faded pass
+    const marks = (svg, H, y0, dash) => {
+      if (loop !== null) sv("rect", { x: loop * px, y: y0, width: (n - loop) * px, height: H - y0, fill: "#edf3f2" }, svg);
+      if (S.cur !== tr.at) sv("rect", { x: S.cur * px, y: y0, width: px, height: H - y0, fill: "#e6effa" }, svg);
+      if (fails) sv("rect", { x: tr.at * px, y: y0, width: px, height: H - y0, fill: "#fbeceb" }, svg);
+      if (loop !== null) sv("line", { x1: loop * px + .5, y1: dash === undefined ? y0 : dash, x2: loop * px + .5, y2: H,
+                             stroke: "#8a9b9c", "stroke-dasharray": "3 3" }, svg);
+      if (ghost) sv("line", { x1: n * px + .5, y1: y0, x2: n * px + .5, y2: H, stroke: "#c3cdcd" }, svg);
+    };
+    // the cursor: under the waves, just right of the edge of its step, so a change there stays in view
+    const cursor = (svg, y0, H) => sv("line", { x1: S.cur * px + 2, y1: y0, x2: S.cur * px + 2, y2: H, stroke: "#2f6fb5", "stroke-width": 2 }, svg);
+    const backed = (svg, t, font) => {   // a word with white behind it, over the lines it crosses
+      const w = textWidth(t.textContent, font), x = +t.getAttribute("x"), a = t.getAttribute("text-anchor");
+      const x0 = a === "middle" ? x - w / 2 : a === "end" ? x - w : x;
+      const r = sv("rect", { x: x0 - 3, y: +t.getAttribute("y") - 1, width: w + 6, height: 13, fill: "#fff" });
+      svg.insertBefore(r, t);
+      return { t, r, w };
+    };
+    // the axis: the lane of the loop, the lane of the step that fails, then the steps (or the times)
+    const ax = h("div", { class: "wv-row wv-axis", style: "height:" + WV.axis + "px" },
+      left("", h("span", { class: "wv-name", style: "width:" + nameW + "px" }, DATA.period ? "t (s)" : "step"),
+        h("span", { class: "wv-corner" }, "value at ", h("span", { class: "wv-at" }, corner(S.cur)))));
+    const asvg = sv("svg", { width: W + 16, height: WV.axis, class: "wv-svg" }, ax);
+    const B = WV.band;
+    marks(asvg, WV.axis, B, 13);
+    cursor(asvg, B, WV.axis);
+    if (loop !== null) {                  // the loop: a bracket over its steps
+      const x0 = loop * px, x1 = n * px;
+      sv("path", { d: `M${x0 + .5} 13V7H${x1 - .5}V13`, fill: "none", stroke: "#17393b", "stroke-width": 1.2 }, asvg);
+      const t = sv("text", { x: x0 + 6, y: 2, "dominant-baseline": "hanging", class: "wv-loop" }, asvg);
+      t.textContent = "↺ loop";
+      tags.push({ ...backed(asvg, t, "600 10px Helvetica, Arial, sans-serif"), mid: false, x: x0 + 6, a: x0, b: x1 });
+    }
+    if (fails) {                          // the step that fails: "fails ▾" over a red column
+      const m = tr.at * px + px / 2;
+      const t = sv("text", { x: m, y: 15, "text-anchor": "middle", "dominant-baseline": "hanging", class: "wv-fails" }, asvg);
+      t.textContent = "fails";
+      tags.push({ ...backed(asvg, t, "bold 10px Helvetica, Arial, sans-serif"), mid: true, x: m, a: tr.at * px, b: tr.at * px + px });
+      sv("path", { d: `M${m - 4} 26h8l-4 5z`, fill: "#b03a2e" }, asvg);
+    }
+    for (let c = 0; c < cols; c++) {
+      const k = real(c), x = c * px, g = c >= n;
+      sv("line", { x1: x, y1: (g ? c - n : c) % every ? WV.axis - 4 : WV.axis - 8, x2: x, y2: WV.axis, stroke: "#b6c1c1" }, asvg);
+      if ((g ? c - n : c) % every === 0 || (!g && (k === tr.at || k === S.cur))) {
+        const t = sv("text", { x: Math.max(x + px / 2, textWidth(label(k), "10.5px Menlo, Monaco, monospace") / 2 + 2), y: WV.axis - 11, "text-anchor": "middle",
+          class: "wv-tick" + (g ? " ghost" : k === tr.at ? " fail" : k === S.cur ? " cur" : "") }, asvg);
+        t.textContent = label(k);
+      }
+    }
+    if (ghost) sv("text", { x: cols * px + 4, y: WV.axis - 11, class: "wv-tick ghost" }, asvg).textContent = "…";
+    grid.appendChild(ax);
+    // the rows, under the name of their group
+    let r = 0;
+    order.forEach((i, j) => {
+      if (groups && (j === 0 || req(order[j - 1]) !== req(i))) {
+        const gr = h("div", { class: "wv-row wv-group", style: "height:" + WV.group + "px" },
+          left("", h("span", { class: "wv-gname", title: req(i) ? "The variables in the terms of " + reqName : "" },
+            req(i) ? ["Variables of ", h("b", {}, reqName)] : "Other variables")));
+        const gs = sv("svg", { width: W + 16, height: WV.group, class: "wv-svg" }, gr);
+        marks(gs, WV.group, 0); cursor(gs, 0, WV.group);
+        grid.appendChild(gr);
+      }
+      const kd = kind(i), plot = kd === "num" && S.plots.has(i);
+      const H = plot ? WV.plot : kd === "bool" ? WV.bool : WV.row;
+      const nums = tr.steps.map(st => st[i]).filter(v => typeof v === "number");
+      const lo = Math.min(...nums), hi = Math.max(...nums);
+      const nm = h("span", { class: "wv-name" + (req(i) ? " port" : ""), title: tr.vars[i], style: "width:" + (nameW - 24) + "px" }, tr.vars[i]);
+      const valv = h("span", { class: "wv-val", style: "width:" + valW + "px" }, fmt(tr.steps[S.cur][i]));
+      if (plot) valv.append(h("small", {}, "max " + short(hi)), h("small", {}, "min " + short(lo)));
+      let tg = h("span", { class: "wv-plot" });
+      if (kd === "num") {
+        const tip = plot ? "Show as values" : "Draw as a line";
+        tg = h("button", { class: "wv-plot" + (plot ? " on" : ""), "data-tip": tip, "aria-label": tip,
+                           onclick: e => { e.stopPropagation(); S.plots.has(i) ? S.plots.delete(i) : S.plots.add(i); draw(); } });
+        tg.innerHTML = '<svg viewBox="0 0 16 16"><path d="M2 13.5h12"/><path d="M2.5 10.5l3-4 3 2.5 5-6"/></svg>';
+      }
+      const lf = left(S.sel === i ? "sel" : "", nm, tg, valv);
+      lf.addEventListener("click", () => { S.sel = i; draw(); selRow(); });
+      const next = order[j + 1];
+      const flat = kd === "bool" && next !== undefined && kind(next) === "bool" && req(next) === req(i);  // no line between two Booleans
+      const row = h("div", { class: "wv-row" + (r++ % 2 ? " odd" : "") + (flat ? " nb" : "") + (S.sel === i ? " sel" : ""), "data-i": i, style: "height:" + H + "px" }, lf);
+      const svg = sv("svg", { width: W + 16, height: H, class: "wv-svg" }, row);
+      marks(svg, H, 0);
+      cursor(svg, 0, H);
+      if (plot) [6, H - 6].forEach(y => sv("line", { x1: 0, y1: y, x2: W, y2: y, stroke: "#dfe5e5", "stroke-dasharray": "2 3" }, svg));
+      const draw1 = (from, to, g, wg) => {
+        if (kd === "bool") {
+          const hiY = 6, loY = H - 6;
+          let d = "";
+          for (let c = from; c < to; c++) {
+            const v = valueAt(c, i), x = c * px;
+            if (v === null || v === undefined) { sv("rect", { x, y: hiY, width: px, height: loY - hiY, fill: "url(#wvhatch)" }, g); continue; }
+            const y = v ? hiY : loY;
+            if (v) sv("rect", { x, y: hiY, width: px, height: loY - hiY, fill: "#c4d9d5" }, g);
+            d += (d && c > from ? "L" : "M") + x + " " + y + "H" + (x + px);
+          }
+          sv("path", { d, fill: "none", stroke: "#17393b", "stroke-width": 1.5 }, g);
+        } else if (plot) {                // a step line, filled faintly under it, between the least and the greatest value
+          const y = v => lo === hi ? H / 2 : H - 6 - (v - lo) / (hi - lo) * (H - 12);
+          let d = "", f = "", x0 = null;
+          for (let c = from; c <= to; c++) {
+            const v = c < to ? valueAt(c, i) : null;
+            if (typeof v !== "number") { if (x0 !== null) f += "V" + (H - 6) + "H" + x0 + "Z"; x0 = null; continue; }
+            const yv = y(v);
+            if (x0 === null) { x0 = c * px; d += "M" + x0 + " " + yv; f += "M" + x0 + " " + (H - 6) + "V" + yv; }
+            else { d += "V" + yv; f += "V" + yv; }
+            d += "H" + (c + 1) * px; f += "H" + (c + 1) * px;
+          }
+          sv("path", { d: f, fill: "rgba(23,57,59,.08)" }, g);
+          sv("path", { d, fill: "none", stroke: "#17393b", "stroke-width": 1.5 }, g);
+        } else if (px < 8) {              // steps too narrow for boxes: a band, a tick where the value changes
+          const top = 4, bot = H - 4;
+          sv("rect", { x: from * px, y: top, width: (to - from) * px, height: bot - top, fill: "#f7f9f9" }, g);
+          for (let c = from; c < to; c++) {
+            const v = valueAt(c, i);
+            if (v === null || v === undefined) sv("rect", { x: c * px, y: top, width: px, height: bot - top, fill: "url(#wvhatch)" }, g);
+          }
+          let d = `M${from * px} ${top + .5}H${to * px}M${from * px} ${bot - .5}H${to * px}`;
+          for (let c = from + 1; c < to; c++) if (c === loop || fmt(valueAt(c, i)) !== fmt(valueAt(c - 1, i))) d += `M${c * px + .5} ${top}V${bot}`;
+          sv("path", { d, fill: "none", stroke: "#7d8c8d", "stroke-width": 1 }, g);
+        } else {                          // a box for each run of one value
+          let c = from;
+          while (c < to) {
+            const v = valueAt(c, i); let e = c + 1;
+            while (e < to && e !== loop && fmt(valueAt(e, i)) === fmt(v)) e++;   // a box ends where the loop starts
+            const x0 = c * px + .5, x1 = e * px - .5, s = Math.min(4, (x1 - x0) / 4), top = 4, bot = H - 4, mid = H / 2;
+            const sl = c === 0 ? 0 : s, sr = e === cols ? 0 : s;   // flat at the start and the end: nothing changes there
+            sv("path", { d: `M${x0} ${mid}L${x0 + sl} ${top}H${x1 - sr}L${x1} ${mid}L${x1 - sr} ${bot}H${x0 + sl}Z`,
+              fill: v === null || v === undefined ? "url(#wvhatch)" : "#f7f9f9", stroke: "#7d8c8d", "stroke-width": 1 }, g);
+            if (x1 - x0 - 2 * s >= 17)
+              words.push({ t: sv("text", { y: mid, "text-anchor": "middle", "dominant-baseline": "central", class: "wv-v" }, wg),
+                           a: x0 + sl, b: x1 - sr, txt: fmt(v), alt: short(v), shown: null });
+            c = e;
+          }
+        }
+      };
+      const wg = sv("g", {});             // the words over the cursor, their halo hiding it
+      draw1(0, n, svg, wg);
+      if (ghost) { const gg = sv("g", { opacity: ".35" }, svg); draw1(n, cols, gg, gg); }
+      svg.appendChild(wg);
+      grid.appendChild(row);
+    });
+    const defs = sv("svg", { width: 0, height: 0, style: "position:absolute" });
+    defs.innerHTML = '<defs><pattern id="wvhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+      + '<rect width="6" height="6" fill="#f2f4f4"/><line x1="0" y1="0" x2="0" y2="6" stroke="#d3dbdb" stroke-width="2"/></pattern></defs>';
+    grid.appendChild(defs);
+    hov = h("div", { class: "wv-hov" });
+    grid.appendChild(hov);
+    where.innerHTML = "";
+    if (DATA.period) where.append("t = ", h("span", { class: "wv-k" }, label(S.cur)), " s");
+    else where.append("Step ", h("span", { class: "wv-k" }, label(S.cur)));
+    zin.classList.toggle("off", S.px >= WV.max); zout.classList.toggle("off", S.px <= least() + 1e-9);   // at the limits
+    fitHeight();
+    place();
+  }
+  function place() {                     // the words of the boxes, the bar under the steps and the steps in view
+    const v0 = scroll.scrollLeft, v1 = v0 + scroll.clientWidth - L;
+    const cx = S.cur * S.px + 2;           // the cursor line
+    const roomOf = (a, b) => Math.floor((b - a - 4) / 6.6);
+    words.forEach(w => {                 // in the middle of the part in view, cut to fit it; beside the cursor, not under it
+      let a = Math.max(w.a, v0), b = Math.min(w.b, v1);
+      if (cx > a + 2 && cx < b - 2) {
+        const [l, r] = [[a, cx - 3], [cx + 4, b]];
+        const side = roomOf(...l) >= roomOf(...r) ? l : r;
+        if (roomOf(...side) >= Math.min(2, w.txt.length)) [a, b] = side;
+      }
+      const room = roomOf(a, b);
+      // cut, a value says it is cut: "2…", or "…" in a box of one letter, never an empty box that looks unchanged
+      const txt = w.txt.length <= room ? w.txt : w.alt.length <= room ? w.alt : room >= 2 ? w.alt.slice(0, room - 1) + "…" : room >= 1 ? "…" : "";
+      if (txt !== w.shown) { w.t.textContent = txt; w.shown = txt; }
+      if (txt) w.t.setAttribute("x", (a + b) / 2);
+    });
+    tags.forEach(m => {                  // "fails" and "↺ loop" inside the part in view, while their steps are in it
+      let x = m.x;
+      if (m.b > v0 && m.a < v1) x = m.mid ? Math.max(v0 + m.w / 2 + 4, Math.min(v1 - m.w / 2 - 4, x))
+                                          : Math.max(v0 + 4, Math.min(v1 - m.w - 4, x));
+      m.t.setAttribute("x", x); m.r.setAttribute("x", (m.mid ? x - m.w / 2 : x) - 3);
+    });
+    const over = scroll.scrollWidth > scroll.clientWidth + 1;
+    sbar.classList.toggle("on", over);
+    const a = Math.max(0, Math.floor(scroll.scrollLeft / S.px)), b = Math.min(cols, Math.ceil((scroll.scrollLeft + avail()) / S.px)) - 1;
+    const end = scroll.scrollTop + scroll.clientHeight;
+    const below = [...grid.querySelectorAll(".wv-row[data-i]")].filter(r => r.offsetTop + r.offsetHeight / 2 > end).length;
+    foot.firstChild.textContent = (over ? (DATA.period ? "t " + label(a) + " to " + label(Math.min(b, n - 1)) : "steps " + a + " to " + Math.min(b, n - 1))
+      + " of " + n + " in view" : n + " steps") + (below ? " · " + below + (below === 1 ? " more row" : " more rows") + " below" : "");
+    fade.style.display = below ? "block" : "none";
+    edgeL.innerHTML = edgeR.innerHTML = "";
+    if (over) {                             // the step that fails or the loop out of view: a way to it at the edge
+      const go = (k, cls, word, key) => (k < a ? edgeL : edgeR).append(h("button", { class: cls, "data-tip": "Go there (" + key + ")",
+        onclick: () => { jump(k); box.focus({ preventScroll: true }); } }, k < a ? "◂ " + word : word + " ▸"));   // the keys stay
+      if (loop !== null && (loop > b || loop < a)) go(loop, "wv-loop", "↺ loop from " + label(loop), "L");   // its word out of view
+      if (fails && (tr.at < a || tr.at > b)) {
+        const side = tr.at < a ? edgeL : edgeR;
+        if (!side.childNodes.length) side.append(h("span"));       // the first line, that of the loop, kept
+        go(tr.at, "wv-fails", "fails at " + label(tr.at), "F");
+      }
+      edgeL.style.top = edgeR.style.top = scroll.offsetTop + "px";
+      edgeL.style.left = (L + 6) + "px";
+    }
+    if (below) fade.style.top = (scroll.offsetTop + scroll.clientHeight - 12) + "px";
+    const hint = foot.lastChild;            // the ways to move, when the drawer has room for them
+    hint.textContent = "Click a step · " + (over ? "drag to pan · " : "") + (mac ? "⌘" : "Ctrl") + " + wheel to zoom · ? for the keys";
+    hint.hidden = box.clientWidth < 800;
+    if (!hint.hidden && foot.offsetHeight > 34) hint.hidden = true;   // the note on one line first
+    if (!over) return;
+    const w = sbar.clientWidth, vis = avail() / (scroll.scrollWidth - L);
+    thumb.style.width = Math.max(24, w * Math.min(1, vis)) + "px";
+    thumb.style.left = (w - thumb.offsetWidth) * scroll.scrollLeft / Math.max(1, scroll.scrollWidth - scroll.clientWidth) + "px";
+  }
+  scroll.addEventListener("scroll", place);
+  // the bar: drag its thumb, or click it to page
+  sbar.addEventListener("mousedown", e => { if (e.target === thumb) return;
+    S.fit = false; scroll.scrollLeft += (e.offsetX < thumb.offsetLeft ? -1 : 1) * avail(); });
+  thumb.addEventListener("mousedown", e => {
+    e.preventDefault(); e.stopPropagation();
+    const x0 = e.clientX, s0 = scroll.scrollLeft, k = scroll.scrollWidth / sbar.clientWidth;
+    thumb.classList.add("drag");
+    const move = m => { S.fit = false; scroll.scrollLeft = s0 + (m.clientX - x0) * k; };
+    const up = () => { thumb.classList.remove("drag"); removeEventListener("mousemove", move); removeEventListener("mouseup", up); };
+    addEventListener("mousemove", move); addEventListener("mouseup", up);
+  });
+  // the pointer on the steps: its column tinted, the value under it in full in the tip
+  const tip = document.getElementById("tip");
+  let tipped = false;
+  const untip = () => { if (tipped) { tip.style.display = "none"; tipped = false; } };
+  const unhover = () => { if (hov) hov.style.display = "none"; untip(); };
+  scroll.addEventListener("mousemove", e => {
+    const c = colAt(e.clientX), rw = e.target.closest(".wv-row");
+    if ((down && down.moved) || c === null || !rw || e.target.closest(".wv-left")) return unhover();
+    hov.style.display = "block"; hov.style.left = (L + c * S.px) + "px"; hov.style.width = S.px + "px";
+    if (rw.dataset.i === undefined) return untip();
+    const i = +rw.dataset.i, v = valueAt(c, i);
+    tip.textContent = tr.vars[i] + (v === null || v === undefined ? ": no value" : " = " + fmt(v)) + " · " + at(real(c)) + (c >= n ? ", next pass" : "");
+    tip.style.display = "block"; tipped = true;
+    const w = tip.offsetWidth, ht = tip.offsetHeight;
+    tip.style.left = Math.max(4, Math.min(e.clientX + 12, innerWidth - w - 8)) + "px";
+    tip.style.top = (e.clientY + 18 + ht > innerHeight ? e.clientY - ht - 10 : e.clientY + 18) + "px";
+  });
+  scroll.addEventListener("mouseleave", unhover);
+  // a click on the steps picks one; a drag pans along them
+  let down = null;
+  scroll.addEventListener("pointerdown", e => {
+    if (e.button !== 0 || e.target.closest(".wv-left")) return;
+    const rw = e.target.closest(".wv-row[data-i]");
+    down = { x: e.clientX, s: scroll.scrollLeft, moved: false, row: rw ? +rw.dataset.i : null };
+  });
+  WAVE.move = e => {
+    if (!down) return;
+    if (Math.abs(e.clientX - down.x) > 4) { down.moved = true; scroll.classList.add("pan"); S.fit = false; }
+    if (down.moved) scroll.scrollLeft = down.s - (e.clientX - down.x);
+  };
+  addEventListener("pointermove", WAVE.move);
+  WAVE.up = e => {
+    if (!down) return;
+    const was = down; down = null; scroll.classList.remove("pan");
+    if (was.moved) return;
+    const k = WAVE.stepAt(e.clientX);      // a click on a row: that row selected, for [ ] and Enter
+    if (was.row !== null && was.row !== S.sel) { S.sel = was.row; if (k === null || k === S.cur) draw(); }
+    if (k !== null) pick(k);
+    if (was.row !== null) selRow();
+  };
+  addEventListener("pointerup", WAVE.up);
+  // Ctrl or Cmd and the wheel (a pinch too) zoom where they point; Shift and the wheel pan along the
+  // steps, and so does the wheel alone when all the rows are in view
+  scroll.addEventListener("wheel", e => {
+    if (!(e.ctrlKey || e.metaKey)) {
+      const tall = scroll.scrollHeight > scroll.clientHeight + 1;
+      if (e.deltaX || !e.deltaY || (tall && !e.shiftKey)) return;
+      e.preventDefault();
+      if (scroll.scrollWidth > scroll.clientWidth + 1) S.fit = false;
+      scroll.scrollLeft += e.deltaY;
+      return;
+    }
+    e.preventDefault();
+    const r = scroll.getBoundingClientRect();
+    zoom(Math.exp(-e.deltaY * 0.01), Math.max(0, e.clientX - r.left - L));
+  }, { passive: false });
+  box.onkeydown = e => {
+    const k = e.key;
+    const go = s => { e.preventDefault(); pick(Math.max(0, Math.min(n - 1, s))); };
+    const changed = s => fmt(tr.steps[s][S.sel]) !== fmt(tr.steps[s - 1][S.sel]);
+    if (k === "Escape") { if (keys.classList.contains("on")) toggleKeys(false); else closeWave(); e.preventDefault(); }
+    else if (S.sel !== null && (k === "]" || (k === "ArrowRight" && e.altKey))) {   // the next change of the row
+      let s = S.cur + 1;
+      while (s < n && !changed(s)) s++;
+      if (s < n) go(s); else e.preventDefault();
+    } else if (S.sel !== null && (k === "[" || (k === "ArrowLeft" && e.altKey))) {  // the change before
+      let s = S.cur - 1;
+      while (s > 0 && !changed(s)) s--;
+      go(s);
+    }
+    else if (k === "ArrowLeft" || k === "ArrowRight") go(S.cur + (k === "ArrowLeft" ? -1 : 1));
+    else if (k === "Home") go(0);
+    else if (k === "End") go(n - 1);
+    else if ((k === "f" || k === "F") && fails) { e.preventDefault(); jump(tr.at); }
+    else if ((k === "l" || k === "L") && loop !== null) { e.preventDefault(); jump(loop); }
+    else if (k === "+" || k === "=") zoom(1.5);
+    else if (k === "-") zoom(1 / 1.5);
+    else if (k === "0") fitAll();
+    else if (k === "?") toggleKeys();
+    else if (k === "ArrowUp" || k === "ArrowDown") {
+      const a = order.indexOf(S.sel), to = order[Math.max(0, Math.min(order.length - 1, a + (k === "ArrowUp" ? -1 : 1)))];
+      S.sel = to; draw(); selRow(); e.preventDefault();
+    } else if (k === "Enter" && S.sel !== null && kind(S.sel) === "num") {
+      S.plots.has(S.sel) ? S.plots.delete(S.sel) : S.plots.add(S.sel); draw();
+    } else return false;
+    e.stopPropagation();
+    return true;
+  };
+  // the keys are the drawer's while it is open, wherever the focus went (a button of the drawer drawn
+  // again, a click on the diagram): those of a field or a button of the page stay theirs
+  WAVE.key = e => box.onkeydown(e);
+  // at first: every step in view, if each has room; else a width where most values are written whole
+  // (four in five of the runs one step long), the step that fails in the middle
+  S.px = Math.min(WV.max, avail() / cols);
+  S.fit = S.px >= 24;
+  if (!S.fit) {
+    const lens = [].concat(...order.filter(i => kind(i) !== "bool").map(i => tr.steps.map(st => short(st[i]).length))).sort((a, b) => a - b);
+    const p80 = lens.length ? lens[Math.floor(lens.length * .8)] : 1;
+    S.px = Math.max(32, Math.min(90, Math.ceil(13 + 6.6 * p80)));
+  }
+  draw();
+  show(fails ? tr.at : S.cur, true);
+  box.focus();
+  // a wider or narrower drawer (the window, the details opened or closed): all the steps stay in the
+  // width if they all were; else the zoom stays. A taller or shorter window: the height again
+  let width = scroll.clientWidth;
+  WAVE.ro = new ResizeObserver(() => {
+    if (!WAVE.open || scroll.clientWidth === width) return;
+    width = scroll.clientWidth;
+    if (S.fit) fitAll(); else place();
+  });
+  WAVE.ro.observe(scroll);
+  WAVE.bro = new ResizeObserver(() => { if (WAVE.open) viewAboveWave(true); });   // the drawer taller or shorter
+  WAVE.bro.observe(box);
+  viewAboveWave(true);                      // at once, not a frame later
+  WAVE.resize = () => { fitHeight(); place(); viewAboveWave(true); };
+  addEventListener("resize", WAVE.resize);
+}
+// The diagram ends above the drawer, as it ends left of the details: what was in the middle stays in the
+// middle; a diagram seen whole that the drawer would cut is fitted to the room left (or, tall, its box of
+// the check brought into view), and at the close the view of before comes back.
+function viewAboveWave(on) {
+  const v = document.getElementById("view"), box = document.getElementById("wave");
+  const h0 = v.clientHeight;
+  const whole = H => cam && cam.y >= TOP - 1 && cam.y + size0.h * cam.k <= H + 1;
+  const was = whole(h0);
+  v.style.bottom = on ? Math.max(0, innerHeight - box.getBoundingClientRect().top + 8) + "px" : "";
+  const d = h0 - v.clientHeight;
+  if (!cam || !d) return;
+  if (!on && WAVE.cam0) { cam = WAVE.cam0; WAVE.cam0 = null; place(); return; }   // the view of before the drawer
+  const cam0 = { ...cam };
+  cam.y -= d / 2;
+  // a diagram seen whole that the drawer would cut: fitted above it, unless that makes it hard to read
+  // (a tall diagram); then its scale kept and the box of the check brought into view
+  if (on && was && !whole(v.clientHeight)) {
+    WAVE.cam0 = WAVE.cam0 || cam0;
+    const n = panel && byId[panel.id];
+    if (fitScale() >= 0.7 * cam.k || !n) fit(); else { place(); bringInto(n); }
+  }
+  else place();
+}
+function closeWave(keepView) {
+  const box = document.getElementById("wave"), tip = document.getElementById("tip");
+  if (!box || !WAVE.open) return;
+  box.style.display = "none"; box.innerHTML = "";
+  document.body.classList.remove("wave");
+  if (tip) tip.style.display = "none";
+  WAVE.open = false;
+  if (WAVE.up) removeEventListener("pointerup", WAVE.up);
+  if (WAVE.move) removeEventListener("pointermove", WAVE.move);
+  if (WAVE.resize) removeEventListener("resize", WAVE.resize);
+  if (WAVE.ro) WAVE.ro.disconnect();
+  if (WAVE.bro) WAVE.bro.disconnect();
+  if (!keepView) viewAboveWave(false);
+}
+// The code of a C function in the details, folded: its title says whose it is.
+function codeSection(n) {
+  const c = n.model && n.model.code;
+  if (!c) return null;
+  const d = h("details", { class: "rp-sec rp-code" },
+    h("summary", { class: "rp-h" }, svgSpan("chev", '<path d="M6 4l4 4-4 4"/>'), "Code",
+      h("span", { class: "rp-file" }, c.file + " · " + n.model.name)));
+  d.open = !!panel.code;
+  d.addEventListener("toggle", () => { panel.code = d.open; });
+  c.parts.forEach((q, i) => {
+    if (c.parts.length > 1) d.appendChild(h("div", { class: "rp-note", style: "margin:" + (i ? 8 : 4) + "px 0 2px" }, q.name));
+    const pre = h("pre", { class: "code" });
+    q.text.split("\n").forEach((l, i) => pre.appendChild(h("span", { class: "l", "data-line": String(q.line + i) },
+      h("span", { class: "n" }, String(q.line + i)), l + "\n")));
+    d.appendChild(pre);
+  });
+  return d;
 }
 // The checks that fail, on the tools: the button opens the list.
 function renderQueue() {
@@ -1829,27 +2929,80 @@ function renderQueue() {
 }
 // the wrench opens and closes the panel
 function toggleQueue() {
+  const list = failing();
   if (inspector.open) hideInspector();
+  else if (list.length === 1) openRepair(list[0][0], list[0][1]);    // one check that fails: its details at once
   else showInspector("problems");
+}
+// an icon of the page, as a span: one size and one stroke for all (class ib or chev)
+function svgSpan(cls, paths) {
+  const sp = h("span", { class: cls });
+  sp.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true">' + paths + "</svg>";
+  return sp;
+}
+// the buttons of the panel: icons, as the cross and the back arrow; what each does is in its tip
+const GLYPH = {
+  find: '<circle cx="7" cy="7" r="4.3"/><path d="M10.2 10.2l3.6 3.6"/>',
+  again: '<path d="M13 8a5 5 0 1 1-1.6-3.7"/><path d="M13 2.6v3.2H9.8"/>',
+  stop: '<rect x="4.5" y="4.5" width="7" height="7" rx="1"/>',
+  eye: '<path d="M1.6 8S4 3.8 8 3.8 14.4 8 14.4 8 12 12.2 8 12.2 1.6 8 1.6 8z"/><circle cx="8" cy="8" r="1.9"/>',
+  apply: '<path d="M3.2 8.4l3 3 6.6-7"/>',
+  longer: '<circle cx="8" cy="8" r="5.6"/><path d="M8 4.8V8l2.2 1.6"/>',
+  prev: '<path d="M10 3.5L5.5 8l4.5 4.5"/>',
+  wave: '<path d="M1.5 11h2.5V5h3v6h2.5V5h3v6h2"/>',
+  zin: '<circle cx="7" cy="7" r="4.3"/><path d="M10.2 10.2l3.6 3.6M5 7h4M7 5v4"/>',
+  zout: '<circle cx="7" cy="7" r="4.3"/><path d="M10.2 10.2l3.6 3.6M5 7h4"/>',
+  fit: '<path d="M1.5 8h13M4.5 5l-3 3 3 3M11.5 5l3 3-3 3"/>',
+  keys: '<rect x="1.5" y="4" width="13" height="8" rx="1.5"/><path d="M4 6.6h.5M6.5 6.6h.5M9 6.6h.5M11.5 6.6h.5M5 9.4h6"/>',
+  next: '<path d="M6 3.5L10.5 8 6 12.5"/>',
+};
+// an icon button; one that cannot act now stays in view, with its tip saying why (not disabled: a
+// disabled button has no tip)
+function iconButton(paths, tip, onclick, cls, off) {
+  const b = h("button", { class: "ib" + (cls ? " " + cls : "") + (off ? " off" : ""), "data-tip": tip, "aria-label": tip,
+                          "aria-disabled": off ? "true" : null, onclick: e => { if (!off) onclick(e); } });
+  b.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true">' + paths + "</svg>";
+  return b;
 }
 // the box of the check picked, marked; brought into the view when it is out of it (once, when picked)
 function markPick() {
   document.querySelectorAll("#view .pick").forEach(e => e.classList.remove("pick"));
   if (panel) { const b = document.querySelector('#view [data-box="' + panel.id + '"]'); if (b) b.classList.add("pick"); }
 }
+const READ = 0.75;     // below this scale the words of a box are hard to read
 function bringInto(n) {
   const b = document.querySelector('#view [data-box="' + n.id + '"] > rect'), v = document.getElementById("view");
   if (!b || !cam) return;
   const r = b.getBoundingClientRect(), all = v.getBoundingClientRect(), P = document.getElementById("insp");
   const right = inspector.open && P && P.offsetParent ? Math.min(all.right, P.getBoundingClientRect().left - 8) : all.right;
   const V = { left: all.left, top: all.top, bottom: all.bottom, right, width: right - all.left, height: all.height };
-  if (r.left >= V.left && r.right <= V.right && r.top >= V.top + 40 && r.bottom <= V.bottom) return;
-  const k = Math.min(cam.k, 0.9 * V.width / r.width * cam.k, 0.85 * (V.height - 40) / r.height * cam.k);
-  if (k < cam.k) { const cx = r.left + r.width / 2, cy = r.top + r.height / 2; zoomAt(cx, cy, k / cam.k); }
+  const seen = r.left >= V.left && r.right <= V.right && r.top >= V.top + 40 && r.bottom <= V.bottom;
+  if (seen && cam.k >= READ) return;
+  // the scale that shows it whole; one too small to read (a large diagram fitted to the window) made
+  // larger, up to the size of its words, and then, if it is still too large, its top left (its title
+  // and its tag) in view
+  const whole = Math.min(0.9 * V.width / r.width * cam.k, 0.85 * (V.height - 40) / r.height * cam.k);
+  const k = cam.k >= READ ? Math.min(cam.k, whole) : Math.max(cam.k, Math.min(1, Math.max(whole, READ)));
+  if (k !== cam.k) zoomAt(r.left + r.width / 2, r.top + r.height / 2, k / cam.k);
   const r2 = b.getBoundingClientRect();
-  cam.x += V.left + V.width / 2 - (r2.left + r2.width / 2);
-  cam.y += V.top + 40 + (V.height - 40) / 2 - (r2.top + r2.height / 2);
+  cam.x += r2.width <= 0.95 * V.width ? V.left + V.width / 2 - (r2.left + r2.width / 2) : V.left + 16 - r2.left;
+  cam.y += r2.height <= 0.9 * (V.height - 40) ? V.top + 40 + (V.height - 40) / 2 - (r2.top + r2.height / 2) : V.top + 52 - r2.top;
   place();
+}
+// A term listed in the panel, on the diagram: its box open, the term in view, its lines flashed.
+async function showTerm(n, id) {
+  const key = (id.startsWith("composed") ? "k:" : "c:") + n.id;
+  if (!open.has(key)) { open.add(key); await render(); }
+  const rows = [...document.querySelectorAll('#view [data-box="' + n.id + '"] > g[data-term="' + id + '"]')];
+  if (!rows.length || !cam) return;
+  bringInto(n);
+  const v = document.getElementById("view").getBoundingClientRect();
+  const r = rows.map(x => x.getBoundingClientRect()), top = Math.min(...r.map(q => q.top)), bottom = Math.max(...r.map(q => q.bottom));
+  const W = document.getElementById("wave"), low = W && W.offsetParent ? W.getBoundingClientRect().top - 8 : v.bottom;
+  if (top < v.top + 48 || bottom > low) { cam.y += (v.top + 48 + low) / 2 - (top + bottom) / 2; place(); }
+  rows.forEach(x => { const b = x.getBBox();
+    const f = el("rect", { class: "flash", x: b.x - 2, y: b.y - 1, width: b.width + 4, height: b.height + 2, rx: 3 }, x);
+    setTimeout(() => f.remove(), 1700); });
 }
 // A counterexample on the diagram: the values of a step on the ports of the box of the check and inside it.
 function replay(n, tr, k) {
@@ -1857,7 +3010,7 @@ function replay(n, tr, k) {
   const inside = new Set();             // the box of the check and the boxes inside it
   (function walk(b) { inside.add(String(b.id)); (b.children || []).forEach(walk); })(n);
   const at = {}; tr.vars.forEach((v, i) => { at[v] = tr.steps[k][i]; });
-  const fmt = v => typeof v === "boolean" ? (v ? "true" : "false") : String(v);
+  const fmt = v => typeof v === "boolean" ? truth(v) : typeof v === "number" ? digits(v) : String(v);
   document.querySelectorAll("#view text[data-var]").forEach(x => {
     const v = x.getAttribute("data-var");
     if (!(v in at) || !inside.has(x.getAttribute("data-pbox"))) return;
@@ -1866,33 +3019,61 @@ function replay(n, tr, k) {
     x.setAttribute("data-orig", x.textContent);
     x.textContent = v + " = " + fmt(at[v]);
     x.classList.add("pv-val");
+    if (typeof at[v] === "number" && fmt(at[v]) !== String(at[v])) { x.setAttribute("data-otip", x.getAttribute("data-tip") || "");
+      x.setAttribute("data-tip", v + " = " + at[v]); }     // the whole value in its tip
     if (x.getAttribute("data-side") === "left") { x.setAttribute("data-ox", x.getAttribute("x"));
       x.setAttribute("x", +x.getAttribute("x") + w0 - x.getComputedTextLength()); }
   });
-  // the two ends of a short wire say the same value: one says it
+  // the two ends of a short wire say the same value: one says it (the two on one line, or a little apart)
   const shown = [...document.querySelectorAll("#view text.pv-val")].map(x => [x, x.getBoundingClientRect()]);
   shown.forEach(([x, r], i) => {
     if (shown.slice(0, i).some(([y, q]) => !y.hasAttribute("data-hid") && y.textContent === x.textContent
-        && r.left < q.right && q.left < r.right && r.top < q.bottom && q.top < r.bottom)) {
+        && r.left < q.right + 40 && q.left < r.right + 40 && r.top < q.bottom && q.top < r.bottom)) {
       x.setAttribute("data-hid", ""); x.style.visibility = "hidden"; }
   });
-  // a variable on a box and on the box around it, with the same value: the box around says it
+  // a variable on a box and on the box around it, with the same value, the two near: the box around
+  // says it (a wire across the box, between two parts, keeps its own)
   const rectOf = id => { const b = document.querySelector('#view [data-box="' + id + '"]'); return b && b.getBoundingClientRect(); };
   const around = (q, r) => q.left <= r.left && q.right >= r.right && q.top <= r.top && q.bottom >= r.bottom
     && (q.width > r.width || q.height > r.height);
   shown.forEach(([x]) => {
     const r = rectOf(x.getAttribute("data-pbox"));
     if (!r || x.hasAttribute("data-hid")) return;
-    if (shown.some(([y]) => y !== x && !y.hasAttribute("data-hid") && y.textContent === x.textContent
-        && (q => q && around(q, r))(rectOf(y.getAttribute("data-pbox"))))) {
+    const near = (a, b) => Math.abs(a.left - b.left) < 140 && Math.abs(a.top - b.top) < 40;
+    if (shown.some(([y, q]) => y !== x && !y.hasAttribute("data-hid") && y.textContent === x.textContent
+        && near(q, x.getBoundingClientRect()) && (o => o && around(o, r))(rectOf(y.getAttribute("data-pbox"))))) {
       x.setAttribute("data-hid", ""); x.style.visibility = "hidden"; }
+  });
+  // each value on a plate of the ground, over the wires (drawn after the labels): a copy on the top
+  // layer, where the label is; the label itself hidden
+  // The plate has the color of what is under it: the innermost box there (its fill, the pale yellow of
+  // a hole), else the ground
+  const frames = [...document.querySelectorAll("#view [data-box] > rect:first-of-type")]
+    .map(r => [r, r.getBoundingClientRect()]).sort((a, b) => a[1].width * a[1].height - b[1].width * b[1].height);
+  const under = x => { const q = x.getBoundingClientRect(), cx = (q.left + q.right) / 2, cy = (q.top + q.bottom) / 2;
+    const hit = frames.find(([, r]) => cx > r.left && cx < r.right && cy > r.top && cy < r.bottom);
+    if (!hit) return "var(--ground)";
+    const f = hit[0].getAttribute("fill") || "";
+    return f.startsWith("url(") ? "var(--hole)" : f; };
+  const top = el("g", { class: "pv-top" }, camera), base = camera.getCTM().inverse();
+  document.querySelectorAll("#view text.pv-val:not([data-hid])").forEach(x => {
+    const b = x.getBBox(), m = base.multiply(x.getCTM());
+    const g = el("g", { transform: `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})` }, top);
+    el("rect", { class: "pv-plate", x: b.x - 2, y: b.y, width: b.width + 4, height: b.height, rx: 3, fill: under(x) }, g);
+    const c = x.cloneNode(true); c.removeAttribute("data-var"); c.removeAttribute("data-orig");
+    c.classList.replace("pv-val", "pv-up"); g.appendChild(c);
+    x.style.visibility = "hidden"; x.setAttribute("data-up", "");
   });
 }
 function clearReplay() {
+  document.querySelectorAll("#view g.pv-top").forEach(x => x.remove());
+  document.querySelectorAll("#view text[data-up]").forEach(x => { x.removeAttribute("data-up"); if (!x.hasAttribute("data-hid")) x.style.visibility = ""; });
   document.querySelectorAll("#view text[data-orig]").forEach(x => { x.textContent = x.getAttribute("data-orig");
     x.removeAttribute("data-orig"); x.classList.remove("pv-val");
     if (x.hasAttribute("data-hid")) { x.removeAttribute("data-hid"); x.style.visibility = ""; }
-    if (x.hasAttribute("data-ox")) { x.setAttribute("x", x.getAttribute("data-ox")); x.removeAttribute("data-ox"); } });
+    if (x.hasAttribute("data-ox")) { x.setAttribute("x", x.getAttribute("data-ox")); x.removeAttribute("data-ox"); }
+    if (x.hasAttribute("data-otip")) { const o = x.getAttribute("data-otip"); o ? x.setAttribute("data-tip", o) : x.removeAttribute("data-tip");
+                                       x.removeAttribute("data-otip"); } });
 }
 function afterRender() {
   if (previewing) { const p = previewing; previewing = null; showPreview(p); }
@@ -1945,7 +3126,7 @@ function deliver(name, mime, data) {
 }
 function exportAs(kind) {
   document.getElementById("export").style.display = "none";
-  const e = exported();
+  const e = exported(kind !== "svg");
   if (!e) return;
   const name = (DATA.title || "diagram").replace(/\.[^.]*$/, "").replace(/[^\w.-]+/g, "_");
   if (kind === "svg") return deliver(name + ".svg", "image/svg+xml", e.text);
@@ -1961,7 +3142,10 @@ function exportAs(kind) {
       return deliver(name + ".pdf", "application/pdf", JSON.stringify({ svg: e.text, w: e.w, h: e.h }));
     let p = document.getElementById("print");
     if (!p) { p = document.createElement("div"); p.id = "print"; p.style.display = "none"; document.body.appendChild(p); }
-    p.innerHTML = e.text;
+    p.innerHTML = e.text.replace(/^<\?xml[^>]*>\s*/, "");
+    let size = document.getElementById("print-size");       // one page, the size of the diagram
+    if (!size) { size = document.createElement("style"); size.id = "print-size"; document.head.appendChild(size); }
+    size.textContent = `@media print { @page { size: ${e.w}px ${e.h}px; margin: 0; } #print svg { width: ${e.w}px; height: ${e.h}px; } }`;
     window.print();
   };
   img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(e.text);

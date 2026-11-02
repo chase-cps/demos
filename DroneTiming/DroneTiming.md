@@ -7,7 +7,10 @@ multi-drone fire suppression of ContrACT (Xiao, Lutz, Castillo-Effen,
 Nuzzo, MEMOCODE 2026), with the worst-case times of each reaction of its
 Table III. Each event `v` has three times: its timestamp `t_v` (when it
 is due, on the logical clock), its start `d_v`, and its completion
-`T_v`. In the pictures, `T_c3` is the completion of the planner and
+`T_v`. An event is named by its reactor and the number of its reaction:
+`dk` the drone timer, `s2` and `s3` the drone (GridDroneSim), `c2` to
+`c4` its controller (GridDroneControl), `a3` and `a4` the coordinator
+(FireCoordinator). So `T_c3` is the completion of the planner, and
 `d_s3 - t_s3` the delay of the move of a drone.
 
 The mission subgraph (the fire spreads, the coordinator reads it)
@@ -17,7 +20,9 @@ plan, have the move granted, move. The drones do not wait for each
 other, so one pipeline gives the bound of each. Each reaction is a
 contract over these times (it starts when its inputs complete and takes
 at most its latency), on real numbers, checked by z3. _Available_ asks
-the move within `lam` of the timestamp, given the offset.
+the move within `lam` of the timestamp, given the offset. _Mission_ calls
+the offset `y0`; _Available_ and _Fast_ call it `offset`. _Fast_ is
+_Available_ with `deadline = 250` in place of `lam`.
 
 **The question.** Each drone must move within 400 ms of its timer. Is
 the bound met, and by how much? With a faster timer of 250 ms, what
@@ -48,10 +53,12 @@ _The system: the reactions of the mission and of a drone with their latencies, i
 
 **Step 1. The mission.** The mission subgraph refines _Mission_ (every
 behavior of the three reactions meets it): it delays the drones by at
-most 59 ms, its worst case. This is the offset of step 2.
+most 59 ms, its worst case. This is the offset of step 2. The assumption
+of _Mission_, `t_ft = d_ft`, says that the fire timer is released on
+time; θ marks the named constants.
 
 <p align="center">
-  <img src="images/mission-refines-mission.png" alt="The mission subgraph inside Mission, the refinement green" width="786">
+  <img src="images/mission-refines-mission.png" alt="The mission subgraph inside Mission, the refinement green" width="560">
   <br>
   <em>Step 1: the mission subgraph inside Mission (y0 = 59).</em>
 </p>
@@ -65,20 +72,29 @@ this means following the longest path through the waits.
 **Step 3. A faster timer fails.** The pipeline does not refine _Fast_,
 which asks for 250 ms. The counterexample gives each event a time: the
 drone timer starts 59 ms late and the move starts 251 ms after its
-timestamp.
+timestamp. z3 sets the move at time 0, so the earlier events have
+negative times. The picture shows the panel of the check alone: _Fast_
+is too wide to be drawn next to it. The orange chip marks a constant of
+the requirement.
 
 <p align="center">
-  <img src="images/repair-deadline-or-plan.png" alt="The counterexample of Fast, and the two repairs: deadline 250 to 280, or x_plan 72 to 42">
+  <img src="images/repair-deadline-or-plan.png" alt="The panel of the check of Fast: the counterexample, and the two repairs: x_plan 72 to 42, or deadline 250 to 280" width="360">
   <br>
-  <em>Steps 3 and 4: the counterexample of Fast at the top, the two repairs at the bottom.</em>
+  <em>Steps 3 and 4: the panel of the check of Fast, the counterexample at the top, the two repairs at the bottom.</em>
 </p>
 
 **Step 4. Repair.** `repair` changes one named constant as little as
 possible so that the check passes, and proves that no smaller change
 works. On the requirement: `deadline = 280`, 30 ms more. On the planner:
 `x_plan = 42`, 30 ms less, since planning is on the longest path. The
-pipeline with `x_plan = 42` refines _Fast_.
+pipeline with `x_plan = 42` refines _Fast_ (`Fast_repaired` in the
+picture: _Fast_ with this pipeline inside).
 
+<p align="center">
+  <img src="images/fast-repaired-plan-42.png" alt="Fast_repaired: the pipeline with Plan open, x_plan = 42, the tag ⪯ green">
+  <br>
+  <em>Step 4: the pipeline with x_plan = 42 (Plan open) refines Fast.</em>
+</p>
 
 **Step 5. The margins.** Under the bound of 400 ms, repair as an
 optimization gives the slowest planner, `x_plan = 192` ms, and the

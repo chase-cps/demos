@@ -9,9 +9,10 @@ install chase-cps):
 
   1. The requirements as written are unrealizable. The unrealizable core is
      the pattern that never connects two generators in parallel, and the one
-     that never leaves the left DC bus unpowered for more than 15 ms.
+     that never leaves the right DC bus unpowered for more than 15 ms.
   2. With 30 ms without power for a DC bus and 20 ms to disconnect a failed
-     generator (template_0_realizable.txt), the requirements are realizable.
+     generator (template_0_realizable.txt), the requirements are realizable,
+     and slugs synthesizes a controller.
 
 The same language describes a small factory: ../FDL2024/factory.py.
 
@@ -28,7 +29,7 @@ import os
 import sys
 import time
 
-from chase_cps import is_realizable, load_dsl, ltl, viz
+from chase_cps import is_realizable, load_dsl, ltl, synthesize, viz
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -42,9 +43,10 @@ def main() -> int:
     args = parser.parse_args()
     wrong = []
 
-    def step(title, expected, contract, core=False):
+    def step(title, expected, contract, core=False, controller=False):
         start = time.time()
-        r = is_realizable(contract, core=core, timeout=args.timeout)
+        r = (synthesize(contract, timeout=args.timeout) if controller
+             else is_realizable(contract, core=core, timeout=args.timeout))
         mark = "" if r.status == expected else f"   (expected {expected})"
         print(f"\n{title}: {r.status} [{time.time() - start:.1f} s]{mark}")
         if r.status != expected:
@@ -55,15 +57,29 @@ def main() -> int:
     eps30 = load_dsl(os.path.join(HERE, "template_0_realizable.txt"), name="EPS_30ms")
     print(f"The power system: {len(eps15.inputs)} inputs, {len(eps15.outputs)} outputs, "
           f"{len(eps15.assumptions)} assumptions, {len(eps15.guarantees)} guarantees")
+    print(f"Relaxed: {len(eps30.assumptions)} assumptions, {len(eps30.guarantees)} guarantees")
+
+    def same(what, found, expected):
+        """A number the page of the demo gives, checked."""
+        if found != expected:
+            print(f"   {what}: {found}   (expected {expected})")
+            wrong.append(what)
+    same("the sizes of the contract as written", (len(eps15.inputs), len(eps15.outputs),
+         len(eps15.assumptions), len(eps15.guarantees)), (11, 7, 30, 28))
+    same("the sizes of the relaxed contract", (len(eps30.assumptions), len(eps30.guarantees)), (24, 26))
 
     first = step("1. The requirements as written are realizable", "unrealizable", eps15, core=True)
     if first.core is not None:
         kept = first.core.core.guarantees
         print(f"   the unrealizable core: {len(kept)} of {len(eps15.guarantees)} guarantees")
+        same("the size of the core", len(kept), 4)
         for g in kept:
             text = ltl.to_str(g)
             print("      " + (text if len(text) <= 100 else text[:97] + "..."))
-    second = step("2. With 30 ms for a DC bus, realizable", "realizable", eps30)
+    second = step("2. With 30 ms for a DC bus, realizable", "realizable", eps30, controller=True)
+    if second.controller:
+        print(f"   controller with {len(second.controller['nodes'])} states")
+        same("the states of the controller", len(second.controller["nodes"]), 97)
 
     if wrong:
         print("\nNot the expected result: " + "; ".join(wrong))

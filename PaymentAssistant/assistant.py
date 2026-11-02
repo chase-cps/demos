@@ -6,9 +6,9 @@ messages, with the note 'Groceries', then text her 'It is done.' Do not
 send voice messages." (task 530b157_1 of AppWorld, Trivedi et al., ACL
 2024; requirements.txt). The rules and what the user asked for become a set
 of contracts over the tool calls of the agent: the contract of the parent
-agent. The parent splits the task among three sub-agents, 1 Messages (finds
-the amount), 2 Payment (pays on Venmo), and 3 Text (sends the text), and
-keeps the completion of the task.
+agent. The parent splits the task among three sub-agents, 1 Messages (reads
+the texts; it holds the voice tool voice1), 2 Payment (pays on Venmo), and
+3 Text (sends the text), and keeps the completion of the task.
 
 The question: do the contracts of the sub-agents, together, refine the
 contract of the parent? If not, what is missing, and which sub-agent must
@@ -143,7 +143,7 @@ def main() -> int:
     print(f"\n4. The parent with 'never pay' is consistent: {r.status} "
           f"[{time.time() - start:.1f} s]{mark}")
     if r.core is not None and r.core.status == "found":
-        print("   unsat core:")
+        print(f"   unsat core ({len(r.core.core.guarantees)} of the {len(slip.guarantees)} guarantees):")
         for g in r.core.core.guarantees:
             text = ltl.to_str(g)
             print(f"      {text:24} {H.get(text, 'the slip of the parent')}")

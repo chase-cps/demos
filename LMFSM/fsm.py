@@ -128,6 +128,9 @@ def main() -> int:
                                     list(contract.assumptions), g)
             return r, "\n".join(lines)
         return run
+    first = [len(c[k].guarantees) for k in ("AutopilotFirst", "SensorFirst")]
+    print(f"The first requirements: {first[0]} of the autopilot and {first[1]} of the sensor "
+          f"({sum(first)} in all)")
     step("1. AutopilotFirst, corrected at each core, is realizable", "realizable",
          fix("AutopilotFirst", "Autopilot"))
     step("   SensorFirst, corrected at each core, is realizable", "realizable",

@@ -21,7 +21,7 @@ fine on its own while the two together ask for the impossible, and this
 is best found before the arbiter is built.
 
 <p align="center">
-  <img src="images/system-arbiter.png" alt="Arbiter, the merge of Grant and Lock, both open with their assumptions and guarantees" width="520">
+  <img src="images/system-arbiter.png" alt="Arbiter, the merge of Grant and Lock, both open with their assumptions and guarantees" width="510">
   <br>
   <em>The system: the arbiter, the merge of the two viewpoints.</em>
 </p>
@@ -37,7 +37,8 @@ how to read them.
 when some controller meets it whatever the masters do. _Grant_ and _Lock_
 are each realizable.
 
-**Step 2. The merge, without the last assumption of Lock.** Without
+**Step 2. The merge, without the last assumption of Lock.** Without the
+third assumption of _Lock_ (LA2),
 `G F !(hmastlock & ((hgrant1 & hbusreq1) | (hgrant2 & hbusreq2)))`, the
 merge is unrealizable. CHASE finds the
 [unrealizable core](https://chase-cps.github.io/tools/synthesis/#unrealizable-cores),
@@ -45,7 +46,8 @@ merge is unrealizable. CHASE finds the
 it, _Lock_ lets it keep the bus
 (`G ((hmastlock & hgrant1) -> X (hbusreq1 -> hgrant1))`), and _Grant_ says
 that master 2 does not wait forever (`G F (hbusreq2 -> hgrant2)`). The
-initial grant, the single grant, and the lock rule complete the core.
+initial grant, the single grant, and the definition of `hmastlock`
+complete the core.
 
 <p align="center">
   <img src="images/step2-merge-core.png" alt="Step 2: the merge without LA2 is unrealizable; the core in red, and the panel of the check">
@@ -54,25 +56,17 @@ initial grant, the single grant, and the lock rule complete the core.
 </p>
 
 **Step 3. What the arbiter must assume.** The core points at the missing
-assumption: a master that has locked the bus stops asking for it sooner
-or later (the third assumption of _Lock_, LA2 in the paper). With it, the
-merge _Arbiter_ is realizable, and slugs synthesizes a controller of 81
-states. _Arbiter_ is also written as SVA in `out/arbiter.sv`, for a tool
-that checks an arbiter written by hand.
+assumption LA2: a master that has locked the bus stops asking for it
+sooner or later. With it, the merge _Arbiter_ is realizable, and slugs
+synthesizes a controller of 81 states. The controller, read as a state
+machine, implements _Arbiter_ (M ⊨ C: the model meets the contract).
+_Arbiter_ is also written as SVA in `out/arbiter.sv`, for a tool that
+checks an arbiter written by hand.
 
 <p align="center">
-  <img src="images/step3-arbiter.png" alt="Step 3: Arbiter, the merge with LA2, open: its assumptions and guarantees, realizable" width="465">
+  <img src="images/step3-arbiter.png" alt="Step 3: Arbiter, the merge with LA2, open: its assumptions and guarantees, realizable; below it the synthesized Controller, M ⊨ C green" width="463">
   <br>
-  <em>Step 3: Arbiter, the merge with the assumption, is realizable.</em>
-</p>
-
-**Step 4. The controller.** The synthesized controller, read as a state
-machine, implements _Arbiter_ (M ⊨ C).
-
-<p align="center">
-  <img src="images/step4-controller.png" alt="Step 4: Arbiter and the synthesized controller, which implements it" width="268">
-  <br>
-  <em>Step 4: the controller implements Arbiter (M ⊨ C).</em>
+  <em>Step 3: Arbiter, the merge with the assumption, is realizable, and its controller implements it (M ⊨ C).</em>
 </p>
 
 ### Run it

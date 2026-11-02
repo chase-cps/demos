@@ -28,7 +28,9 @@ The contracts are in SystemVerilog Assertions (sva/), the RTL in Verilog
      one cycle. In the whole link, a ping escalates the receiver.
 
 The page out/escalation.html draws the system inside Functional, with
-Functional and the receiver open, and the fast sender with its contract.
+Functional and the receiver open, and the fast sender with its contract;
+out/escalation-link.html the link inside Functional and inside Integrity;
+out/escalation-receiver.html the receiver alone, with its state machine.
 
     python escalation.py
     python escalation.py --expect     # exit code 1 when a result is not the expected one
@@ -112,8 +114,8 @@ def main() -> int:
     composed = link.composition(discharge=True, timeout=t)
     link.status = step("2. Sender || Channel || Receiver refines Functional", "valid",
                        lambda: refines(composed, functional, timeout=t)).status
-    step("   Sender || Channel || Receiver refines Integrity", "valid",
-         lambda: refines(composed, integrity, timeout=t))
+    in_integrity = step("   Sender || Channel || Receiver refines Integrity", "valid",
+                        lambda: refines(composed, integrity, timeout=t))
 
     whole = rtl("esc_link", "esc_sender.v", "esc_channel.v", "esc_receiver.v", "esc_link.v")
     step("3. The whole RTL implements Functional", "valid",
@@ -145,9 +147,18 @@ def main() -> int:
                                 open=[functional, link.components[2]],
                                 why=[(faster, "M ⊨ C", in_fast, sender)]),
                     os.path.join(HERE, "out", "escalation.html"))
-    # the link with the results of steps 1 and 2, the modules closed
-    viz.save(viz.diagram(link, open=[functional], title="Escalation link: the modules and the link"),
+    # the link with the results of steps 1 and 2, the modules closed: inside
+    # Functional, and inside Integrity
+    parts = System("Link", [Component(k.name, k.contract, k.implementation, status=k.status)
+                            for k in link.components])
+    viz.save(viz.diagram(link, refines=[(parts, integrity, in_integrity)], open=[functional, integrity],
+                         title="Escalation link: the modules and the link"),
              os.path.join(HERE, "out", "escalation-link.html"))
+    # the receiver alone, with its contract and its state machine (step 1)
+    k = link.components[2]
+    alone = Component(k.name, k.contract, k.implementation, status=k.status)
+    viz.save(viz.diagram(alone, open=[alone], title="Escalation link: the receiver"),
+             os.path.join(HERE, "out", "escalation-receiver.html"))
     # the system alone, without the results: the three modules with their RTL,
     # in the requirement Functional
     system = System("Link", [Component("Sender", sender, models["Sender"]),
